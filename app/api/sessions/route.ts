@@ -43,7 +43,7 @@ export async function POST(req: Request) {
   const supabase = createServiceClient();
 
   const { data, error } = await supabase
-    .from("sessions")
+    .from("retro_sessions")
     .insert({
       owner_token: ownerToken,
       template_id: template.id,

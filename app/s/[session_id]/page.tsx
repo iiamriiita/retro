@@ -13,7 +13,7 @@ export default async function FillPage({
   const supabase = createServiceClient();
 
   const { data: session } = await supabase
-    .from("sessions")
+    .from("retro_sessions")
     .select("id, template_id, anonymity, status, deadline")
     .eq("id", session_id)
     .single();

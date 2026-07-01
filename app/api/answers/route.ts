@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
   const supabase = createServiceClient();
   const { data: session, error } = await supabase
-    .from("sessions")
+    .from("retro_sessions")
     .select("id, template_id, anonymity, status, deadline")
     .eq("id", body.session_id)
     .single();
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
 
   // Create the participant, then the answers.
   const { data: participant, error: pErr } = await supabase
-    .from("participants")
+    .from("retro_participants")
     .insert({ session_id: session.id, display_name: displayName })
     .select("id")
     .single();
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Could not save" }, { status: 500 });
   }
 
-  const { error: aErr } = await supabase.from("answers").insert(
+  const { error: aErr } = await supabase.from("retro_answers").insert(
     rows.map((r) => ({
       session_id: session.id,
       participant_id: participant.id,

@@ -65,8 +65,9 @@ Supabase CLI:
 supabase db push
 ```
 
-This creates `sessions`, `participants`, `answers`, `comments`, the RLS
-policies, and enables Realtime on `comments`.
+This creates the `retro_sessions`, `retro_participants`, `retro_answers`,
+`retro_comments` tables (prefixed so it can share a Supabase project with other
+apps), the RLS policies, and enables Realtime on `retro_comments`.
 
 ## 3. Run locally
 

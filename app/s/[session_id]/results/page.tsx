@@ -16,7 +16,7 @@ export default async function ResultsPage({
   const supabase = createServiceClient();
 
   const { data: session } = await supabase
-    .from("sessions")
+    .from("retro_sessions")
     .select("id, owner_token, template_id, anonymity, status, deadline")
     .eq("id", session_id)
     .single();
@@ -41,7 +41,7 @@ export default async function ResultsPage({
   // Still open and not expired → results are not shown yet.
   if (!viewable) {
     const { count } = await supabase
-      .from("participants")
+      .from("retro_participants")
       .select("id", { count: "exact", head: true })
       .eq("session_id", session.id);
 
@@ -71,7 +71,7 @@ export default async function ResultsPage({
 
   // Viewable → load answers, de-identify for anonymous sessions.
   const { data: rawAnswers } = await supabase
-    .from("answers")
+    .from("retro_answers")
     .select("id, question_key, content, participant_id, created_at")
     .eq("session_id", session.id)
     .order("created_at", { ascending: true });
@@ -79,7 +79,7 @@ export default async function ResultsPage({
   let nameById = new Map<string, string | null>();
   if (!anonymous) {
     const { data: participants } = await supabase
-      .from("participants")
+      .from("retro_participants")
       .select("id, display_name")
       .eq("session_id", session.id);
     nameById = new Map(

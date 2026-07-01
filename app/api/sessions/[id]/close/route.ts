@@ -13,7 +13,7 @@ export async function POST(
 
   const supabase = createServiceClient();
   const { data: session, error } = await supabase
-    .from("sessions")
+    .from("retro_sessions")
     .select("id, owner_token, status")
     .eq("id", id)
     .single();
@@ -32,7 +32,7 @@ export async function POST(
   }
 
   const { error: updateError } = await supabase
-    .from("sessions")
+    .from("retro_sessions")
     .update({ status: "closed" })
     .eq("id", id);
 
