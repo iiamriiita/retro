@@ -128,8 +128,10 @@ export async function POST(req: Request) {
     });
 
     if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      console.error("gemini summarize failed", res.status, detail);
       return NextResponse.json(
-        { error: "AI 服務暫時無法使用，請稍後再試。" },
+        { error: `AI 服務錯誤（${res.status}）：${detail.slice(0, 400)}` },
         { status: 502 },
       );
     }
