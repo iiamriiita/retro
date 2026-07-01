@@ -55,8 +55,9 @@ export async function POST(req: Request) {
     .single();
 
   if (error || !data) {
+    console.error("create session failed:", error);
     return NextResponse.json(
-      { error: "Could not create session" },
+      { error: `建立失敗：${error?.message ?? "unknown error"}` },
       { status: 500 },
     );
   }
