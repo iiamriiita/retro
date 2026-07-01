@@ -5,7 +5,7 @@ import type { ModerateResult } from "@/lib/types";
 export const runtime = "nodejs";
 
 // Google Gemini via the REST API (no SDK dependency). Model is overridable.
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 // System prompt — verbatim from the moderation spec. The gatekeeper's ONLY job
 // is to decide "send as-is (ok)" vs "please rewrite (revise)", defaulting to ok.
