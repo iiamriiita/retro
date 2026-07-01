@@ -52,3 +52,21 @@ export interface PublicAnswer {
   content: string;
   author_name: string | null;
 }
+
+// A select-to-comment thread entry (Google-Docs-style annotation).
+export interface PublicComment {
+  id: string;
+  answer_id: string;
+  quote: string;
+  quote_start: number;
+  quote_end: number;
+  body: string;
+  author_name: string | null;
+  created_at: string;
+}
+
+// One turn of the AI-summary conversation.
+export interface ChatTurn {
+  role: "user" | "model";
+  text: string;
+}

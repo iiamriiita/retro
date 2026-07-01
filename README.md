@@ -26,9 +26,16 @@ coming-next AI summaries).
 - Grouped, de-identified **results** page (author names hidden in anonymous
   mode).
 
-**Phase 2 (next): select-to-comment with Realtime sync, and the AI summary
-route (`POST /api/summarize`).** The schema and results page
-already have the seams for these.
+**Phase 2 (this build): select-to-comment + AI summary.**
+
+- **Select-to-comment** on the results page: highlight any span of an answer →
+  a floating “💬 留言” button → comment on that quote. Threads render as
+  highlights + a side panel, kept in sync across viewers via **Supabase
+  Realtime** (`POST /api/comments`). Anonymous mode never stores/returns author
+  names.
+- **AI assistant** (`POST /api/summarize`, Google Gemini): summarizes the whole
+  session (de-identified, text only) into themes / positives / improvements /
+  concrete next steps as markdown, with multi-turn follow-up questions.
 
 ## Prerequisites
 

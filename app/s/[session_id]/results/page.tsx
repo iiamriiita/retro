@@ -1,8 +1,9 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import { getOwnerCookie } from "@/lib/owner";
-import type { PublicAnswer } from "@/lib/types";
-import ResultsView from "@/components/ResultsView";
+import type { PublicAnswer, PublicComment } from "@/lib/types";
+import ResultsClient from "@/components/ResultsClient";
+import AiSummary from "@/components/AiSummary";
 import CloseSessionButton from "@/components/CloseSessionButton";
 
 export const dynamic = "force-dynamic";
@@ -95,6 +96,24 @@ export default async function ResultsPage({
     author_name: anonymous ? null : (nameById.get(a.participant_id) ?? null),
   }));
 
+  // Existing comment threads (de-identified in anonymous mode).
+  const { data: rawComments } = await supabase
+    .from("retro_comments")
+    .select("id, answer_id, quote, quote_start, quote_end, body, author_name, created_at")
+    .eq("session_id", session.id)
+    .order("created_at", { ascending: true });
+
+  const initialComments: PublicComment[] = (rawComments ?? []).map((c) => ({
+    id: c.id,
+    answer_id: c.answer_id,
+    quote: c.quote,
+    quote_start: c.quote_start,
+    quote_end: c.quote_end,
+    body: c.body,
+    author_name: anonymous ? null : c.author_name,
+    created_at: c.created_at,
+  }));
+
   return (
     <div className="container-wide">
       <div className="mb-6 flex items-center justify-between">
@@ -109,18 +128,19 @@ export default async function ResultsPage({
       </div>
 
       {template ? (
-        <ResultsView
-          questions={template.questions}
-          answers={answers}
-          anonymous={anonymous}
-        />
+        <>
+          <ResultsClient
+            sessionId={session.id}
+            anonymous={anonymous}
+            questions={template.questions}
+            answers={answers}
+            initialComments={initialComments}
+          />
+          <AiSummary sessionId={session.id} />
+        </>
       ) : (
         <p className="text-sm text-muted">找不到問卷模板。</p>
       )}
-
-      <p className="mt-10 text-xs text-muted">
-        選字留言與 AI 助理總結會在下一階段加入。
-      </p>
     </div>
   );
 }
