@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import { checkBlocklist } from "@/lib/blocklist";
 import type { ModerateResult } from "@/lib/types";
 
 export const runtime = "nodejs";
 
-const MODEL = "claude-haiku-4-5-20251001";
+// Google Gemini via the REST API (no SDK dependency). Model is overridable.
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 
 // System prompt — verbatim from the moderation spec. The gatekeeper's ONLY job
 // is to decide "send as-is (ok)" vs "please rewrite (revise)", defaulting to ok.
@@ -42,7 +42,7 @@ const SYSTEM_PROMPT = `你是一個團隊 retro（回顧會議）工具的回饋
 
 # 當你判定 revise 時
 
-\`suggestion\` 要用第二人稱、友善、像協助而非指責的語氣，並具體告訴對方「補上什麼」就能送出。指出缺的是「具體事件」還是「可改進方向」。不要說教，一句話即可。
+suggestion 要用第二人稱、友善、像協助而非指責的語氣，並具體告訴對方「補上什麼」就能送出。指出缺的是「具體事件」還是「可改進方向」。不要說教，一句話即可。
 
 # 輸出格式
 
@@ -54,25 +54,36 @@ const SYSTEM_PROMPT = `你是一個團隊 retro（回顧會議）工具的回饋
   "suggestion": verdict 為 ok 時給空字串 ""；為 revise 時給一句中文引導
 }`;
 
-// A few-shot exchange to stabilise the JSON output.
-const FEWSHOT: Anthropic.MessageParam[] = [
-  { role: "user", content: "你根本就是團隊的累贅，什麼都做不好。" },
+// A few-shot exchange (Gemini uses roles "user" / "model") to stabilise output.
+const FEWSHOT = [
+  { role: "user", parts: [{ text: "你根本就是團隊的累贅，什麼都做不好。" }] },
   {
-    role: "assistant",
-    content:
-      '{"verdict":"revise","reasons":["insulting"],"suggestion":"這句是在評價人，而不是行為。試著改成某個具體情境下你希望對方怎麼調整，會更有幫助 🙂"}',
+    role: "model",
+    parts: [
+      {
+        text: '{"verdict":"revise","reasons":["insulting"],"suggestion":"這句是在評價人，而不是行為。試著改成某個具體情境下你希望對方怎麼調整，會更有幫助 🙂"}',
+      },
+    ],
   },
-  { role: "user", content: "爛死了，不想講。" },
+  { role: "user", parts: [{ text: "爛死了，不想講。" }] },
   {
-    role: "assistant",
-    content:
-      '{"verdict":"revise","reasons":["non_constructive","purely_emotional"],"suggestion":"聽起來你有些不滿——可以補上是哪件事、當下發生什麼，以及你希望怎麼改變嗎？這樣對方才知道怎麼調整。"}',
+    role: "model",
+    parts: [
+      {
+        text: '{"verdict":"revise","reasons":["non_constructive","purely_emotional"],"suggestion":"聽起來你有些不滿——可以補上是哪件事、當下發生什麼，以及你希望怎麼改變嗎？這樣對方才知道怎麼調整。"}',
+      },
+    ],
   },
   {
     role: "user",
-    content: "站會常常拖到 40 分鐘，後面的人時間被壓縮，希望能控制在 15 分鐘內。",
+    parts: [
+      { text: "站會常常拖到 40 分鐘，後面的人時間被壓縮，希望能控制在 15 分鐘內。" },
+    ],
   },
-  { role: "assistant", content: '{"verdict":"ok","reasons":[],"suggestion":""}' },
+  {
+    role: "model",
+    parts: [{ text: '{"verdict":"ok","reasons":[],"suggestion":""}' }],
+  },
 ];
 
 // Fallback used whenever the LLM is unavailable / errors / times out: degrade to
@@ -106,10 +117,11 @@ export async function POST(req: Request) {
     const body = await req.json();
     text = typeof body?.text === "string" ? body.text : "";
   } catch {
-    return NextResponse.json(
-      { verdict: "ok", reasons: [], suggestion: "" } satisfies ModerateResult,
-      { status: 200 },
-    );
+    return NextResponse.json({
+      verdict: "ok",
+      reasons: [],
+      suggestion: "",
+    } satisfies ModerateResult);
   }
 
   const trimmed = text.trim();
@@ -133,30 +145,37 @@ export async function POST(req: Request) {
     } satisfies ModerateResult);
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     // No key configured → degrade gracefully instead of blocking.
     return NextResponse.json(degrade(trimmed));
   }
 
   try {
-    const client = new Anthropic({ apiKey });
-    const message = await client.messages.create(
-      {
-        model: MODEL,
-        max_tokens: 300,
-        temperature: 0.2,
-        system: SYSTEM_PROMPT,
-        messages: [...FEWSHOT, { role: "user", content: trimmed }],
-      },
-      { timeout: 12_000 },
-    );
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: [...FEWSHOT, { role: "user", parts: [{ text: trimmed }] }],
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 300,
+          responseMimeType: "application/json",
+        },
+      }),
+      signal: AbortSignal.timeout(12_000),
+    });
 
-    const raw = message.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("")
-      .trim();
+    if (!res.ok) return NextResponse.json(degrade(trimmed));
+
+    const data = await res.json();
+    const raw: string =
+      data?.candidates?.[0]?.content?.parts
+        ?.map((p: { text?: string }) => p.text ?? "")
+        .join("")
+        .trim() ?? "";
 
     const parsed = JSON.parse(raw);
     if (isModerateResult(parsed)) {

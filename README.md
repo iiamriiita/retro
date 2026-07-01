@@ -7,8 +7,8 @@ once everyone is done the starter closes the session and the group reviews the
 results together.
 
 Built with **Next.js (App Router) + TypeScript + Tailwind**, **Supabase**
-(Postgres + RLS + Realtime), and **Anthropic Claude** for moderation and
-(coming next) AI summaries.
+(Postgres + RLS + Realtime), and **Google Gemini** for moderation (and
+coming-next AI summaries).
 
 ## Status
 
@@ -18,7 +18,7 @@ Built with **Next.js (App Router) + TypeScript + Tailwind**, **Supabase**
 - Fill the form with **two-stage content gatekeeping**:
   1. a keyword blocklist (`lib/blocklist.ts`) instantly flags blatant personal
      insults, and
-  2. an LLM pass (`POST /api/moderate`, Claude Haiku) judges
+  2. an LLM pass (`POST /api/moderate`, Google Gemini) judges
      constructive / emotional and returns a friendly rewrite suggestion.
      Failures degrade to the keyword list and **let the user through** — the
      gate never blocks on our outage.
@@ -27,14 +27,14 @@ Built with **Next.js (App Router) + TypeScript + Tailwind**, **Supabase**
   mode).
 
 **Phase 2 (next): select-to-comment with Realtime sync, and the AI summary
-route (`POST /api/summarize`, Claude Opus).** The schema and results page
+route (`POST /api/summarize`).** The schema and results page
 already have the seams for these.
 
 ## Prerequisites
 
 - Node.js 18.18+ (or 20+)
 - A Supabase project
-- An Anthropic API key
+- A Google Gemini API key (optional)
 
 ## 1. Environment variables
 
@@ -49,9 +49,9 @@ cp .env.example .env.local
 | `NEXT_PUBLIC_SUPABASE_URL`      | anon client + Realtime + server     | yes                 |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon client + Realtime              | yes                 |
 | `SUPABASE_SERVICE_ROLE_KEY`     | server routes (privileged writes)   | **no**              |
-| `ANTHROPIC_API_KEY`             | `/api/moderate` (`/api/summarize`)  | **no**              |
+| `GEMINI_API_KEY` (optional)     | `/api/moderate`                     | **no**              |
 
-> The service-role and Anthropic keys are server-only and never bundled into the
+> The service-role and Gemini keys are server-only and never bundled into the
 > client. `sessions.owner_token` is likewise never exposed — the browser client
 > is never granted access to the `sessions` table.
 
@@ -95,7 +95,7 @@ app/
     sessions/route.ts          create session (sets owner cookie)
     sessions/[id]/close/route.ts  close (owner-token gated)
     answers/route.ts           submit answers (open + not expired)
-    moderate/route.ts          single-answer gatekeeping (Claude Haiku)
+    moderate/route.ts          single-answer gatekeeping (Google Gemini)
 lib/
   supabase/{server,client}.ts  service-role + anon clients
   templates.ts                 3 built-in questionnaires
