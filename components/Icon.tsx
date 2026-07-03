@@ -14,6 +14,8 @@ type IconName =
   | "arrow-left"
   | "link"
   | "external-link"
+  | "message"
+  | "x"
   | "check";
 
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -71,6 +73,15 @@ const PATHS: Record<IconName, React.ReactNode> = {
     </>
   ),
   check: <path d="M20 6 9 17l-5-5" />,
+  message: (
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  ),
+  x: (
+    <>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </>
+  ),
 };
 
 export default function Icon({

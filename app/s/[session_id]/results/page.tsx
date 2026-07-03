@@ -122,10 +122,10 @@ export default async function ResultsPage({
   }));
 
   return (
-    <div className="container-wide">
+    <div className="container-narrow">
       <BackButton fallback="/" label="返回" />
       <div className="mb-6">
-        <h1 className="text-xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-extrabold tracking-tight">
           {template?.name ?? "Retro"} — 結果
         </h1>
         <p className="mt-1 text-sm text-muted">
