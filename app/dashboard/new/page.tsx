@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { TEMPLATES } from "@/lib/templates";
-import CreateSessionForm from "@/components/CreateSessionForm";
+import CreateWizard from "@/components/CreateWizard";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,7 @@ export default async function NewSessionPage() {
           選一套問卷、產生分享連結，讓 2–5 人的小組互相給回饋。
         </p>
       </div>
-      <CreateSessionForm templates={TEMPLATES} />
+      <CreateWizard templates={TEMPLATES} />
     </div>
   );
 }
