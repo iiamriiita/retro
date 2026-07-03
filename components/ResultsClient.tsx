@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import type { PublicAnswer, PublicComment, Question } from "@/lib/types";
 
@@ -12,12 +12,14 @@ interface FloatingBtn {
   end: number;
   quote: string;
 }
-
-interface Composer {
+interface Pending {
   answerId: string;
   start: number;
   end: number;
   quote: string;
+}
+interface Identity {
+  name: string | null; // null = anonymous
 }
 
 function fmtTime(iso: string) {
@@ -28,7 +30,6 @@ function fmtTime(iso: string) {
   }
 }
 
-// Render an answer's text with <mark> over any character covered by a comment.
 function renderHighlighted(content: string, ranges: PublicComment[]) {
   const clamp = (n: number) => Math.max(0, Math.min(content.length, n));
   const spans = ranges
@@ -42,7 +43,6 @@ function renderHighlighted(content: string, ranges: PublicComment[]) {
     points.add(r.end);
   });
   const sorted = [...points].sort((a, b) => a - b);
-
   const out: React.ReactNode[] = [];
   for (let i = 0; i < sorted.length - 1; i++) {
     const s = sorted[i];
@@ -66,24 +66,45 @@ function renderHighlighted(content: string, ranges: PublicComment[]) {
 export default function ResultsClient({
   sessionId,
   anonymous,
+  discussionEnabled,
   questions,
   answers,
   initialComments,
+  rosterNames,
 }: {
   sessionId: string;
   anonymous: boolean;
+  discussionEnabled: boolean;
   questions: Question[];
   answers: PublicAnswer[];
   initialComments: PublicComment[];
+  rosterNames: string[];
 }) {
   const [comments, setComments] = useState<PublicComment[]>(initialComments);
   const [floating, setFloating] = useState<FloatingBtn | null>(null);
-  const [composer, setComposer] = useState<Composer | null>(null);
+  const [pending, setPending] = useState<Pending | null>(null);
+  const [composer, setComposer] = useState<Pending | null>(null);
   const [body, setBody] = useState("");
-  const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+
+  const [identity, setIdentity] = useState<Identity | null>(null);
+  const [identityOpen, setIdentityOpen] = useState(false);
+  const [customName, setCustomName] = useState("");
+
+  const idKey = `retro_commenter_${sessionId}`;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem(idKey);
+    if (raw) {
+      try {
+        setIdentity(JSON.parse(raw));
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [idKey]);
 
   const commentsByAnswer = useMemo(() => {
     const map = new Map<string, PublicComment[]>();
@@ -104,7 +125,7 @@ export default function ResultsClient({
     [comments],
   );
 
-  // Realtime: new comment threads appear live for everyone viewing.
+  // Realtime: new threads appear live.
   useEffect(() => {
     const supabase = createBrowserSupabase();
     const channel = supabase
@@ -130,9 +151,21 @@ export default function ResultsClient({
     };
   }, [sessionId]);
 
-  // On mouse-up, if the user selected text inside one answer, offer a Comment
-  // button at the pointer.
+  function chooseIdentity(name: string | null) {
+    const id = { name };
+    setIdentity(id);
+    if (typeof window !== "undefined")
+      localStorage.setItem(idKey, JSON.stringify(id));
+    setIdentityOpen(false);
+    if (pending) {
+      setComposer(pending);
+      setPending(null);
+      setBody("");
+    }
+  }
+
   function onMouseUp(e: React.MouseEvent) {
+    if (!discussionEnabled) return;
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
       setFloating(null);
@@ -170,18 +203,23 @@ export default function ResultsClient({
     });
   }
 
-  function openComposer() {
+  function startComment() {
     if (!floating) return;
-    setComposer({
+    const p: Pending = {
       answerId: floating.answerId,
       start: floating.start,
       end: floating.end,
       quote: floating.quote,
-    });
-    setBody("");
-    setError(null);
+    };
     setFloating(null);
     window.getSelection()?.removeAllRanges();
+    if (!identity) {
+      setPending(p);
+      setIdentityOpen(true);
+    } else {
+      setComposer(p);
+      setBody("");
+    }
   }
 
   async function submitComment(e: React.FormEvent) {
@@ -200,7 +238,7 @@ export default function ResultsClient({
           quote_start: composer.start,
           quote_end: composer.end,
           body: body.trim(),
-          author_name: anonymous ? undefined : name.trim() || undefined,
+          author_name: identity?.name ?? undefined,
         }),
       });
       const data = await res.json();
@@ -218,8 +256,8 @@ export default function ResultsClient({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-      {/* Left: answers with highlights */}
-      <div ref={contentRef} onMouseUp={onMouseUp} className="space-y-8">
+      {/* Left: answers */}
+      <div onMouseUp={onMouseUp} className="space-y-8">
         {questions.map((q) => {
           const group = answers.filter((a) => a.question_key === q.key);
           return (
@@ -253,14 +291,32 @@ export default function ResultsClient({
             </section>
           );
         })}
-        <p className="text-xs text-muted">
-          💡 用滑鼠選取任一段回答文字，就能對它留言。
-        </p>
+        {discussionEnabled && (
+          <p className="text-xs text-muted">
+            💡 用滑鼠選取任一段回答文字，就能對它留言。
+          </p>
+        )}
       </div>
 
       {/* Right: comment sidebar */}
       <aside className="lg:sticky lg:top-6 lg:self-start">
-        <h3 className="mb-3 text-sm font-semibold">留言</h3>
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">討論</h3>
+          {discussionEnabled && identity && (
+            <button
+              className="text-xs text-muted hover:text-ink"
+              onClick={() => setIdentityOpen(true)}
+            >
+              以「{identity.name ?? "匿名"}」身分（更改）
+            </button>
+          )}
+        </div>
+
+        {!discussionEnabled && (
+          <p className="mb-3 text-xs text-muted">
+            討論尚未開啟。
+          </p>
+        )}
 
         {composer && (
           <form onSubmit={submitComment} className="card mb-4 space-y-2">
@@ -275,14 +331,6 @@ export default function ResultsClient({
               value={body}
               onChange={(e) => setBody(e.target.value)}
             />
-            {!anonymous && (
-              <input
-                className="textarea !py-1.5"
-                placeholder="你的名字（可留空）"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            )}
             {error && <p className="text-xs text-red-600">{error}</p>}
             <div className="flex gap-2">
               <button
@@ -305,7 +353,9 @@ export default function ResultsClient({
 
         {sortedComments.length === 0 && !composer && (
           <p className="text-sm text-muted">
-            還沒有留言。選取一段回答文字來新增第一則。
+            {discussionEnabled
+              ? "還沒有留言。選取一段回答文字來新增第一則。"
+              : "還沒有留言。"}
           </p>
         )}
 
@@ -317,24 +367,79 @@ export default function ResultsClient({
               </p>
               <p className="mt-2 whitespace-pre-wrap text-sm">{c.body}</p>
               <p className="mt-1 text-[11px] text-muted">
-                {(anonymous ? null : c.author_name) || "匿名"} · {fmtTime(c.created_at)}
+                {c.author_name || "匿名"} · {fmtTime(c.created_at)}
               </p>
             </li>
           ))}
         </ul>
       </aside>
 
-      {/* Floating "Comment" button at the selection */}
+      {/* Floating comment button */}
       {floating && (
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={openComposer}
+          onClick={startComment}
           style={{ position: "fixed", left: floating.x, top: floating.y + 8, zIndex: 50 }}
           className="rounded-md bg-ink px-2.5 py-1 text-xs font-medium text-white shadow-lg"
         >
           💬 留言
         </button>
+      )}
+
+      {/* Identity popup */}
+      {identityOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setIdentityOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-xl border border-line bg-white p-5 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-sm font-semibold">你是誰？</h3>
+            <p className="mt-1 text-xs text-muted">
+              選擇留言時顯示的身分，也可以匿名。
+            </p>
+
+            {!anonymous && rosterNames.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {rosterNames.map((n) => (
+                  <button
+                    key={n}
+                    className="btn-ghost !py-1.5 text-xs"
+                    onClick={() => chooseIdentity(n)}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-3 flex gap-2">
+              <input
+                className="textarea !py-1.5 text-sm"
+                placeholder="自行輸入名字"
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+              />
+              <button
+                className="btn-primary !py-1.5 text-xs"
+                disabled={!customName.trim()}
+                onClick={() => chooseIdentity(customName.trim())}
+              >
+                使用
+              </button>
+            </div>
+
+            <button
+              className="mt-3 text-xs text-muted hover:text-ink"
+              onClick={() => chooseIdentity(null)}
+            >
+              匿名留言
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

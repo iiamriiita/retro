@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select("id, anonymity, status, deadline")
+    .select("id, anonymity, discussion_enabled")
     .eq("id", session_id)
     .single();
 
@@ -49,13 +49,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  // Comments are only allowed once results are viewable (closed or past deadline).
-  const viewable =
-    session.status === "closed" ||
-    new Date(session.deadline).getTime() <= Date.now();
-  if (!viewable) {
+  // Commenting is only allowed once the owner has opened discussion.
+  if (!session.discussion_enabled) {
     return NextResponse.json(
-      { error: "session 尚未結束，還不能留言。" },
+      { error: "討論尚未開啟。" },
       { status: 409 },
     );
   }
@@ -71,11 +68,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "找不到對應的回答" }, { status: 400 });
   }
 
-  // Anonymity is enforced here: no author name is ever stored in anonymous mode.
-  const authorName =
-    session.anonymity === "anonymous"
-      ? null
-      : (body.author_name ?? "").trim() || null;
+  // Discussion identity is chosen by the commenter (name or anonymous) via the
+  // popup — independent of the session's answer anonymity.
+  const authorName = (body.author_name ?? "").trim() || null;
 
   const { data: inserted, error } = await supabase
     .from("retro_comments")

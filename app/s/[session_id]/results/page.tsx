@@ -3,7 +3,8 @@ import { getTemplate } from "@/lib/templates";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import type { PublicAnswer, PublicComment } from "@/lib/types";
 import ResultsClient from "@/components/ResultsClient";
-import AiSummary from "@/components/AiSummary";
+import ReportView from "@/components/ReportView";
+import OwnerControls from "@/components/OwnerControls";
 import CloseSessionButton from "@/components/CloseSessionButton";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,9 @@ export default async function ResultsPage({
 
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select("id, owner_id, template_id, anonymity, status, deadline")
+    .select(
+      "id, owner_id, template_id, anonymity, status, deadline, discussion_enabled, ai_report, ai_report_at",
+    )
     .eq("id", session_id)
     .single();
 
@@ -44,7 +47,8 @@ export default async function ResultsPage({
     const { count } = await supabase
       .from("retro_participants")
       .select("id", { count: "exact", head: true })
-      .eq("session_id", session.id);
+      .eq("session_id", session.id)
+      .not("submitted_at", "is", null);
 
     return (
       <div className="container-narrow space-y-5">
@@ -78,17 +82,18 @@ export default async function ResultsPage({
     .order("created_at", { ascending: true });
 
   let nameById = new Map<string, string | null>();
+  let rosterNames: string[] = [];
   if (!anonymous) {
     const { data: participants } = await supabase
       .from("retro_participants")
       .select("id, display_name")
       .eq("session_id", session.id);
-    nameById = new Map(
-      (participants ?? []).map((p) => [p.id, p.display_name]),
-    );
+    nameById = new Map((participants ?? []).map((p) => [p.id, p.display_name]));
+    rosterNames = (participants ?? [])
+      .map((p) => (p.display_name ?? "").trim())
+      .filter((n) => n.length > 0);
   }
 
-  // NOTE: in anonymous mode we never attach any author-identifying field.
   const answers: PublicAnswer[] = (rawAnswers ?? []).map((a) => ({
     id: a.id,
     question_key: a.question_key,
@@ -96,7 +101,8 @@ export default async function ResultsPage({
     author_name: anonymous ? null : (nameById.get(a.participant_id) ?? null),
   }));
 
-  // Existing comment threads (de-identified in anonymous mode).
+  // Comment threads. Author names come from the commenter's discussion identity,
+  // so they are shown as stored (not tied to answer anonymity).
   const { data: rawComments } = await supabase
     .from("retro_comments")
     .select("id, answer_id, quote, quote_start, quote_end, body, author_name, created_at")
@@ -110,33 +116,45 @@ export default async function ResultsPage({
     quote_start: c.quote_start,
     quote_end: c.quote_end,
     body: c.body,
-    author_name: anonymous ? null : c.author_name,
+    author_name: c.author_name,
     created_at: c.created_at,
   }));
 
   return (
     <div className="container-wide">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">
-            {template?.name ?? "Retro"} — 結果
-          </h1>
-          <p className="mt-1 text-sm text-muted">
-            {anonymous ? "匿名模式" : "具名模式"} · 共 {answers.length} 則回答
-          </p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold tracking-tight">
+          {template?.name ?? "Retro"} — 結果
+        </h1>
+        <p className="mt-1 text-sm text-muted">
+          {anonymous ? "匿名模式" : "具名模式"} · 共 {answers.length} 則回答
+          {session.discussion_enabled && " · 討論中"}
+        </p>
       </div>
+
+      {isOwner && (
+        <OwnerControls
+          sessionId={session.id}
+          discussionEnabled={session.discussion_enabled}
+          hasReport={!!session.ai_report}
+        />
+      )}
 
       {template ? (
         <>
           <ResultsClient
             sessionId={session.id}
             anonymous={anonymous}
+            discussionEnabled={session.discussion_enabled}
             questions={template.questions}
             answers={answers}
             initialComments={initialComments}
+            rosterNames={rosterNames}
           />
-          <AiSummary sessionId={session.id} />
+          <ReportView
+            report={session.ai_report}
+            generatedAt={session.ai_report_at}
+          />
         </>
       ) : (
         <p className="text-sm text-muted">找不到問卷模板。</p>
