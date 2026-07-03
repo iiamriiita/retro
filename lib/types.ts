@@ -53,13 +53,15 @@ export interface PublicAnswer {
   author_name: string | null;
 }
 
-// A select-to-comment thread entry (Google-Docs-style annotation).
+// A discussion comment. Top-level comments anchor to a quote (quote/offsets set,
+// parent_id null); replies belong to a parent (parent_id set, no anchor).
 export interface PublicComment {
   id: string;
   answer_id: string;
-  quote: string;
-  quote_start: number;
-  quote_end: number;
+  parent_id: string | null;
+  quote: string | null;
+  quote_start: number | null;
+  quote_end: number | null;
   body: string;
   author_name: string | null;
   created_at: string;

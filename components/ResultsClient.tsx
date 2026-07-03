@@ -18,8 +18,13 @@ interface Pending {
   end: number;
   quote: string;
 }
+type PendingAction =
+  | { kind: "comment"; p: Pending }
+  | { kind: "reply"; parentId: string }
+  | null;
+
 interface Identity {
-  name: string | null; // null = anonymous
+  name: string | null;
 }
 
 function fmtTime(iso: string) {
@@ -33,7 +38,8 @@ function fmtTime(iso: string) {
 function renderHighlighted(content: string, ranges: PublicComment[]) {
   const clamp = (n: number) => Math.max(0, Math.min(content.length, n));
   const spans = ranges
-    .map((r) => ({ start: clamp(r.quote_start), end: clamp(r.quote_end) }))
+    .filter((r) => r.quote_start != null && r.quote_end != null)
+    .map((r) => ({ start: clamp(r.quote_start!), end: clamp(r.quote_end!) }))
     .filter((r) => r.end > r.start);
   if (spans.length === 0) return content;
 
@@ -82,14 +88,17 @@ export default function ResultsClient({
 }) {
   const [comments, setComments] = useState<PublicComment[]>(initialComments);
   const [floating, setFloating] = useState<FloatingBtn | null>(null);
-  const [pending, setPending] = useState<Pending | null>(null);
   const [composer, setComposer] = useState<Pending | null>(null);
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyBody, setReplyBody] = useState("");
+
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [identityOpen, setIdentityOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [customName, setCustomName] = useState("");
 
   const idKey = `retro_commenter_${sessionId}`;
@@ -106,26 +115,43 @@ export default function ResultsClient({
     }
   }, [idKey]);
 
-  const commentsByAnswer = useMemo(() => {
+  const topLevel = useMemo(
+    () =>
+      comments
+        .filter((c) => !c.parent_id)
+        .sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+        ),
+    [comments],
+  );
+  const repliesByParent = useMemo(() => {
     const map = new Map<string, PublicComment[]>();
     for (const c of comments) {
+      if (!c.parent_id) continue;
+      const arr = map.get(c.parent_id) ?? [];
+      arr.push(c);
+      map.set(c.parent_id, arr);
+    }
+    for (const arr of map.values())
+      arr.sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      );
+    return map;
+  }, [comments]);
+
+  const anchorsByAnswer = useMemo(() => {
+    const map = new Map<string, PublicComment[]>();
+    for (const c of topLevel) {
       const arr = map.get(c.answer_id) ?? [];
       arr.push(c);
       map.set(c.answer_id, arr);
     }
     return map;
-  }, [comments]);
+  }, [topLevel]);
 
-  const sortedComments = useMemo(
-    () =>
-      [...comments].sort(
-        (a, b) =>
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-      ),
-    [comments],
-  );
-
-  // Realtime: new threads appear live.
+  // Realtime.
   useEffect(() => {
     const supabase = createBrowserSupabase();
     const channel = supabase
@@ -151,16 +177,29 @@ export default function ResultsClient({
     };
   }, [sessionId]);
 
-  function chooseIdentity(name: string | null) {
+  function saveIdentity(name: string | null) {
     const id = { name };
     setIdentity(id);
     if (typeof window !== "undefined")
       localStorage.setItem(idKey, JSON.stringify(id));
     setIdentityOpen(false);
-    if (pending) {
-      setComposer(pending);
-      setPending(null);
+    const action = pendingAction;
+    setPendingAction(null);
+    if (action?.kind === "comment") {
+      setComposer(action.p);
       setBody("");
+    } else if (action?.kind === "reply") {
+      setReplyingTo(action.parentId);
+      setReplyBody("");
+    }
+  }
+
+  function requireIdentity(action: PendingAction, run: () => void) {
+    if (identity) {
+      run();
+    } else {
+      setPendingAction(action);
+      setIdentityOpen(true);
     }
   }
 
@@ -213,13 +252,29 @@ export default function ResultsClient({
     };
     setFloating(null);
     window.getSelection()?.removeAllRanges();
-    if (!identity) {
-      setPending(p);
-      setIdentityOpen(true);
-    } else {
+    requireIdentity({ kind: "comment", p }, () => {
       setComposer(p);
       setBody("");
-    }
+    });
+  }
+
+  function startReply(parentId: string) {
+    requireIdentity({ kind: "reply", parentId }, () => {
+      setReplyingTo(parentId);
+      setReplyBody("");
+    });
+  }
+
+  async function postComment(payload: Record<string, unknown>) {
+    const res = await fetch("/api/comments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error ?? "留言失敗");
+    const c = data.comment as PublicComment;
+    setComments((prev) => (prev.some((x) => x.id === c.id) ? prev : [...prev, c]));
   }
 
   async function submitComment(e: React.FormEvent) {
@@ -228,23 +283,15 @@ export default function ResultsClient({
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: sessionId,
-          answer_id: composer.answerId,
-          quote: composer.quote,
-          quote_start: composer.start,
-          quote_end: composer.end,
-          body: body.trim(),
-          author_name: identity?.name ?? undefined,
-        }),
+      await postComment({
+        session_id: sessionId,
+        answer_id: composer.answerId,
+        quote: composer.quote,
+        quote_start: composer.start,
+        quote_end: composer.end,
+        body: body.trim(),
+        author_name: identity?.name ?? undefined,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "留言失敗");
-      const c = data.comment as PublicComment;
-      setComments((prev) => (prev.some((x) => x.id === c.id) ? prev : [...prev, c]));
       setComposer(null);
       setBody("");
     } catch (err) {
@@ -254,8 +301,28 @@ export default function ResultsClient({
     }
   }
 
+  async function submitReply(parentId: string) {
+    if (!replyBody.trim()) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await postComment({
+        session_id: sessionId,
+        parent_id: parentId,
+        body: replyBody.trim(),
+        author_name: identity?.name ?? undefined,
+      });
+      setReplyingTo(null);
+      setReplyBody("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "回覆失敗");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+    <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
       {/* Left: answers */}
       <div onMouseUp={onMouseUp} className="space-y-8">
         {questions.map((q) => {
@@ -276,7 +343,7 @@ export default function ResultsClient({
                       >
                         {renderHighlighted(
                           a.content,
-                          commentsByAnswer.get(a.id) ?? [],
+                          anchorsByAnswer.get(a.id) ?? [],
                         )}
                       </p>
                       {!anonymous && a.author_name && (
@@ -293,12 +360,12 @@ export default function ResultsClient({
         })}
         {discussionEnabled && (
           <p className="text-xs text-muted">
-            💡 用滑鼠選取任一段回答文字，就能對它留言。
+            💡 選取任一段回答文字即可留言，也能在每則留言下回覆。
           </p>
         )}
       </div>
 
-      {/* Right: comment sidebar */}
+      {/* Right: discussion */}
       <aside className="lg:sticky lg:top-6 lg:self-start">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold">討論</h3>
@@ -307,17 +374,16 @@ export default function ResultsClient({
               className="text-xs text-muted hover:text-ink"
               onClick={() => setIdentityOpen(true)}
             >
-              以「{identity.name ?? "匿名"}」身分（更改）
+              以「{identity.name ?? "匿名"}」（更改）
             </button>
           )}
         </div>
 
         {!discussionEnabled && (
-          <p className="mb-3 text-xs text-muted">
-            討論尚未開啟。
-          </p>
+          <p className="mb-3 text-xs text-muted">討論尚未開啟。</p>
         )}
 
+        {/* New anchored comment composer */}
         {composer && (
           <form onSubmit={submitComment} className="card mb-4 space-y-2">
             <p className="border-l-2 border-amber-300 pl-2 text-xs italic text-muted">
@@ -338,7 +404,7 @@ export default function ResultsClient({
                 className="btn-primary !py-1.5 text-xs"
                 disabled={submitting || !body.trim()}
               >
-                {submitting ? "送出中…" : "送出留言"}
+                {submitting ? "送出中…" : "送出"}
               </button>
               <button
                 type="button"
@@ -351,26 +417,80 @@ export default function ResultsClient({
           </form>
         )}
 
-        {sortedComments.length === 0 && !composer && (
+        {topLevel.length === 0 && !composer && (
           <p className="text-sm text-muted">
             {discussionEnabled
-              ? "還沒有留言。選取一段回答文字來新增第一則。"
+              ? "還沒有留言。選取一段回答文字來開一個討論串。"
               : "還沒有留言。"}
           </p>
         )}
 
+        {/* Threads */}
         <ul className="space-y-3">
-          {sortedComments.map((c) => (
-            <li key={c.id} className="card">
-              <p className="border-l-2 border-amber-300 pl-2 text-xs italic text-muted">
-                「{c.quote.slice(0, 120)}」
-              </p>
-              <p className="mt-2 whitespace-pre-wrap text-sm">{c.body}</p>
-              <p className="mt-1 text-[11px] text-muted">
-                {c.author_name || "匿名"} · {fmtTime(c.created_at)}
-              </p>
-            </li>
-          ))}
+          {topLevel.map((c) => {
+            const replies = repliesByParent.get(c.id) ?? [];
+            return (
+              <li key={c.id} className="card">
+                {c.quote && (
+                  <p className="border-l-2 border-amber-300 pl-2 text-xs italic text-muted">
+                    「{c.quote.slice(0, 120)}」
+                  </p>
+                )}
+                <p className="mt-2 whitespace-pre-wrap text-sm">{c.body}</p>
+                <p className="mt-1 text-[11px] text-muted">
+                  {c.author_name || "匿名"} · {fmtTime(c.created_at)}
+                </p>
+
+                {/* replies */}
+                {replies.length > 0 && (
+                  <ul className="mt-3 space-y-2 border-l border-line pl-3">
+                    {replies.map((r) => (
+                      <li key={r.id}>
+                        <p className="whitespace-pre-wrap text-sm">{r.body}</p>
+                        <p className="mt-0.5 text-[11px] text-muted">
+                          {r.author_name || "匿名"} · {fmtTime(r.created_at)}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {/* reply box */}
+                {discussionEnabled &&
+                  (replyingTo === c.id ? (
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        autoFocus
+                        className="textarea !py-1.5 text-sm"
+                        placeholder="回覆…"
+                        value={replyBody}
+                        onChange={(e) => setReplyBody(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            void submitReply(c.id);
+                          }
+                        }}
+                      />
+                      <button
+                        className="btn-primary !py-1.5 text-xs"
+                        disabled={submitting || !replyBody.trim()}
+                        onClick={() => void submitReply(c.id)}
+                      >
+                        送出
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="mt-2 text-xs text-accent hover:underline"
+                      onClick={() => startReply(c.id)}
+                    >
+                      回覆
+                    </button>
+                  ))}
+              </li>
+            );
+          })}
         </ul>
       </aside>
 
@@ -401,21 +521,19 @@ export default function ResultsClient({
             <p className="mt-1 text-xs text-muted">
               選擇留言時顯示的身分，也可以匿名。
             </p>
-
             {!anonymous && rosterNames.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {rosterNames.map((n) => (
                   <button
                     key={n}
                     className="btn-ghost !py-1.5 text-xs"
-                    onClick={() => chooseIdentity(n)}
+                    onClick={() => saveIdentity(n)}
                   >
                     {n}
                   </button>
                 ))}
               </div>
             )}
-
             <div className="mt-3 flex gap-2">
               <input
                 className="textarea !py-1.5 text-sm"
@@ -426,15 +544,14 @@ export default function ResultsClient({
               <button
                 className="btn-primary !py-1.5 text-xs"
                 disabled={!customName.trim()}
-                onClick={() => chooseIdentity(customName.trim())}
+                onClick={() => saveIdentity(customName.trim())}
               >
                 使用
               </button>
             </div>
-
             <button
               className="mt-3 text-xs text-muted hover:text-ink"
-              onClick={() => chooseIdentity(null)}
+              onClick={() => saveIdentity(null)}
             >
               匿名留言
             </button>

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { TEMPLATES } from "@/lib/templates";
 import CreateWizard from "@/components/CreateWizard";
+import BackButton from "@/components/BackButton";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ export default async function NewSessionPage() {
 
   return (
     <div className="container-narrow">
+      <BackButton fallback="/dashboard" label="返回 Dashboard" />
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">發起一場 Retro</h1>
         <p className="mt-2 text-sm text-muted">

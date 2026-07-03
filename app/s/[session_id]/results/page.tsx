@@ -6,6 +6,7 @@ import ResultsClient from "@/components/ResultsClient";
 import ReportView from "@/components/ReportView";
 import OwnerControls from "@/components/OwnerControls";
 import CloseSessionButton from "@/components/CloseSessionButton";
+import BackButton from "@/components/BackButton";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,7 @@ export default async function ResultsPage({
 
     return (
       <div className="container-narrow space-y-5">
+        <BackButton fallback="/dashboard" label="返回" />
         <div className="card">
           <h1 className="text-lg font-semibold">Session 進行中</h1>
           <p className="mt-2 text-sm text-muted">
@@ -105,13 +107,16 @@ export default async function ResultsPage({
   // so they are shown as stored (not tied to answer anonymity).
   const { data: rawComments } = await supabase
     .from("retro_comments")
-    .select("id, answer_id, quote, quote_start, quote_end, body, author_name, created_at")
+    .select(
+      "id, answer_id, parent_id, quote, quote_start, quote_end, body, author_name, created_at",
+    )
     .eq("session_id", session.id)
     .order("created_at", { ascending: true });
 
   const initialComments: PublicComment[] = (rawComments ?? []).map((c) => ({
     id: c.id,
     answer_id: c.answer_id,
+    parent_id: c.parent_id,
     quote: c.quote,
     quote_start: c.quote_start,
     quote_end: c.quote_end,
@@ -122,6 +127,7 @@ export default async function ResultsPage({
 
   return (
     <div className="container-wide">
+      <BackButton fallback="/" label="返回" />
       <div className="mb-6">
         <h1 className="text-xl font-semibold tracking-tight">
           {template?.name ?? "Retro"} — 結果

@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import FillWizard, { type RosterMember } from "@/components/FillWizard";
+import BackButton from "@/components/BackButton";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +69,7 @@ export default async function FillPage({
 
   return (
     <div className="container-narrow">
+      <BackButton fallback="/" label="返回" />
       <FillWizard
         sessionId={session.id}
         anonymity={session.anonymity}
