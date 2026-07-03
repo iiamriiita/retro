@@ -8,12 +8,20 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Map the app's semantic color names onto the Susbase design tokens so
+      // existing utility classes (text-ink / text-muted / border-line /
+      // bg-accent …) pick up the new look without touching component structure.
       colors: {
-        // Calm, collaborative palette — Linear/Notion feel, no loud gradients.
-        ink: "#1a1a1a",
-        muted: "#6b7280",
-        line: "#e5e7eb",
-        accent: "#4f46e5",
+        ink: "var(--text)",
+        muted: "var(--text-muted)",
+        line: "var(--border)",
+        accent: "var(--accent)",
+        surface: "var(--surface)",
+      },
+      fontFamily: {
+        display: ["var(--font-display)"],
+        body: ["var(--font-body)"],
+        mono: ["var(--font-mono)"],
       },
     },
   },

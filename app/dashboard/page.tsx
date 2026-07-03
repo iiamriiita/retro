@@ -67,7 +67,7 @@ export default async function DashboardPage() {
                     {state.badges.map((b) => (
                       <span
                         key={b}
-                        className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-700"
+                        className="rounded-full bg-[color:var(--accent-weak)] px-2 py-0.5 text-xs text-[color:var(--gold-700)]"
                       >
                         {b}
                       </span>

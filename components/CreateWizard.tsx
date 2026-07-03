@@ -122,7 +122,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
             <span
               className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] ${
                 i === step
-                  ? "bg-accent text-white"
+                  ? "bg-accent text-[color:var(--accent-ink)]"
                   : i < step
                     ? "bg-emerald-100 text-emerald-700"
                     : "bg-gray-100 text-muted"
@@ -154,7 +154,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                   onClick={() => setAnonymity(o.v as Anonymity)}
                   className={`rounded-lg border p-3 text-left ${
                     anonymity === o.v
-                      ? "border-accent bg-indigo-50/40"
+                      ? "border-accent bg-[color:var(--accent-weak)]"
                       : "border-line hover:bg-gray-50"
                   }`}
                 >
@@ -208,7 +208,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                     </button>
                     <button
                       type="button"
-                      className="mt-2 text-xs text-accent hover:underline"
+                      className="mt-2 text-xs text-[color:var(--gold-700)] hover:underline"
                       onClick={() => setPreview(open ? null : t.id)}
                     >
                       {open ? "收起預覽" : "預覽題目"}

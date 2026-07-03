@@ -482,7 +482,7 @@ export default function ResultsClient({
                     </div>
                   ) : (
                     <button
-                      className="mt-2 text-xs text-accent hover:underline"
+                      className="mt-2 text-xs text-[color:var(--gold-700)] hover:underline"
                       onClick={() => startReply(c.id)}
                     >
                       回覆
