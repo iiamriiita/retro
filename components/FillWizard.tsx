@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/lib/i18n/client";
 import type { Anonymity, ModerateResult, Question } from "@/lib/types";
 
-async function moderate(text: string): Promise<ModerateResult> {
+async function moderate(
+  text: string,
+  locale: string,
+): Promise<ModerateResult> {
   try {
     const res = await fetch("/api/moderate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, locale }),
     });
     return (await res.json()) as ModerateResult;
   } catch {
@@ -29,6 +33,7 @@ export default function FillWizard({
   templateDescription: string;
   questions: Question[];
 }) {
+  const { t, locale } = useT();
   const localKey = `retro_filled_${sessionId}`;
   const named = anonymity === "named";
 
@@ -62,7 +67,7 @@ export default function FillWizard({
     setError(null);
     if (inIdentity) {
       if (!name.trim()) {
-        setError("請輸入你的名字。");
+        setError(t("fw.enterName"));
         return;
       }
       setStep((s) => s + 1);
@@ -72,7 +77,7 @@ export default function FillWizard({
       const text = (values[currentQuestion.key] ?? "").trim();
       if (text) {
         setChecking(true);
-        const res = await moderate(text);
+        const res = await moderate(text, locale);
         setChecking(false);
         if (res.verdict === "revise") {
           setSuggestion(res.suggestion);
@@ -94,7 +99,7 @@ export default function FillWizard({
     setError(null);
     const filled = questions.filter((q) => (values[q.key] ?? "").trim());
     if (filled.length === 0) {
-      setError("至少填寫一題再送出。");
+      setError(t("fw.atLeastOne"));
       return;
     }
     setSubmitting(true);
@@ -102,7 +107,7 @@ export default function FillWizard({
       const results = await Promise.all(
         filled.map(async (q) => ({
           key: q.key,
-          result: await moderate(values[q.key].trim()),
+          result: await moderate(values[q.key].trim(), locale),
         })),
       );
       const bad = results.find((r) => r.result.verdict === "revise");
@@ -110,7 +115,7 @@ export default function FillWizard({
         const idx = questions.findIndex((q) => q.key === bad.key);
         setStep((hasIdentity ? 1 : 0) + idx);
         setSuggestion(bad.result.suggestion);
-        setError("有一題需要再調整一下 🙂");
+        setError(t("fw.oneNeedsFix"));
         setSubmitting(false);
         return;
       }
@@ -128,12 +133,12 @@ export default function FillWizard({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "送出失敗");
+      if (!res.ok) throw new Error(data?.error ?? t("fw.submitFail"));
 
       if (typeof window !== "undefined") localStorage.setItem(localKey, "1");
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "送出失敗");
+      setError(err instanceof Error ? err.message : t("fw.submitFail"));
     } finally {
       setSubmitting(false);
     }
@@ -142,10 +147,8 @@ export default function FillWizard({
   if (done) {
     return (
       <div className="card">
-        <h1 className="text-lg font-semibold">已送出，謝謝你的回饋 🙌</h1>
-        <p className="mt-2 text-sm text-muted">
-          等發起者結束 session 後，就能一起看結果。
-        </p>
+        <h1 className="text-lg font-semibold">{t("fw.doneTitle")}</h1>
+        <p className="mt-2 text-sm text-muted">{t("fw.doneDesc")}</p>
       </div>
     );
   }
@@ -153,15 +156,13 @@ export default function FillWizard({
   if (already) {
     return (
       <div className="card">
-        <h1 className="text-lg font-semibold">你在這台裝置已經填過了</h1>
-        <p className="mt-2 text-sm text-muted">
-          每人填一次即可。如果這不是你，換一台裝置或清除瀏覽器資料再試。
-        </p>
+        <h1 className="text-lg font-semibold">{t("fw.alreadyTitle")}</h1>
+        <p className="mt-2 text-sm text-muted">{t("fw.alreadyDesc")}</p>
         <button
           className="btn-ghost mt-3 text-xs"
           onClick={() => setAlready(false)}
         >
-          還是要再填一次
+          {t("fw.fillAgain")}
         </button>
       </div>
     );
@@ -187,11 +188,11 @@ export default function FillWizard({
 
       {inIdentity && (
         <div className="card space-y-2">
-          <label className="field-label">你的名字</label>
+          <label className="field-label">{t("fw.yourName")}</label>
           <input
             autoFocus
             className="textarea"
-            placeholder="例：Alex"
+            placeholder={t("fw.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
@@ -201,7 +202,7 @@ export default function FillWizard({
               }
             }}
           />
-          <p className="text-xs text-muted">結果與你的名字會一起顯示。</p>
+          <p className="text-xs text-muted">{t("fw.nameHint")}</p>
         </div>
       )}
 
@@ -219,7 +220,7 @@ export default function FillWizard({
             onChange={(e) => setValue(currentQuestion.key, e.target.value)}
           />
           <div className="mt-2 min-h-[1.25rem] text-xs">
-            {checking && <span className="text-muted">正在確認…</span>}
+            {checking && <span className="text-muted">{t("fw.checking")}</span>}
             {suggestion && (
               <div className="rounded-lg bg-amber-50 p-2 text-amber-800">
                 {suggestion}
@@ -227,17 +228,17 @@ export default function FillWizard({
             )}
           </div>
           <p className="mt-1 text-xs text-muted">
-            第 {qIndex + 1} / {questions.length} 題（可留空跳過）
+            {t("fw.qProgress", { i: qIndex + 1, n: questions.length })}
           </p>
         </div>
       )}
 
       {inReview && (
         <div className="card space-y-3">
-          <h2 className="text-sm font-semibold">確認送出</h2>
+          <h2 className="text-sm font-semibold">{t("fw.reviewTitle")}</h2>
           {named && (
             <p className="text-xs text-muted">
-              以「<span className="font-medium">{name.trim() || "（未填）"}</span>」的身分
+              {t("fw.asIdentity", { name: name.trim() || t("fw.blank") })}
             </p>
           )}
           <ul className="space-y-3">
@@ -245,7 +246,7 @@ export default function FillWizard({
               <li key={q.key}>
                 <p className="text-xs font-medium">{q.label}</p>
                 <p className="mt-0.5 whitespace-pre-wrap text-sm text-muted">
-                  {(values[q.key] ?? "").trim() || "（未填）"}
+                  {(values[q.key] ?? "").trim() || t("fw.blank")}
                 </p>
               </li>
             ))}
@@ -266,7 +267,7 @@ export default function FillWizard({
           onClick={back}
           disabled={step === 0 || submitting}
         >
-          上一步
+          {t("fw.prev")}
         </button>
         {inReview ? (
           <button
@@ -275,7 +276,7 @@ export default function FillWizard({
             onClick={submit}
             disabled={submitting}
           >
-            {submitting ? "送出中…" : "送出回饋"}
+            {submitting ? t("fw.submitting") : t("fw.submit")}
           </button>
         ) : (
           <button
@@ -284,7 +285,7 @@ export default function FillWizard({
             onClick={next}
             disabled={checking}
           >
-            {checking ? "確認中…" : "下一步"}
+            {checking ? t("fw.nextChecking") : t("fw.next")}
           </button>
         )}
       </div>

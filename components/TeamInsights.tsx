@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Icon from "@/components/Icon";
+import { useT } from "@/lib/i18n/client";
 import type { AiInsights, TeamStats } from "@/lib/insights";
 
 function Delta({ value, unit }: { value: number | null; unit: string }) {
@@ -64,6 +65,7 @@ export default function TeamInsights({
   initialInsights: AiInsights | null;
   initialGeneratedAt: string | null;
 }) {
+  const { t: tr } = useT();
   const [insights, setInsights] = useState<AiInsights | null>(initialInsights);
   const [generatedAt, setGeneratedAt] = useState<string | null>(
     initialGeneratedAt,
@@ -77,11 +79,11 @@ export default function TeamInsights({
     try {
       const res = await fetch("/api/insights", { method: "POST" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "產生失敗");
+      if (!res.ok) throw new Error(data?.error ?? tr("ti.genFail"));
       setInsights(data.data as AiInsights);
       setGeneratedAt(data.generated_at as string);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "產生失敗");
+      setError(err instanceof Error ? err.message : tr("ti.genFail"));
     } finally {
       setBusy(false);
     }
@@ -99,29 +101,34 @@ export default function TeamInsights({
         >
           <Icon name="line-chart" size={17} />
         </span>
-        <h2 className="text-lg font-extrabold tracking-tight">團隊洞察</h2>
+        <h2 className="text-lg font-extrabold tracking-tight">
+          {tr("ti.title")}
+        </h2>
         <span className="eyebrow">
-          跨 {stats.retroCount} 場 retro · 已結束 {stats.closedCount} 場
+          {tr("ti.scope", {
+            count: stats.retroCount,
+            closed: stats.closedCount,
+          })}
         </span>
       </div>
 
       {/* Real stat cards */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="累積回饋" value={String(stats.totalResponses)}>
+        <StatCard label={tr("ti.cardFeedback")} value={String(stats.totalResponses)}>
           <span className="mt-1 text-xs text-subtle">
-            平均每場 {stats.avgResponses} 則
+            {tr("ti.avgPerRetro", { n: stats.avgResponses })}
           </span>
-          <Delta value={stats.responsesDelta} unit="vs 上一場" />
+          <Delta value={stats.responsesDelta} unit={tr("ti.vsLast")} />
         </StatCard>
-        <StatCard label="討論留言" value={String(stats.totalComments)}>
-          <span className="mt-1 text-xs text-subtle">跨所有 retro</span>
-          <Delta value={stats.commentsDelta} unit="vs 上一場" />
+        <StatCard label={tr("ti.cardComments")} value={String(stats.totalComments)}>
+          <span className="mt-1 text-xs text-subtle">{tr("ti.acrossAll")}</span>
+          <Delta value={stats.commentsDelta} unit={tr("ti.vsLast")} />
         </StatCard>
         <StatCard
-          label="完成場次"
+          label={tr("ti.cardCompleted")}
           value={`${stats.closedCount} / ${stats.retroCount}`}
         >
-          <span className="mt-1 text-xs text-subtle">已結束 / 全部</span>
+          <span className="mt-1 text-xs text-subtle">{tr("ti.endedAll")}</span>
         </StatCard>
       </div>
 
@@ -130,11 +137,13 @@ export default function TeamInsights({
         {/* Responses over time */}
         <div className="card">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-bold">每場回饋數</h3>
-            <span className="eyebrow">最近 {stats.timeline.length} 場</span>
+            <h3 className="text-sm font-bold">{tr("ti.chartTitle")}</h3>
+            <span className="eyebrow">
+              {tr("ti.lastN", { n: stats.timeline.length })}
+            </span>
           </div>
           {stats.timeline.length === 0 ? (
-            <p className="text-sm text-muted">還沒有資料。</p>
+            <p className="text-sm text-muted">{tr("ti.noData")}</p>
           ) : (
             <div className="flex h-40 items-end gap-2">
               {stats.timeline.map((t, i) => {
@@ -153,7 +162,7 @@ export default function TeamInsights({
                             ? "var(--accent)"
                             : "var(--brown-200, #E4D0BA)",
                         }}
-                        title={`${t.responses} 則`}
+                        title={tr("rc.responses", { n: t.responses })}
                       />
                     </div>
                     <span
@@ -183,7 +192,7 @@ export default function TeamInsights({
             >
               <Icon name="sparkles" size={16} />
             </span>
-            <h3 className="text-sm font-bold">Team pulse</h3>
+            <h3 className="text-sm font-bold">{tr("ti.pulse")}</h3>
             {insights && (
               <button
                 onClick={generate}
@@ -191,7 +200,7 @@ export default function TeamInsights({
                 className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--gold-700)] hover:underline disabled:opacity-50"
               >
                 <Icon name="sparkles" size={13} />
-                {busy ? "生成中…" : "重新生成"}
+                {busy ? tr("oc.processing") : tr("ti.regen")}
               </button>
             )}
           </div>
@@ -199,7 +208,7 @@ export default function TeamInsights({
           {!insights ? (
             <div className="py-4 text-center">
               <p className="mx-auto max-w-xs text-sm text-muted">
-                用 AI 跨場分析團隊氛圍走向、重複出現的主題與尚未解決的痛點。
+                {tr("ti.emptyDesc")}
               </p>
               <button
                 onClick={generate}
@@ -207,7 +216,7 @@ export default function TeamInsights({
                 className="btn-primary mx-auto mt-4"
               >
                 <Icon name="sparkles" size={15} />
-                {busy ? "生成中…（約 10–20 秒）" : "用 AI 生成洞察"}
+                {busy ? tr("ti.generating") : tr("ti.generate")}
               </button>
               {error && <p className="mt-3 text-xs text-red-600">{error}</p>}
             </div>
@@ -231,7 +240,7 @@ export default function TeamInsights({
 
               {insights.themes.length > 0 && (
                 <>
-                  <p className="eyebrow mt-4">重複主題</p>
+                  <p className="eyebrow mt-4">{tr("ti.themes")}</p>
                   <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2">
                     {insights.themes.map((t, i) => {
                       const tone = themeTone(t.direction);
@@ -253,7 +262,9 @@ export default function TeamInsights({
               {error && <p className="mt-3 text-xs text-red-600">{error}</p>}
               {generatedAt && (
                 <p className="mt-4 text-[11px] text-subtle">
-                  AI 生成 · {new Date(generatedAt).toLocaleString()}．僅供參考
+                  {tr("ti.generatedAt", {
+                    date: new Date(generatedAt).toLocaleString(),
+                  })}
                 </p>
               )}
             </>

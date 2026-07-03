@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
+import { getLocale } from "@/lib/i18n/server";
 import type { PublicComment } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -19,6 +20,8 @@ const SELECT =
   "id, answer_id, parent_id, quote, quote_start, quote_end, body, author_name, created_at";
 
 export async function POST(req: Request) {
+  const en = (await getLocale()) === "en";
+  const missing = en ? "Missing required fields" : "缺少必要欄位";
   let body: CommentBody;
   try {
     body = await req.json();
@@ -29,7 +32,7 @@ export async function POST(req: Request) {
   const { session_id } = body;
   const text = (body.body ?? "").trim();
   if (!session_id || !text) {
-    return NextResponse.json({ error: "缺少必要欄位" }, { status: 400 });
+    return NextResponse.json({ error: missing }, { status: 400 });
   }
 
   const supabase = createServiceClient();
@@ -42,7 +45,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
   if (!session.discussion_enabled) {
-    return NextResponse.json({ error: "討論尚未開啟。" }, { status: 409 });
+    return NextResponse.json(
+      { error: en ? "Discussion isn't open yet." : "討論尚未開啟。" },
+      { status: 409 },
+    );
   }
 
   const authorName = (body.author_name ?? "").trim() || null;
@@ -56,7 +62,10 @@ export async function POST(req: Request) {
       .eq("session_id", session_id)
       .single();
     if (!parent) {
-      return NextResponse.json({ error: "找不到原留言" }, { status: 400 });
+      return NextResponse.json(
+        { error: en ? "Original comment not found" : "找不到原留言" },
+        { status: 400 },
+      );
     }
     const { data: inserted, error } = await supabase
       .from("retro_comments")
@@ -73,7 +82,10 @@ export async function POST(req: Request) {
       .select(SELECT)
       .single();
     if (error || !inserted) {
-      return NextResponse.json({ error: "回覆失敗" }, { status: 500 });
+      return NextResponse.json(
+        { error: en ? "Reply failed" : "回覆失敗" },
+        { status: 500 },
+      );
     }
     return NextResponse.json({ comment: inserted as PublicComment });
   }
@@ -87,7 +99,7 @@ export async function POST(req: Request) {
     typeof quote_end !== "number" ||
     quote_end <= quote_start
   ) {
-    return NextResponse.json({ error: "缺少必要欄位" }, { status: 400 });
+    return NextResponse.json({ error: missing }, { status: 400 });
   }
 
   const { data: answer } = await supabase
@@ -97,7 +109,10 @@ export async function POST(req: Request) {
     .eq("session_id", session_id)
     .single();
   if (!answer) {
-    return NextResponse.json({ error: "找不到對應的回答" }, { status: 400 });
+    return NextResponse.json(
+      { error: en ? "Answer not found" : "找不到對應的回答" },
+      { status: 400 },
+    );
   }
 
   const { data: inserted, error } = await supabase
@@ -116,7 +131,10 @@ export async function POST(req: Request) {
     .single();
 
   if (error || !inserted) {
-    return NextResponse.json({ error: "留言失敗" }, { status: 500 });
+    return NextResponse.json(
+      { error: en ? "Comment failed" : "留言失敗" },
+      { status: 500 },
+    );
   }
   return NextResponse.json({ comment: inserted as PublicComment });
 }

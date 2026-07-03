@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { getTemplate } from "@/lib/templates";
+import { getLocale } from "@/lib/i18n/server";
 import type { Anonymity } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -17,9 +18,13 @@ interface CreateBody {
 
 export async function POST(req: Request) {
   // Only a logged-in organizer can create a session.
+  const en = (await getLocale()) === "en";
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "請先登入" }, { status: 401 });
+    return NextResponse.json(
+      { error: en ? "Please log in first" : "請先登入" },
+      { status: 401 },
+    );
   }
 
   let body: CreateBody;
@@ -43,7 +48,7 @@ export async function POST(req: Request) {
   }
   if (deadline.getTime() <= Date.now()) {
     return NextResponse.json(
-      { error: "截止時間必須在未來" },
+      { error: en ? "The deadline must be in the future" : "截止時間必須在未來" },
       { status: 400 },
     );
   }
@@ -67,7 +72,11 @@ export async function POST(req: Request) {
   if (error || !data) {
     console.error("create session failed:", error);
     return NextResponse.json(
-      { error: `建立失敗：${error?.message ?? "unknown error"}` },
+      {
+        error:
+          (en ? "Failed to create: " : "建立失敗：") +
+          (error?.message ?? "unknown error"),
+      },
       { status: 500 },
     );
   }

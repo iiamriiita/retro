@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
+import { getLocale } from "@/lib/i18n/server";
 
 export const runtime = "nodejs";
 
@@ -13,7 +14,11 @@ export async function POST(
 
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "請先登入" }, { status: 401 });
+    const en = (await getLocale()) === "en";
+    return NextResponse.json(
+      { error: en ? "Please log in first" : "請先登入" },
+      { status: 401 },
+    );
   }
 
   const supabase = createServiceClient();

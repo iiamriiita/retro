@@ -1,4 +1,5 @@
 import { getTemplate } from "./templates";
+import type { Locale } from "./i18n/messages";
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
@@ -118,7 +119,7 @@ export interface RetroForAI {
   answers: { question_key: string; content: string }[];
 }
 
-const INSIGHTS_SYSTEM = `你是一個團隊 retro（回顧會議）的資深教練。你會收到同一個團隊「多場」retro 的回答（依時間排序，已去識別化）。
+const INSIGHTS_SYSTEM_ZH = `你是一個團隊 retro（回顧會議）的資深教練。你會收到同一個團隊「多場」retro 的回答（依時間排序，已去識別化）。
 
 請跨場分析團隊的走向，並「只」輸出 JSON（繁體中文內容），欄位如下：
 - sentiment.label：整體氛圍，用「正面 / 中性 / 需要關注」其中一個。
@@ -130,12 +131,26 @@ const INSIGHTS_SYSTEM = `你是一個團隊 retro（回顧會議）的資深教�
 
 原則：對事不對人、忠實反映內容、不要杜撰沒出現的事。只輸出 JSON，不要多餘文字。`;
 
-function buildAiContext(retros: RetroForAI[]): string {
+const INSIGHTS_SYSTEM_EN = `You are a senior coach for a team's retrospectives. You'll receive answers from MULTIPLE retros of the same team (in chronological order, de-identified).
+
+Analyze the team's trajectory across retros and output ONLY JSON (content in English), with these fields:
+- sentiment.label: overall mood, one of "Positive / Neutral / Needs attention".
+- sentiment.score: an overall health score, 0–100.
+- sentiment.note: a one-line trend note, e.g. "Improving 3 retros in a row".
+- pulse: 2–4 sentences on where the team is — the trajectory, lasting strengths, and unresolved pain points.
+- themes: recurring themes across retros; each has label (2–4 words), count (approx times it appeared), direction (up = improving, warning = recurring pain point, down = getting worse). Max 6, ordered by importance.
+- timeline: a mood score per retro; label is that retro's date, score 0–100, in the same order as the input.
+
+Principles: about the work not the people, reflect the content faithfully, don't invent things. Output JSON only, no extra text.`;
+
+function buildAiContext(retros: RetroForAI[], locale: Locale): string {
+  const nth = (i: number, d: string) =>
+    locale === "en" ? `## Retro ${i + 1} (${d})` : `## 第 ${i + 1} 場（${d}）`;
   const blocks: string[] = [];
   retros.forEach((r, i) => {
-    const template = getTemplate(r.templateId);
+    const template = getTemplate(r.templateId, locale);
     const questions = template?.questions ?? [];
-    const lines: string[] = [`## 第 ${i + 1} 場（${r.dateLabel}）`];
+    const lines: string[] = [nth(i, r.dateLabel)];
     for (const q of questions) {
       const group = r.answers.filter((a) => a.question_key === q.key);
       if (group.length === 0) continue;
@@ -187,26 +202,35 @@ const RESPONSE_SCHEMA = {
   required: ["sentiment", "pulse", "themes", "timeline"],
 };
 
-export async function geminiInsights(retros: RetroForAI[]): Promise<AiInsights> {
+export async function geminiInsights(
+  retros: RetroForAI[],
+  locale: Locale = "en",
+): Promise<AiInsights> {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("尚未設定 GEMINI_API_KEY，無法產生 AI 洞察。");
+  if (!apiKey)
+    throw new Error(
+      locale === "en"
+        ? "GEMINI_API_KEY is not set; cannot generate AI insights."
+        : "尚未設定 GEMINI_API_KEY，無法產生 AI 洞察。",
+    );
 
-  const context = buildAiContext(retros);
+  const context = buildAiContext(retros, locale);
+  const system = locale === "en" ? INSIGHTS_SYSTEM_EN : INSIGHTS_SYSTEM_ZH;
+  const intro =
+    locale === "en"
+      ? `${system}\n\nHere are the team's retros in chronological order:\n\n${context}`
+      : `${system}\n\n以下是這個團隊依時間排序的多場 retro 回答：\n\n${context}`;
+  const ask =
+    locale === "en"
+      ? "Analyze across retros and output JSON."
+      : "請跨場分析並輸出 JSON。";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      systemInstruction: {
-        parts: [
-          {
-            text: `${INSIGHTS_SYSTEM}\n\n以下是這個團隊依時間排序的多場 retro 回答：\n\n${context}`,
-          },
-        ],
-      },
-      contents: [
-        { role: "user", parts: [{ text: "請跨場分析並輸出 JSON。" }] },
-      ],
+      systemInstruction: { parts: [{ text: intro }] },
+      contents: [{ role: "user", parts: [{ text: ask }] }],
       generationConfig: {
         temperature: 0.4,
         maxOutputTokens: 1200,
@@ -219,7 +243,10 @@ export async function geminiInsights(retros: RetroForAI[]): Promise<AiInsights> 
 
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
-    throw new Error(`AI 服務錯誤（${res.status}）：${detail.slice(0, 300)}`);
+    throw new Error(
+      (locale === "en" ? "AI service error" : "AI 服務錯誤") +
+        `（${res.status}）：${detail.slice(0, 300)}`,
+    );
   }
 
   const data = await res.json();
@@ -228,13 +255,22 @@ export async function geminiInsights(retros: RetroForAI[]): Promise<AiInsights> 
       ?.map((p: { text?: string }) => p.text ?? "")
       .join("")
       .trim() ?? "";
-  if (!raw) throw new Error("AI 沒有回覆內容，請再試一次。");
+  if (!raw)
+    throw new Error(
+      locale === "en"
+        ? "The AI returned no content — please try again."
+        : "AI 沒有回覆內容，請再試一次。",
+    );
 
   let parsed: AiInsights;
   try {
     parsed = JSON.parse(raw) as AiInsights;
   } catch {
-    throw new Error("AI 回傳格式錯誤，請再試一次。");
+    throw new Error(
+      locale === "en"
+        ? "The AI returned malformed output — please try again."
+        : "AI 回傳格式錯誤，請再試一次。",
+    );
   }
   return parsed;
 }

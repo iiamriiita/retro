@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
+import { getT } from "@/lib/i18n/server";
 import FillWizard from "@/components/FillWizard";
 import BackButton from "@/components/BackButton";
 
@@ -12,6 +13,7 @@ export default async function FillPage({
 }) {
   const { session_id } = await params;
   const supabase = createServiceClient();
+  const { locale, t } = await getT();
 
   const { data: session } = await supabase
     .from("retro_sessions")
@@ -23,23 +25,23 @@ export default async function FillPage({
     return (
       <div className="container-narrow">
         <div className="card">
-          <h1 className="text-lg font-semibold">找不到這場 Retro</h1>
-          <p className="mt-2 text-sm text-muted">連結可能有誤或已被刪除。</p>
+          <h1 className="text-lg font-semibold">{t("fill.notFound")}</h1>
+          <p className="mt-2 text-sm text-muted">{t("fill.notFoundDesc")}</p>
         </div>
       </div>
     );
   }
 
-  const template = getTemplate(session.template_id);
+  const template = getTemplate(session.template_id, locale);
   const expired = new Date(session.deadline).getTime() <= Date.now();
   const locked = session.status === "closed" || expired;
 
   if (!template) {
     return (
       <div className="container-narrow">
-        <BackButton fallback="/" label="返回" />
+        <BackButton fallback="/" />
         <div className="card">
-          <h1 className="text-lg font-semibold">找不到問卷</h1>
+          <h1 className="text-lg font-semibold">{t("fill.noTemplate")}</h1>
         </div>
       </div>
     );
@@ -48,16 +50,16 @@ export default async function FillPage({
   if (locked) {
     return (
       <div className="container-narrow space-y-5">
-        <BackButton fallback="/" label="返回" />
+        <BackButton fallback="/" />
         <div className="card bg-gray-50">
-          <h1 className="text-lg font-semibold">此 Retro 已結束</h1>
+          <h1 className="text-lg font-semibold">{t("fill.endedTitle")}</h1>
           <p className="mt-2 text-sm text-muted">
             {session.status === "closed"
-              ? "發起者已結束這場 session，表單已鎖定。"
-              : "已超過截止時間，表單已鎖定。"}
+              ? t("fill.endedClosed")
+              : t("fill.endedExpired")}
           </p>
           <a className="btn-primary mt-4" href={`/s/${session.id}/results`}>
-            查看結果
+            {t("fill.viewResults")}
           </a>
         </div>
 
@@ -78,7 +80,7 @@ export default async function FillPage({
               </div>
             ))}
           </div>
-          <p className="mt-3 text-xs text-muted">🔒 表單已鎖定，無法再填寫。</p>
+          <p className="mt-3 text-xs text-muted">{t("fill.locked")}</p>
         </div>
       </div>
     );
@@ -86,7 +88,7 @@ export default async function FillPage({
 
   return (
     <div className="container-narrow">
-      <BackButton fallback="/" label="返回" />
+      <BackButton fallback="/" />
       <FillWizard
         sessionId={session.id}
         anonymity={session.anonymity}

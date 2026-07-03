@@ -86,16 +86,22 @@ const FEWSHOT = [
   },
 ];
 
+// Locale-specific canned "looks like a personal attack" suggestion.
+function insultSuggestion(locale: string): string {
+  return locale === "en"
+    ? "This reads more like a personal attack. Try focusing on the specific behaviour and the change you'd like to see 🙂"
+    : "這裡出現了比較像人身攻擊的字眼。試著把焦點放在具體行為與你希望的調整，會更有幫助 🙂";
+}
+
 // Fallback used whenever the LLM is unavailable / errors / times out: degrade to
 // the keyword list and, absent a hit, allow. Never block the user on our outage.
-function degrade(text: string): ModerateResult {
+function degrade(text: string, locale: string): ModerateResult {
   const { hit } = checkBlocklist(text);
   if (hit) {
     return {
       verdict: "revise",
       reasons: ["insulting"],
-      suggestion:
-        "這裡出現了比較像人身攻擊的字眼。試著把焦點放在具體行為與你希望的調整，會更有幫助 🙂",
+      suggestion: insultSuggestion(locale),
     };
   }
   return { verdict: "ok", reasons: [], suggestion: "" };
@@ -113,9 +119,11 @@ function isModerateResult(v: unknown): v is ModerateResult {
 
 export async function POST(req: Request) {
   let text = "";
+  let locale = "en";
   try {
     const body = await req.json();
     text = typeof body?.text === "string" ? body.text : "";
+    if (body?.locale === "zh" || body?.locale === "en") locale = body.locale;
   } catch {
     return NextResponse.json({
       verdict: "ok",
@@ -140,16 +148,20 @@ export async function POST(req: Request) {
     return NextResponse.json({
       verdict: "revise",
       reasons: ["insulting"],
-      suggestion:
-        "這裡出現了比較像人身攻擊的字眼。試著把焦點放在具體行為與你希望的調整，會更有幫助 🙂",
+      suggestion: insultSuggestion(locale),
     } satisfies ModerateResult);
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     // No key configured → degrade gracefully instead of blocking.
-    return NextResponse.json(degrade(trimmed));
+    return NextResponse.json(degrade(trimmed, locale));
   }
+
+  const langDirective =
+    locale === "en"
+      ? "\n\nIMPORTANT: Write the `suggestion` field in English."
+      : "\n\n重要：`suggestion` 欄位請一律使用繁體中文。";
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
@@ -157,7 +169,7 @@ export async function POST(req: Request) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT + langDirective }] },
         contents: [...FEWSHOT, { role: "user", parts: [{ text: trimmed }] }],
         generationConfig: {
           temperature: 0.2,
@@ -168,7 +180,7 @@ export async function POST(req: Request) {
       signal: AbortSignal.timeout(12_000),
     });
 
-    if (!res.ok) return NextResponse.json(degrade(trimmed));
+    if (!res.ok) return NextResponse.json(degrade(trimmed, locale));
 
     const data = await res.json();
     const raw: string =
@@ -181,9 +193,9 @@ export async function POST(req: Request) {
     if (isModerateResult(parsed)) {
       return NextResponse.json(parsed);
     }
-    return NextResponse.json(degrade(trimmed));
+    return NextResponse.json(degrade(trimmed, locale));
   } catch {
     // Timeout / parse error / API error → degrade + allow.
-    return NextResponse.json(degrade(trimmed));
+    return NextResponse.json(degrade(trimmed, locale));
   }
 }

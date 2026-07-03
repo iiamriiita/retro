@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
+import { getT } from "@/lib/i18n/server";
 import type { PublicAnswer, PublicComment } from "@/lib/types";
 import ResultsClient from "@/components/ResultsClient";
 import ReportView from "@/components/ReportView";
@@ -17,6 +18,7 @@ export default async function ResultsPage({
 }) {
   const { session_id } = await params;
   const supabase = createServiceClient();
+  const { locale, t } = await getT();
 
   const { data: session } = await supabase
     .from("retro_sessions")
@@ -30,13 +32,13 @@ export default async function ResultsPage({
     return (
       <div className="container-narrow">
         <div className="card">
-          <h1 className="text-lg font-semibold">找不到這場 Retro</h1>
+          <h1 className="text-lg font-semibold">{t("fill.notFound")}</h1>
         </div>
       </div>
     );
   }
 
-  const template = getTemplate(session.template_id);
+  const template = getTemplate(session.template_id, locale);
   const user = await getCurrentUser();
   const isOwner = !!user && user.id === session.owner_id;
   const expired = new Date(session.deadline).getTime() <= Date.now();
@@ -53,24 +55,20 @@ export default async function ResultsPage({
 
     return (
       <div className="container-narrow space-y-5">
-        <BackButton fallback="/dashboard" label="返回" />
+        <BackButton fallback="/dashboard" />
         <div className="card">
-          <h1 className="text-lg font-semibold">Session 進行中</h1>
+          <h1 className="text-lg font-semibold">{t("res.inProgressTitle")}</h1>
           <p className="mt-2 text-sm text-muted">
-            目前已有 {count ?? 0} 人填寫。結束後才會顯示結果。
+            {t("res.inProgressDesc", { n: count ?? 0 })}
           </p>
         </div>
         {isOwner ? (
           <div className="card">
-            <p className="mb-3 text-sm text-muted">
-              你是這場的發起者，準備好了就可以結束 session。
-            </p>
+            <p className="mb-3 text-sm text-muted">{t("res.ownerCanEnd")}</p>
             <CloseSessionButton sessionId={session.id} />
           </div>
         ) : (
-          <p className="text-sm text-muted">
-            等發起者結束 session（或到截止時間）後，回到這頁就能看到結果。
-          </p>
+          <p className="text-sm text-muted">{t("res.waitOrganizer")}</p>
         )}
       </div>
     );
@@ -123,14 +121,15 @@ export default async function ResultsPage({
 
   return (
     <div className="container-narrow">
-      <BackButton fallback="/" label="返回" />
+      <BackButton fallback="/" />
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold tracking-tight">
-          {template?.name ?? "Retro"} — 結果
+          {t("res.title", { name: template?.name ?? "Retro" })}
         </h1>
         <p className="mt-1 text-sm text-muted">
-          {anonymous ? "匿名模式" : "具名模式"} · 共 {answers.length} 則回答
-          {session.discussion_enabled && " · 討論中"}
+          {anonymous ? t("res.modeAnon") : t("res.modeNamed")} ·{" "}
+          {t("res.responsesTotal", { n: answers.length })}
+          {session.discussion_enabled && ` · ${t("res.discussing")}`}
         </p>
       </div>
 
@@ -159,7 +158,7 @@ export default async function ResultsPage({
           />
         </>
       ) : (
-        <p className="text-sm text-muted">找不到問卷模板。</p>
+        <p className="text-sm text-muted">{t("res.noTemplate")}</p>
       )}
     </div>
   );

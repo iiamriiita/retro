@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useT } from "@/lib/i18n/client";
 
 export default function CloseSessionButton({
   sessionId,
@@ -9,11 +10,12 @@ export default function CloseSessionButton({
   sessionId: string;
 }) {
   const router = useRouter();
+  const { t } = useT();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function close() {
-    if (!confirm("結束後成員就無法再填寫，確定要結束嗎？")) return;
+    if (!confirm(t("csb.confirm"))) return;
     setBusy(true);
     setError(null);
     try {
@@ -22,11 +24,11 @@ export default function CloseSessionButton({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error ?? "結束失敗");
+        throw new Error(data?.error ?? t("csb.endFail"));
       }
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "結束失敗");
+      setError(err instanceof Error ? err.message : t("csb.endFail"));
       setBusy(false);
     }
   }
@@ -34,7 +36,7 @@ export default function CloseSessionButton({
   return (
     <div>
       <button className="btn-primary" onClick={close} disabled={busy}>
-        {busy ? "結束中…" : "結束 session 並看結果"}
+        {busy ? t("csb.ending") : t("csb.endBtn")}
       </button>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>

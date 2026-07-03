@@ -6,28 +6,29 @@ export interface SessionStateInput {
 }
 
 export interface SessionState {
-  primary: { label: string; tone: "open" | "closed" };
-  badges: string[];
+  primary: { key: string; tone: "open" | "closed" };
+  badgeKeys: string[];
 }
 
-// Derive the dashboard state from the orthogonal flags:
-//   open (not past deadline)          → 進行中
-//   closed / past deadline            → 已結束
-//   + discussion_enabled              → 討論中 badge
-//   + ai_report present               → AI報告已生成 badge
+// Derive the dashboard state from the orthogonal flags. Labels are returned as
+// i18n keys (translated in the component), not literal text:
+//   open (not past deadline)  → status.open
+//   closed / past deadline    → status.closed
+//   + discussion_enabled      → status.discussing badge
+//   + ai_report present       → status.reportReady badge
 // Discussion and report are independent and may both be on.
 export function deriveState(s: SessionStateInput): SessionState {
   const expired = new Date(s.deadline).getTime() <= Date.now();
   const isOpen = s.status === "open" && !expired;
 
-  const badges: string[] = [];
-  if (s.discussion_enabled) badges.push("討論中");
-  if (s.ai_report_at) badges.push("AI 報告已生成");
+  const badgeKeys: string[] = [];
+  if (s.discussion_enabled) badgeKeys.push("status.discussing");
+  if (s.ai_report_at) badgeKeys.push("status.reportReady");
 
   return {
     primary: isOpen
-      ? { label: "進行中", tone: "open" }
-      : { label: "已結束", tone: "closed" },
-    badges,
+      ? { key: "status.open", tone: "open" }
+      : { key: "status.closed", tone: "closed" },
+    badgeKeys,
   };
 }

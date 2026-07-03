@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
+import { getLocale } from "@/lib/i18n/server";
 import { geminiInsights, type RetroForAI } from "@/lib/insights";
 
 export const runtime = "nodejs";
@@ -20,7 +21,13 @@ function fmtDate(iso: string): string {
 // the result. Triggered by the "用 AI 生成洞察" button on the dashboard.
 export async function POST() {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "請先登入" }, { status: 401 });
+  const locale = await getLocale();
+  const en = locale === "en";
+  if (!user)
+    return NextResponse.json(
+      { error: en ? "Please log in first" : "請先登入" },
+      { status: 401 },
+    );
 
   const supabase = createServiceClient();
 
@@ -36,7 +43,11 @@ export async function POST() {
   );
   if (finished.length === 0) {
     return NextResponse.json(
-      { error: "需要至少一場已結束的 retro 才能分析。" },
+      {
+        error: en
+          ? "You need at least one finished retro to analyze."
+          : "需要至少一場已結束的 retro 才能分析。",
+      },
       { status: 400 },
     );
   }
@@ -71,23 +82,35 @@ export async function POST() {
 
   if (retros.length === 0) {
     return NextResponse.json(
-      { error: "已結束的 retro 還沒有任何回答，無法分析。" },
+      {
+        error: en
+          ? "Your finished retros have no answers yet, so there's nothing to analyze."
+          : "已結束的 retro 還沒有任何回答，無法分析。",
+      },
       { status: 400 },
     );
   }
 
   try {
-    const data = await geminiInsights(retros);
+    const data = await geminiInsights(retros, locale);
     const generated_at = new Date().toISOString();
     const { error } = await supabase
       .from("retro_team_insights")
       .upsert({ owner_id: user.id, data, generated_at });
-    if (error) throw new Error("儲存洞察失敗");
+    if (error) throw new Error(en ? "Failed to save insights" : "儲存洞察失敗");
     return NextResponse.json({ ok: true, data, generated_at });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "產生失敗" },
+      {
+        error:
+          err instanceof Error
+            ? err.message
+            : en
+              ? "Generation failed"
+              : "產生失敗",
+      },
       { status: 502 },
     );
   }
 }
+

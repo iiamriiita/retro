@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import { checkBlocklist } from "@/lib/blocklist";
+import { getLocale } from "@/lib/i18n/server";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,7 @@ interface SubmitBody {
 }
 
 export async function POST(req: Request) {
+  const en = (await getLocale()) === "en";
   let body: SubmitBody;
   try {
     body = await req.json();
@@ -41,7 +43,11 @@ export async function POST(req: Request) {
   const expired = new Date(session.deadline).getTime() <= Date.now();
   if (session.status !== "open" || expired) {
     return NextResponse.json(
-      { error: "此 session 已結束或已過截止時間，無法再填寫。" },
+      {
+        error: en
+          ? "This session has ended or passed its deadline — you can no longer submit."
+          : "此 session 已結束或已過截止時間，無法再填寫。",
+      },
       { status: 409 },
     );
   }
@@ -57,7 +63,10 @@ export async function POST(req: Request) {
     .map((a) => ({ question_key: a.question_key, content: a.content.trim() }));
 
   if (rows.length === 0) {
-    return NextResponse.json({ error: "沒有可送出的內容。" }, { status: 400 });
+    return NextResponse.json(
+      { error: en ? "Nothing to submit." : "沒有可送出的內容。" },
+      { status: 400 },
+    );
   }
 
   // Server-side hard gate against blatant personal insults.
@@ -65,7 +74,9 @@ export async function POST(req: Request) {
     if (checkBlocklist(r.content).hit) {
       return NextResponse.json(
         {
-          error: "有內容包含人身攻擊字眼，請調整為對事不對人的回饋後再送出。",
+          error: en
+            ? "Some content contains a personal attack. Please make it about the work, not the person, then submit."
+            : "有內容包含人身攻擊字眼，請調整為對事不對人的回饋後再送出。",
           question_key: r.question_key,
         },
         { status: 422 },
@@ -78,7 +89,10 @@ export async function POST(req: Request) {
   if (session.anonymity === "named") {
     displayName = (body.display_name ?? "").trim();
     if (!displayName) {
-      return NextResponse.json({ error: "請先填寫你的名字。" }, { status: 400 });
+      return NextResponse.json(
+        { error: en ? "Please enter your name first." : "請先填寫你的名字。" },
+        { status: 400 },
+      );
     }
   }
 

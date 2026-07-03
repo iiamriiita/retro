@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createBrowserSupabase } from "@/lib/supabase/client";
+import { useT } from "@/lib/i18n/client";
 
 type View = "login" | "otp";
 type OtpMode = "register" | "reset";
@@ -18,6 +19,7 @@ export default function AuthModal({
   defaultTab?: "login" | "register";
   defaultOpen?: boolean;
 }) {
+  const { t } = useT();
   const [open, setOpen] = useState(defaultOpen);
   const [view, setView] = useState<View>(
     defaultTab === "register" ? "otp" : "login",
@@ -67,7 +69,7 @@ export default function AuthModal({
       if (error) throw error;
       go();
     } catch {
-      setError("登入失敗，請確認 email 與密碼。若還沒註冊，請切到「註冊」。");
+      setError(t("am.loginFail"));
       setLoading(false);
     }
   }
@@ -85,14 +87,14 @@ export default function AuthModal({
       });
       if (error) throw error;
       setStep("code");
-      setInfo("驗證碼已寄出，請查看信箱（含垃圾信匣）。");
+      setInfo(t("am.codeSent"));
     } catch (err) {
       setError(
         otpMode === "reset"
-          ? "找不到這個 email 或寄送失敗。"
+          ? t("am.sendFailReset")
           : err instanceof Error
             ? err.message
-            : "寄送失敗，請稍後再試。",
+            : t("am.sendFail"),
       );
     } finally {
       setLoading(false);
@@ -114,7 +116,7 @@ export default function AuthModal({
       setStep("password");
       setInfo(null);
     } catch {
-      setError("驗證碼錯誤或已過期，請重新寄送。");
+      setError(t("am.codeError"));
     } finally {
       setLoading(false);
     }
@@ -132,7 +134,7 @@ export default function AuthModal({
       if (error) throw error;
       go();
     } catch {
-      setError("設定密碼失敗，請換一組再試（至少 6 碼）。");
+      setError(t("am.setPasswordFail"));
       setLoading(false);
     }
   }
@@ -171,7 +173,7 @@ export default function AuthModal({
                   }`}
                   onClick={() => reset(false)}
                 >
-                  登入
+                  {t("am.login")}
                 </button>
                 <button
                   type="button"
@@ -182,14 +184,14 @@ export default function AuthModal({
                   }`}
                   onClick={() => reset(true)}
                 >
-                  註冊
+                  {t("am.register")}
                 </button>
               </div>
               <button
                 type="button"
                 className="text-muted hover:text-ink"
                 onClick={() => setOpen(false)}
-                aria-label="關閉"
+                aria-label={t("am.close")}
               >
                 ✕
               </button>
@@ -219,7 +221,7 @@ export default function AuthModal({
                   />
                 </div>
                 <div>
-                  <label className="field-label">密碼</label>
+                  <label className="field-label">{t("am.password")}</label>
                   <input
                     type="password"
                     required
@@ -229,7 +231,7 @@ export default function AuthModal({
                   />
                 </div>
                 <button type="submit" className="btn-primary w-full" disabled={loading}>
-                  {loading ? "登入中…" : "登入"}
+                  {loading ? t("am.loggingIn") : t("am.loginBtn")}
                 </button>
                 <button
                   type="button"
@@ -242,7 +244,7 @@ export default function AuthModal({
                     setInfo(null);
                   }}
                 >
-                  忘記密碼？
+                  {t("am.forgot")}
                 </button>
               </form>
             )}
@@ -251,11 +253,11 @@ export default function AuthModal({
             {view === "otp" && step === "email" && (
               <form onSubmit={sendCode} className="space-y-3">
                 <p className="text-sm font-medium">
-                  {otpMode === "register" ? "註冊新帳號" : "重設密碼"}
+                  {otpMode === "register"
+                    ? t("am.registerTitle")
+                    : t("am.resetTitle")}
                 </p>
-                <p className="text-xs text-muted">
-                  輸入 email，我們寄一組 6 位數驗證碼給你。
-                </p>
+                <p className="text-xs text-muted">{t("am.emailHint")}</p>
                 <div>
                   <label className="field-label">Email</label>
                   <input
@@ -268,7 +270,7 @@ export default function AuthModal({
                   />
                 </div>
                 <button type="submit" className="btn-primary w-full" disabled={loading}>
-                  {loading ? "寄送中…" : "寄送驗證碼"}
+                  {loading ? t("am.sending") : t("am.sendCode")}
                 </button>
               </form>
             )}
@@ -276,9 +278,9 @@ export default function AuthModal({
             {/* OTP: code step */}
             {view === "otp" && step === "code" && (
               <form onSubmit={verify} className="space-y-3">
-                <p className="text-sm font-medium">輸入驗證碼</p>
+                <p className="text-sm font-medium">{t("am.enterCode")}</p>
                 <p className="text-xs text-muted">
-                  已寄到 <span className="font-medium">{email}</span>。
+                  {t("am.sentTo", { email })}
                 </p>
                 <input
                   inputMode="numeric"
@@ -293,7 +295,7 @@ export default function AuthModal({
                   className="btn-primary w-full"
                   disabled={loading || code.trim().length < 6}
                 >
-                  {loading ? "驗證中…" : "驗證"}
+                  {loading ? t("am.verifying") : t("am.verify")}
                 </button>
                 <button
                   type="button"
@@ -304,7 +306,7 @@ export default function AuthModal({
                     setError(null);
                   }}
                 >
-                  重新寄送
+                  {t("am.resend")}
                 </button>
               </form>
             )}
@@ -312,12 +314,10 @@ export default function AuthModal({
             {/* OTP: set password step */}
             {view === "otp" && step === "password" && (
               <form onSubmit={savePassword} className="space-y-3">
-                <p className="text-sm font-medium">設定密碼</p>
-                <p className="text-xs text-muted">
-                  設定一組密碼（至少 6 碼），之後就用 email + 密碼登入。
-                </p>
+                <p className="text-sm font-medium">{t("am.setPassword")}</p>
+                <p className="text-xs text-muted">{t("am.setPasswordHint")}</p>
                 <div>
-                  <label className="field-label">密碼</label>
+                  <label className="field-label">{t("am.password")}</label>
                   <input
                     type="password"
                     minLength={6}
@@ -331,7 +331,7 @@ export default function AuthModal({
                   className="btn-primary w-full"
                   disabled={loading || newPassword.length < 6}
                 >
-                  {loading ? "設定中…" : "設定密碼並進入"}
+                  {loading ? t("am.settingUp") : t("am.setAndEnter")}
                 </button>
               </form>
             )}

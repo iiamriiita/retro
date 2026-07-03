@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import Icon from "@/components/Icon";
+import { useT } from "@/lib/i18n/client";
 import type { PublicAnswer, PublicComment, Question } from "@/lib/types";
 
 interface Coords {
@@ -72,6 +73,7 @@ export default function ResultsClient({
   initialComments: PublicComment[];
   rosterNames: string[];
 }) {
+  const { t } = useT();
   const [comments, setComments] = useState<PublicComment[]>(initialComments);
   const [floating, setFloating] = useState<FloatingBtn | null>(null);
 
@@ -252,7 +254,7 @@ export default function ResultsClient({
       body: JSON.stringify(payload),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data?.error ?? "留言失敗");
+    if (!res.ok) throw new Error(data?.error ?? t("rc.commentFail"));
     const c = data.comment as PublicComment;
     setComments((prev) =>
       prev.some((x) => x.id === c.id) ? prev : [...prev, c],
@@ -280,7 +282,7 @@ export default function ResultsClient({
       // Open the freshly-created thread pinned near where it was made.
       setOpenThread({ id: c.id, x: composer.x, y: composer.y });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "留言失敗");
+      setError(err instanceof Error ? err.message : t("rc.commentFail"));
     } finally {
       setSubmitting(false);
     }
@@ -299,7 +301,7 @@ export default function ResultsClient({
       });
       setReplyBody("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "回覆失敗");
+      setError(err instanceof Error ? err.message : t("rc.replyFail"));
     } finally {
       setSubmitting(false);
     }
@@ -360,7 +362,7 @@ export default function ResultsClient({
                 ev.stopPropagation();
                 openThreadAt(sp.c.id, ev.clientX, ev.clientY);
               }}
-              title="查看討論"
+              title={t("rc.responses", { n: count })}
               className="relative -top-1.5 mx-0.5 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 align-middle text-[10px] font-semibold leading-none"
               style={{
                 background: "var(--accent)",
@@ -386,13 +388,13 @@ export default function ResultsClient({
       {discussionEnabled && (
         <div className="mb-4 flex items-center gap-2 text-xs text-muted">
           <Icon name="message" size={13} />
-          <span>選取任一段回答文字即可留言。</span>
+          <span>{t("rc.hint")}</span>
           {identity && (
             <button
               className="ml-auto hover:text-ink"
               onClick={() => setIdentityOpen(true)}
             >
-              以「{identity.name ?? "匿名"}」· 更改
+              {t("rc.asIdentity", { name: identity.name ?? t("rc.anonymous") })}
             </button>
           )}
         </div>
@@ -405,10 +407,10 @@ export default function ResultsClient({
             <section key={q.key}>
               <h2 className="text-lg font-bold">{q.label}</h2>
               <p className="mb-3 text-xs text-muted">
-                {group.length} 則回答
+                {t("rc.responses", { n: group.length })}
               </p>
               {group.length === 0 ? (
-                <p className="text-sm text-muted">還沒有人回答這題。</p>
+                <p className="text-sm text-muted">{t("rc.noAnswers")}</p>
               ) : (
                 <ul className="space-y-3">
                   {group.map((a) => (
@@ -453,7 +455,7 @@ export default function ResultsClient({
           className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-semibold shadow-lg"
         >
           <Icon name="message" size={13} />
-          留言
+          {t("rc.commentBtn")}
         </button>
       )}
 
@@ -468,7 +470,7 @@ export default function ResultsClient({
               autoFocus
               rows={3}
               className="textarea"
-              placeholder="寫下你的留言…"
+              placeholder={t("rc.writeComment")}
               value={body}
               onChange={(e) => setBody(e.target.value)}
             />
@@ -479,18 +481,18 @@ export default function ResultsClient({
                 className="btn-primary !h-8 !px-3 text-xs"
                 disabled={submitting || !body.trim()}
               >
-                {submitting ? "送出中…" : "送出"}
+                {submitting ? t("rc.submitting") : t("rc.submit")}
               </button>
               <button
                 type="button"
                 className="btn-ghost !h-8 !px-3 text-xs"
                 onClick={() => setComposer(null)}
               >
-                取消
+                {t("rc.cancel")}
               </button>
               {identity && (
                 <span className="ml-auto text-[11px] text-subtle">
-                  {identity.name ?? "匿名"}
+                  {identity.name ?? t("rc.anonymous")}
                 </span>
               )}
             </div>
@@ -516,7 +518,7 @@ export default function ResultsClient({
             <button
               className="text-subtle hover:text-ink"
               onClick={() => setOpenThread(null)}
-              aria-label="關閉"
+              aria-label={t("am.close")}
             >
               <Icon name="x" size={15} />
             </button>
@@ -527,7 +529,7 @@ export default function ResultsClient({
             <div>
               <p className="whitespace-pre-wrap text-sm">{openComment.body}</p>
               <p className="mt-0.5 text-[11px] text-subtle">
-                {openComment.author_name || "匿名"} ·{" "}
+                {openComment.author_name || t("rc.anonymous")} ·{" "}
                 {fmtTime(openComment.created_at)}
               </p>
             </div>
@@ -536,7 +538,7 @@ export default function ResultsClient({
               <div key={r.id} className="border-l-2 border-[color:var(--surface-3)] pl-3">
                 <p className="whitespace-pre-wrap text-sm">{r.body}</p>
                 <p className="mt-0.5 text-[11px] text-subtle">
-                  {r.author_name || "匿名"} · {fmtTime(r.created_at)}
+                  {r.author_name || t("rc.anonymous")} · {fmtTime(r.created_at)}
                 </p>
               </div>
             ))}
@@ -548,7 +550,7 @@ export default function ResultsClient({
             <div className="mt-3 flex gap-2">
               <input
                 className="textarea !h-8 text-sm"
-                placeholder="回覆…"
+                placeholder={t("rc.reply")}
                 value={replyBody}
                 onChange={(e) => setReplyBody(e.target.value)}
                 onFocus={() => {
@@ -584,7 +586,7 @@ export default function ResultsClient({
                   void submitReply(openComment.id);
                 }}
               >
-                送出
+                {t("rc.submit")}
               </button>
             </div>
           )}
@@ -601,10 +603,8 @@ export default function ResultsClient({
             className="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-sm font-semibold">你是誰？</h3>
-            <p className="mt-1 text-xs text-muted">
-              選擇留言時顯示的身分，也可以匿名。
-            </p>
+            <h3 className="text-sm font-semibold">{t("rc.whoTitle")}</h3>
+            <p className="mt-1 text-xs text-muted">{t("rc.whoDesc")}</p>
             {!anonymous && rosterNames.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {rosterNames.map((n) => (
@@ -621,7 +621,7 @@ export default function ResultsClient({
             <div className="mt-3 flex gap-2">
               <input
                 className="textarea !h-9 text-sm"
-                placeholder="自行輸入名字"
+                placeholder={t("rc.customName")}
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
               />
@@ -630,14 +630,14 @@ export default function ResultsClient({
                 disabled={!customName.trim()}
                 onClick={() => saveIdentity(customName.trim())}
               >
-                使用
+                {t("rc.use")}
               </button>
             </div>
             <button
               className="mt-3 text-xs text-muted hover:text-ink"
               onClick={() => saveIdentity(null)}
             >
-              匿名留言
+              {t("rc.anonComment")}
             </button>
           </div>
         </div>

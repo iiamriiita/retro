@@ -1,18 +1,20 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
+import { getT } from "@/lib/i18n/server";
 import AuthModal from "@/components/AuthModal";
 import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
 
 const FEATURES = [
-  { icon: "shield" as const, label: "即時建設性把關" },
-  { icon: "message" as const, label: "選字逐句討論" },
-  { icon: "sparkles" as const, label: "AI 團隊洞察" },
+  { icon: "shield" as const, key: "landing.featGuardrails" },
+  { icon: "message" as const, key: "landing.featDiscussion" },
+  { icon: "sparkles" as const, key: "landing.featAI" },
 ];
 
 export default async function LandingPage() {
   const user = await getCurrentUser();
+  const { t } = await getT();
 
   return (
     <div
@@ -25,18 +27,19 @@ export default async function LandingPage() {
     >
       <div className="mx-auto max-w-3xl py-10">
         <p className="eyebrow" style={{ color: "var(--gold-700)" }}>
-          給小團隊的回顧工具
+          {t("landing.eyebrow")}
         </p>
 
         <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
-          誠實的團隊回饋，
-          <br />
-          少一點<span style={{ color: "var(--accent-press)" }}>尷尬</span>。
+          {t("landing.headlineLead")}
+          <span style={{ color: "var(--accent-press)" }}>
+            {t("landing.headlineAccent")}
+          </span>
+          {t("landing.headlineTail")}
         </h1>
 
         <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
-          發起一場 retro、分享連結，讓大家一起說真話。即時把關讓回饋保持建設性
-          —— 結束後一起討論，再讓 AI 幫你看見重點。
+          {t("landing.subtitle")}
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -44,21 +47,25 @@ export default async function LandingPage() {
             <>
               <Link className="btn-primary" href="/dashboard">
                 <Icon name="arrow-right" size={16} />
-                前往我的 Dashboard
+                {t("landing.ctaDashboard")}
               </Link>
               <Link className="btn-ghost" href="/dashboard/new">
                 <Icon name="plus" size={15} />
-                發起新 retro
+                {t("landing.ctaNew")}
               </Link>
             </>
           ) : (
             <>
               <AuthModal
-                label="免費開始使用"
+                label={t("landing.ctaStart")}
                 variant="primary"
                 defaultTab="register"
               />
-              <AuthModal label="登入" variant="ghost" defaultTab="login" />
+              <AuthModal
+                label={t("landing.ctaLogin")}
+                variant="ghost"
+                defaultTab="login"
+              />
             </>
           )}
         </div>
@@ -66,21 +73,19 @@ export default async function LandingPage() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5">
           {FEATURES.map((f) => (
             <span
-              key={f.label}
+              key={f.key}
               className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold"
               style={{ background: "var(--surface-2)", color: "var(--text)" }}
             >
               <span style={{ color: "var(--gold-700)" }}>
                 <Icon name={f.icon} size={15} />
               </span>
-              {f.label}
+              {t(f.key)}
             </span>
           ))}
         </div>
 
-        <p className="mt-8 text-xs text-subtle">
-          只有發起者需要登入；填寫與討論的人用連結進來即可。
-        </p>
+        <p className="mt-8 text-xs text-subtle">{t("landing.footnote")}</p>
       </div>
     </div>
   );

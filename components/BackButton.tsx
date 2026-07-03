@@ -2,15 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import Icon from "@/components/Icon";
+import { useT } from "@/lib/i18n/client";
 
 export default function BackButton({
   fallback = "/",
-  label = "返回",
+  label,
 }: {
   fallback?: string;
   label?: string;
 }) {
   const router = useRouter();
+  const { t } = useT();
+  const text = label ?? t("common.back");
   return (
     <button
       type="button"
@@ -24,7 +27,7 @@ export default function BackButton({
       }}
     >
       <Icon name="arrow-left" size={15} />
-      {label}
+      {text}
     </button>
   );
 }

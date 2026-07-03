@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Icon from "@/components/Icon";
+import { useT } from "@/lib/i18n/client";
 
 export default function FormLinkButton({ sessionId }: { sessionId: string }) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -37,7 +39,7 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
         className="btn-ghost !py-1.5 text-xs"
         onClick={() => setOpen(true)}
       >
-        retro form
+        {t("flb.trigger")}
       </button>
 
       {open && (
@@ -87,7 +89,7 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="關閉"
+                aria-label={t("am.close")}
                 className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-lg text-[color:var(--text-inverse)] transition-colors"
                 style={{ background: "rgba(255,255,255,0.55)" }}
               >
@@ -110,20 +112,18 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
                 className="eyebrow relative mt-4"
                 style={{ color: "var(--text-inverse)", opacity: 0.85 }}
               >
-                邀請你的團隊
+                {t("flb.inviteEyebrow")}
               </p>
             </div>
 
             {/* Body */}
             <div className="p-6">
               <h3 className="text-xl font-extrabold tracking-tight">
-                分享 retro 表單
+                {t("flb.shareTitle")}
               </h3>
-              <p className="mt-1.5 text-sm text-muted">
-                任何拿到連結的人都能填寫回饋 — 不需要註冊帳號。
-              </p>
+              <p className="mt-1.5 text-sm text-muted">{t("flb.shareDesc")}</p>
 
-              <p className="eyebrow mt-5">表單連結</p>
+              <p className="eyebrow mt-5">{t("flb.formLink")}</p>
               <div className="mt-2 flex items-stretch gap-2">
                 <input
                   readOnly
@@ -138,7 +138,7 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
                   onClick={copy}
                 >
                   <Icon name={copied ? "check" : "link"} size={15} />
-                  {copied ? "已複製" : "複製"}
+                  {copied ? t("flb.copied") : t("flb.copy")}
                 </button>
               </div>
 
@@ -150,7 +150,7 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
                 onClick={() => setOpen(false)}
               >
                 <Icon name="external-link" size={15} />
-                在新分頁開啟表單
+                {t("flb.openNewTab")}
               </a>
             </div>
           </div>

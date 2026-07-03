@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import { deriveState } from "@/lib/status";
 import { computeTeamStats, type RetroRow, type AiInsights } from "@/lib/insights";
+import { getT } from "@/lib/i18n/server";
 import FormLinkButton from "@/components/FormLinkButton";
 import TeamInsights from "@/components/TeamInsights";
 import Icon from "@/components/Icon";
@@ -14,6 +15,8 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+
+  const { locale, t } = await getT();
 
   const supabase = createServiceClient();
   const { data: sessions } = await supabase
@@ -61,20 +64,20 @@ export default async function DashboardPage() {
     <div className="container-wide">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">我的 Retro</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight">
+            {t("dash.title")}
+          </h1>
           <p className="mt-1.5 text-sm text-muted">{user.email}</p>
         </div>
         <Link className="btn-primary" href="/dashboard/new">
           <Icon name="plus" size={15} />
-          發起新 retro
+          {t("dash.new")}
         </Link>
       </div>
 
       {!sessions || sessions.length === 0 ? (
         <div className="card">
-          <p className="text-sm text-muted">
-            還沒有任何 retro。點右上角「發起新 retro」開始第一場。
-          </p>
+          <p className="text-sm text-muted">{t("dash.empty")}</p>
         </div>
       ) : (
         <>
@@ -83,7 +86,7 @@ export default async function DashboardPage() {
             initialInsights={(insightRow?.data as AiInsights | undefined) ?? null}
             initialGeneratedAt={insightRow?.generated_at ?? null}
           />
-          <h2 className="mb-3 text-sm font-bold">所有 retro</h2>
+          <h2 className="mb-3 text-sm font-bold">{t("dash.allRetros")}</h2>
           <ul className="space-y-3">
           {sessions.map((s) => {
             const state = deriveState({
@@ -92,7 +95,7 @@ export default async function DashboardPage() {
               discussion_enabled: s.discussion_enabled,
               ai_report_at: s.ai_report_at,
             });
-            const template = getTemplate(s.template_id);
+            const template = getTemplate(s.template_id, locale);
             return (
               <li key={s.id} className="card flex items-center justify-between gap-4">
                 <div className="min-w-0">
@@ -107,17 +110,19 @@ export default async function DashboardPage() {
                           : "badge"
                       }
                     >
-                      {state.primary.label}
+                      {t(state.primary.key)}
                     </span>
-                    {state.badges.map((b) => (
+                    {state.badgeKeys.map((b) => (
                       <span key={b} className="badge badge-accent">
-                        {b}
+                        {t(b)}
                       </span>
                     ))}
                   </div>
                   <p className="mt-1 text-xs text-muted">
-                    {s.anonymity === "anonymous" ? "匿名" : "具名"} · 截止{" "}
-                    {new Date(s.deadline).toLocaleString()}
+                    {s.anonymity === "anonymous"
+                      ? t("dash.anonymous")
+                      : t("dash.named")}{" "}
+                    · {t("dash.due", { date: new Date(s.deadline).toLocaleString() })}
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
@@ -126,7 +131,7 @@ export default async function DashboardPage() {
                     className="btn-primary !py-1.5 text-xs"
                     href={`/s/${s.id}/results`}
                   >
-                    管理 / 結果
+                    {t("dash.manage")}
                   </Link>
                 </div>
               </li>

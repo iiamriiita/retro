@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useT } from "@/lib/i18n/client";
 import type { Anonymity, Template } from "@/lib/types";
 
 function defaultDeadline(): string {
@@ -12,9 +13,9 @@ function defaultDeadline(): string {
   )}:${pad(d.getMinutes())}`;
 }
 
-const STEPS = ["設定", "選問卷"];
-
 export default function CreateWizard({ templates }: { templates: Template[] }) {
+  const { t: tr } = useT();
+  const STEPS = [tr("cw.stepSetup"), tr("cw.stepTemplate")];
   const [step, setStep] = useState(0);
 
   const [anonymity, setAnonymity] = useState<Anonymity>("named");
@@ -42,7 +43,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
     if (step === 0) {
       const d = new Date(deadline);
       if (Number.isNaN(d.getTime()) || d.getTime() <= Date.now()) {
-        setError("截止時間必須在未來。");
+        setError(tr("cw.deadlineErr"));
         return;
       }
     }
@@ -67,10 +68,10 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "建立失敗");
+      if (!res.ok) throw new Error(data?.error ?? tr("cw.createFail"));
       setCreatedId(data.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "建立失敗");
+      setError(err instanceof Error ? err.message : tr("cw.createFail"));
     } finally {
       setSubmitting(false);
     }
@@ -79,10 +80,8 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
   if (createdId) {
     return (
       <div className="card">
-        <h2 className="text-lg font-semibold">Retro 已建立 🎉</h2>
-        <p className="mt-1 text-sm text-muted">
-          把這個連結分享給成員，他們就能開始填寫。
-        </p>
+        <h2 className="text-lg font-semibold">{tr("cw.createdTitle")}</h2>
+        <p className="mt-1 text-sm text-muted">{tr("cw.createdDesc")}</p>
         <div className="mt-4 flex items-center gap-2">
           <input
             readOnly
@@ -99,15 +98,15 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
               setTimeout(() => setCopied(false), 1500);
             }}
           >
-            {copied ? "已複製" : "複製"}
+            {copied ? tr("cw.copied") : tr("cw.copy")}
           </button>
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
           <a className="btn-primary" href={`/s/${createdId}/results`}>
-            管理 / 結果
+            {tr("cw.manageResults")}
           </a>
           <a className="btn-ghost" href="/dashboard">
-            回 Dashboard
+            {tr("cw.backDashboard")}
           </a>
         </div>
       </div>
@@ -142,11 +141,11 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
       {step === 0 && (
         <div className="card space-y-5">
           <div>
-            <label className="field-label">這場要匿名嗎？</label>
+            <label className="field-label">{tr("cw.anonTitle")}</label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { v: "named", t: "具名", d: "填寫時自己打名字，結果會顯示" },
-                { v: "anonymous", t: "匿名", d: "不顯示身分" },
+                { v: "named", t: tr("cw.named"), d: tr("cw.namedDesc") },
+                { v: "anonymous", t: tr("cw.anon"), d: tr("cw.anonDesc") },
               ].map((o) => (
                 <button
                   key={o.v}
@@ -166,16 +165,14 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
           </div>
 
           <div>
-            <label className="field-label">截止時間</label>
+            <label className="field-label">{tr("cw.deadline")}</label>
             <input
               type="datetime-local"
               className="textarea"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
             />
-            <p className="mt-1 text-xs text-muted">
-              過了截止時間，表單會自動鎖定不能再填。
-            </p>
+            <p className="mt-1 text-xs text-muted">{tr("cw.deadlineHint")}</p>
           </div>
         </div>
       )}
@@ -219,7 +216,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                       className="mt-2 text-xs text-[color:var(--gold-700)] hover:underline"
                       onClick={() => setPreview(open ? null : t.id)}
                     >
-                      {open ? "收起預覽" : "預覽題目"}
+                      {open ? tr("cw.previewHide") : tr("cw.previewShow")}
                     </button>
                     {open && (
                       <ul className="mt-2 space-y-2 rounded-lg bg-gray-50 p-3">
@@ -228,7 +225,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                             <span className="font-medium">{q.label}</span>
                             {q.placeholder && (
                               <span className="mt-0.5 block text-muted">
-                                例：{q.placeholder}
+                                {tr("cw.example", { text: q.placeholder })}
                               </span>
                             )}
                           </li>
@@ -242,7 +239,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
           })}
           {selected && (
             <p className="text-xs text-muted">
-              已選：<span className="font-medium">{selected.name}</span>
+              {tr("cw.selected", { name: selected.name })}
             </p>
           )}
         </div>
@@ -261,11 +258,11 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
           onClick={back}
           disabled={step === 0 || submitting}
         >
-          上一步
+          {tr("cw.prev")}
         </button>
         {step < STEPS.length - 1 ? (
           <button type="button" className="btn-primary" onClick={next}>
-            下一步
+            {tr("cw.next")}
           </button>
         ) : (
           <button
@@ -274,7 +271,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
             onClick={submit}
             disabled={submitting || !templateId}
           >
-            {submitting ? "建立中…" : "建立並產生連結"}
+            {submitting ? tr("cw.creating") : tr("cw.create")}
           </button>
         )}
       </div>

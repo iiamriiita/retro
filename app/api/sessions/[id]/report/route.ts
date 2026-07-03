@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
+import { getLocale } from "@/lib/i18n/server";
 import { buildContext, geminiSummary } from "@/lib/summary";
 
 export const runtime = "nodejs";
@@ -12,8 +13,14 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  const locale = await getLocale();
+  const en = locale === "en";
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "請先登入" }, { status: 401 });
+  if (!user)
+    return NextResponse.json(
+      { error: en ? "Please log in first" : "請先登入" },
+      { status: 401 },
+    );
 
   const supabase = createServiceClient();
   const { data: session } = await supabase
@@ -31,7 +38,11 @@ export async function POST(
     new Date(session.deadline).getTime() <= Date.now();
   if (!viewable) {
     return NextResponse.json(
-      { error: "請先結束 session 再生成報告。" },
+      {
+        error: en
+          ? "End the session before generating the report."
+          : "請先結束 session 再生成報告。",
+      },
       { status: 409 },
     );
   }
@@ -41,20 +52,33 @@ export async function POST(
     .select("question_key, content")
     .eq("session_id", session.id);
   if (!answers || answers.length === 0) {
-    return NextResponse.json({ error: "這場還沒有任何回答。" }, { status: 400 });
+    return NextResponse.json(
+      { error: en ? "This retro has no answers yet." : "這場還沒有任何回答。" },
+      { status: 400 },
+    );
   }
 
   try {
-    const report = await geminiSummary(buildContext(session.template_id, answers));
+    const report = await geminiSummary(
+      buildContext(session.template_id, answers, locale),
+      locale,
+    );
     const { error } = await supabase
       .from("retro_sessions")
       .update({ ai_report: report, ai_report_at: new Date().toISOString() })
       .eq("id", session.id);
-    if (error) throw new Error("儲存報告失敗");
+    if (error) throw new Error(en ? "Failed to save report" : "儲存報告失敗");
     return NextResponse.json({ ok: true, report });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "產生失敗" },
+      {
+        error:
+          err instanceof Error
+            ? err.message
+            : en
+              ? "Generation failed"
+              : "產生失敗",
+      },
       { status: 502 },
     );
   }

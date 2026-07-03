@@ -1,0 +1,496 @@
+// Bilingual UI dictionary. Every user-facing string lives here in both
+// languages. RULE: whenever you add or change a string, edit BOTH en and zh.
+// Access with t("some.key", { var }); "{var}" placeholders are interpolated.
+
+export type Locale = "en" | "zh";
+export const LOCALES: Locale[] = ["en", "zh"];
+export const DEFAULT_LOCALE: Locale = "en";
+export const LOCALE_COOKIE = "locale";
+
+type Dict = Record<string, string>;
+
+const en: Dict = {
+  // nav / chrome
+  "nav.dashboard": "Dashboard",
+  "nav.signOut": "Sign out",
+  "nav.login": "Log in",
+
+  // landing
+  "landing.eyebrow": "Retrospectives for small teams",
+  "landing.headlineLead": "Honest team feedback, minus the ",
+  "landing.headlineAccent": "awkward",
+  "landing.headlineTail": ".",
+  "landing.subtitle":
+    "Launch a retro, share a link, and let everyone weigh in. Real-time guardrails keep it constructive — then discuss and let AI surface what matters.",
+  "landing.ctaDashboard": "Go to my dashboard",
+  "landing.ctaNew": "New retro",
+  "landing.ctaStart": "Get started free",
+  "landing.ctaLogin": "Log in",
+  "landing.featGuardrails": "Constructive guardrails",
+  "landing.featDiscussion": "Quote-level discussion",
+  "landing.featAI": "AI insights",
+  "landing.footnote":
+    "Only the organizer needs an account — everyone else joins with a link.",
+
+  // meta
+  "meta.title": "Team Retro",
+  "meta.description":
+    "A retrospective tool for small teams — real-time guardrails keep feedback constructive.",
+
+  // login page
+  "login.prompt": "Please log in or sign up first.",
+
+  // dashboard
+  "dash.title": "My retros",
+  "dash.new": "New retro",
+  "dash.empty":
+    "No retros yet. Click “New retro” in the top-right to start your first one.",
+  "dash.allRetros": "All retros",
+  "dash.manage": "Manage / Results",
+  "dash.named": "Named",
+  "dash.anonymous": "Anonymous",
+  "dash.due": "Due {date}",
+
+  // session status
+  "status.open": "In progress",
+  "status.closed": "Ended",
+  "status.discussing": "In discussion",
+  "status.reportReady": "AI report ready",
+
+  // team insights
+  "ti.title": "Team insights",
+  "ti.scope": "Across {count} retros · {closed} ended",
+  "ti.cardFeedback": "Total feedback",
+  "ti.avgPerRetro": "Avg {n} per retro",
+  "ti.vsLast": "vs last retro",
+  "ti.cardComments": "Discussion comments",
+  "ti.acrossAll": "Across all retros",
+  "ti.cardCompleted": "Completed",
+  "ti.endedAll": "Ended / total",
+  "ti.chartTitle": "Feedback per retro",
+  "ti.lastN": "Last {n}",
+  "ti.noData": "No data yet.",
+  "ti.pulse": "Team pulse",
+  "ti.regen": "Regenerate",
+  "ti.emptyDesc":
+    "Use AI to analyze the team's sentiment over time, recurring themes, and unresolved pain points across retros.",
+  "ti.generate": "Generate AI insights",
+  "ti.generating": "Generating… (about 10–20s)",
+  "ti.themes": "Recurring themes",
+  "ti.generatedAt": "AI generated · {date} · for reference",
+  "ti.genFail": "Generation failed",
+
+  // new retro page
+  "new.back": "Back to dashboard",
+  "new.title": "Start a retro",
+  "new.desc":
+    "Pick a template, generate a share link, and let a group of 2–5 give each other feedback.",
+
+  // create wizard
+  "cw.stepSetup": "Setup",
+  "cw.stepTemplate": "Template",
+  "cw.anonTitle": "Anonymous this round?",
+  "cw.named": "Named",
+  "cw.namedDesc": "People type their name; results show it.",
+  "cw.anon": "Anonymous",
+  "cw.anonDesc": "Identities are hidden.",
+  "cw.deadline": "Deadline",
+  "cw.deadlineHint": "After the deadline the form locks automatically.",
+  "cw.deadlineErr": "The deadline must be in the future.",
+  "cw.previewShow": "Preview questions",
+  "cw.previewHide": "Hide preview",
+  "cw.example": "e.g. {text}",
+  "cw.selected": "Selected: {name}",
+  "cw.prev": "Back",
+  "cw.next": "Next",
+  "cw.create": "Create & get link",
+  "cw.creating": "Creating…",
+  "cw.createFail": "Failed to create",
+  "cw.createdTitle": "Retro created 🎉",
+  "cw.createdDesc":
+    "Share this link with your team so they can start filling it in.",
+  "cw.copy": "Copy",
+  "cw.copied": "Copied",
+  "cw.manageResults": "Manage / Results",
+  "cw.backDashboard": "Back to dashboard",
+
+  // fill wizard
+  "fw.enterName": "Please enter your name.",
+  "fw.atLeastOne": "Fill in at least one question before submitting.",
+  "fw.oneNeedsFix": "One answer needs a small tweak 🙂",
+  "fw.submitFail": "Submit failed",
+  "fw.doneTitle": "Submitted — thanks for your feedback 🙌",
+  "fw.doneDesc": "You'll see the results once the organizer ends the session.",
+  "fw.alreadyTitle": "You've already filled this in on this device",
+  "fw.alreadyDesc":
+    "One submission per person. If this wasn't you, use another device or clear your browser data.",
+  "fw.fillAgain": "Fill in again anyway",
+  "fw.yourName": "Your name",
+  "fw.namePlaceholder": "e.g. Alex",
+  "fw.nameHint": "Your name will be shown with your results.",
+  "fw.checking": "Checking…",
+  "fw.qProgress": "Question {i} / {n} (leave blank to skip)",
+  "fw.reviewTitle": "Review & submit",
+  "fw.asIdentity": "As {name}",
+  "fw.blank": "(blank)",
+  "fw.prev": "Back",
+  "fw.submit": "Submit feedback",
+  "fw.submitting": "Submitting…",
+  "fw.next": "Next",
+  "fw.nextChecking": "Checking…",
+
+  // fill page
+  "fill.notFound": "Retro not found",
+  "fill.notFoundDesc": "The link may be wrong or the retro was deleted.",
+  "fill.noTemplate": "Questionnaire not found",
+  "fill.endedTitle": "This retro has ended",
+  "fill.endedClosed": "The organizer ended this session; the form is locked.",
+  "fill.endedExpired": "The deadline has passed; the form is locked.",
+  "fill.viewResults": "View results",
+  "fill.locked": "🔒 The form is locked and can no longer be filled in.",
+
+  // results page
+  "res.title": "{name} — Results",
+  "res.modeAnon": "Anonymous",
+  "res.modeNamed": "Named",
+  "res.responsesTotal": "{n} responses total",
+  "res.discussing": "in discussion",
+  "res.inProgressTitle": "Session in progress",
+  "res.inProgressDesc":
+    "{n} people have filled it in so far. Results appear after it ends.",
+  "res.ownerCanEnd":
+    "You're the organizer — end the session whenever you're ready.",
+  "res.waitOrganizer":
+    "Once the organizer ends the session (or the deadline passes), come back here to see the results.",
+  "res.noTemplate": "Questionnaire template not found.",
+
+  // owner controls
+  "oc.title": "Organizer console",
+  "oc.closeDiscussion": "Close discussion",
+  "oc.openDiscussion": "Open discussion",
+  "oc.processing": "Working…",
+  "oc.regenReport": "Regenerate AI report",
+  "oc.genReport": "Generate AI report",
+  "oc.generating": "Generating… (about 10–20s)",
+  "oc.hint":
+    "Discussion and the AI report are independent — you can run both. Once discussion is open, anyone with the link can select text and comment.",
+  "oc.updateFail": "Update failed",
+  "oc.genFail": "Generation failed",
+
+  // close session
+  "csb.confirm": "Once ended, members can no longer fill it in. End now?",
+  "csb.ending": "Ending…",
+  "csb.endBtn": "End session & see results",
+  "csb.endFail": "Failed to end",
+
+  // report view
+  "rv.title": "AI report",
+  "rv.generatedAt": "Generated {date}",
+  "rv.none": "The organizer hasn't generated an AI report yet.",
+
+  // results client / discussion
+  "rc.hint": "Select any part of an answer to comment.",
+  "rc.asIdentity": "As {name} · change",
+  "rc.anonymous": "Anonymous",
+  "rc.responses": "{n} responses",
+  "rc.noAnswers": "No one has answered this yet.",
+  "rc.commentBtn": "Comment",
+  "rc.writeComment": "Write a comment…",
+  "rc.submit": "Send",
+  "rc.submitting": "Sending…",
+  "rc.cancel": "Cancel",
+  "rc.reply": "Reply…",
+  "rc.commentFail": "Comment failed",
+  "rc.replyFail": "Reply failed",
+  "rc.whoTitle": "Who are you?",
+  "rc.whoDesc": "Choose the name shown on your comments, or stay anonymous.",
+  "rc.customName": "Type a name",
+  "rc.use": "Use",
+  "rc.anonComment": "Comment anonymously",
+
+  // form link popup
+  "flb.trigger": "Retro form",
+  "flb.inviteEyebrow": "Invite your team",
+  "flb.shareTitle": "Share retro form",
+  "flb.shareDesc":
+    "Anyone with this link can submit feedback — no account needed.",
+  "flb.formLink": "Form link",
+  "flb.copy": "Copy",
+  "flb.copied": "Copied",
+  "flb.openNewTab": "Open form in new tab",
+
+  // auth modal
+  "am.login": "Log in",
+  "am.register": "Sign up",
+  "am.close": "Close",
+  "am.email": "Email",
+  "am.password": "Password",
+  "am.loggingIn": "Logging in…",
+  "am.loginBtn": "Log in",
+  "am.forgot": "Forgot password?",
+  "am.loginFail":
+    "Login failed. Check your email and password. If you haven't signed up, switch to “Sign up”.",
+  "am.registerTitle": "Create an account",
+  "am.resetTitle": "Reset password",
+  "am.emailHint": "Enter your email and we'll send you a 6-digit code.",
+  "am.sending": "Sending…",
+  "am.sendCode": "Send code",
+  "am.codeSent": "Code sent — check your inbox (including spam).",
+  "am.sendFailReset": "That email wasn't found, or sending failed.",
+  "am.sendFail": "Sending failed, please try again later.",
+  "am.enterCode": "Enter the code",
+  "am.sentTo": "Sent to {email}.",
+  "am.codeError": "The code is wrong or expired — please resend.",
+  "am.verifying": "Verifying…",
+  "am.verify": "Verify",
+  "am.resend": "Resend",
+  "am.setPassword": "Set a password",
+  "am.setPasswordHint":
+    "Set a password (at least 6 characters); then log in with email + password.",
+  "am.setPasswordFail": "Couldn't set the password — try another (min 6 chars).",
+  "am.settingUp": "Setting up…",
+  "am.setAndEnter": "Set password & enter",
+
+  // language
+  "lang.switch": "Language",
+
+  // common
+  "common.back": "Back",
+};
+
+const zh: Dict = {
+  "nav.dashboard": "Dashboard",
+  "nav.signOut": "登出",
+  "nav.login": "登入",
+
+  "landing.eyebrow": "給小團隊的回顧工具",
+  "landing.headlineLead": "誠實的團隊回饋，少一點",
+  "landing.headlineAccent": "尷尬",
+  "landing.headlineTail": "。",
+  "landing.subtitle":
+    "發起一場 retro、分享連結，讓大家一起說真話。即時把關讓回饋保持建設性 —— 結束後一起討論，再讓 AI 幫你看見重點。",
+  "landing.ctaDashboard": "前往我的 Dashboard",
+  "landing.ctaNew": "發起新 retro",
+  "landing.ctaStart": "免費開始使用",
+  "landing.ctaLogin": "登入",
+  "landing.featGuardrails": "即時建設性把關",
+  "landing.featDiscussion": "選字逐句討論",
+  "landing.featAI": "AI 團隊洞察",
+  "landing.footnote": "只有發起者需要登入；填寫與討論的人用連結進來即可。",
+
+  "meta.title": "Team Retro",
+  "meta.description": "給小組的回顧工具 — 即時把關有建設性的回饋。",
+
+  "login.prompt": "請先登入或註冊。",
+
+  "dash.title": "我的 Retro",
+  "dash.new": "發起新 retro",
+  "dash.empty": "還沒有任何 retro。點右上角「發起新 retro」開始第一場。",
+  "dash.allRetros": "所有 retro",
+  "dash.manage": "管理 / 結果",
+  "dash.named": "具名",
+  "dash.anonymous": "匿名",
+  "dash.due": "截止 {date}",
+
+  "status.open": "進行中",
+  "status.closed": "已結束",
+  "status.discussing": "討論中",
+  "status.reportReady": "AI 報告已生成",
+
+  "ti.title": "團隊洞察",
+  "ti.scope": "跨 {count} 場 retro · 已結束 {closed} 場",
+  "ti.cardFeedback": "累積回饋",
+  "ti.avgPerRetro": "平均每場 {n} 則",
+  "ti.vsLast": "vs 上一場",
+  "ti.cardComments": "討論留言",
+  "ti.acrossAll": "跨所有 retro",
+  "ti.cardCompleted": "完成場次",
+  "ti.endedAll": "已結束 / 全部",
+  "ti.chartTitle": "每場回饋數",
+  "ti.lastN": "最近 {n} 場",
+  "ti.noData": "還沒有資料。",
+  "ti.pulse": "Team pulse",
+  "ti.regen": "重新生成",
+  "ti.emptyDesc": "用 AI 跨場分析團隊氛圍走向、重複出現的主題與尚未解決的痛點。",
+  "ti.generate": "用 AI 生成洞察",
+  "ti.generating": "生成中…（約 10–20 秒）",
+  "ti.themes": "重複主題",
+  "ti.generatedAt": "AI 生成 · {date}．僅供參考",
+  "ti.genFail": "產生失敗",
+
+  "new.back": "返回 Dashboard",
+  "new.title": "發起一場 Retro",
+  "new.desc": "選一套問卷、產生分享連結，讓 2–5 人的小組互相給回饋。",
+
+  "cw.stepSetup": "設定",
+  "cw.stepTemplate": "選問卷",
+  "cw.anonTitle": "這場要匿名嗎？",
+  "cw.named": "具名",
+  "cw.namedDesc": "填寫時自己打名字，結果會顯示。",
+  "cw.anon": "匿名",
+  "cw.anonDesc": "不顯示身分。",
+  "cw.deadline": "截止時間",
+  "cw.deadlineHint": "過了截止時間，表單會自動鎖定不能再填。",
+  "cw.deadlineErr": "截止時間必須在未來。",
+  "cw.previewShow": "預覽題目",
+  "cw.previewHide": "收起預覽",
+  "cw.example": "例：{text}",
+  "cw.selected": "已選：{name}",
+  "cw.prev": "上一步",
+  "cw.next": "下一步",
+  "cw.create": "建立並產生連結",
+  "cw.creating": "建立中…",
+  "cw.createFail": "建立失敗",
+  "cw.createdTitle": "Retro 已建立 🎉",
+  "cw.createdDesc": "把這個連結分享給成員，他們就能開始填寫。",
+  "cw.copy": "複製",
+  "cw.copied": "已複製",
+  "cw.manageResults": "管理 / 結果",
+  "cw.backDashboard": "回 Dashboard",
+
+  "fw.enterName": "請輸入你的名字。",
+  "fw.atLeastOne": "至少填寫一題再送出。",
+  "fw.oneNeedsFix": "有一題需要再調整一下 🙂",
+  "fw.submitFail": "送出失敗",
+  "fw.doneTitle": "已送出，謝謝你的回饋 🙌",
+  "fw.doneDesc": "等發起者結束 session 後，就能一起看結果。",
+  "fw.alreadyTitle": "你在這台裝置已經填過了",
+  "fw.alreadyDesc":
+    "每人填一次即可。如果這不是你，換一台裝置或清除瀏覽器資料再試。",
+  "fw.fillAgain": "還是要再填一次",
+  "fw.yourName": "你的名字",
+  "fw.namePlaceholder": "例：Alex",
+  "fw.nameHint": "結果與你的名字會一起顯示。",
+  "fw.checking": "正在確認…",
+  "fw.qProgress": "第 {i} / {n} 題（可留空跳過）",
+  "fw.reviewTitle": "確認送出",
+  "fw.asIdentity": "以「{name}」的身分",
+  "fw.blank": "（未填）",
+  "fw.prev": "上一步",
+  "fw.submit": "送出回饋",
+  "fw.submitting": "送出中…",
+  "fw.next": "下一步",
+  "fw.nextChecking": "確認中…",
+
+  "fill.notFound": "找不到這場 Retro",
+  "fill.notFoundDesc": "連結可能有誤或已被刪除。",
+  "fill.noTemplate": "找不到問卷",
+  "fill.endedTitle": "此 Retro 已結束",
+  "fill.endedClosed": "發起者已結束這場 session，表單已鎖定。",
+  "fill.endedExpired": "已超過截止時間，表單已鎖定。",
+  "fill.viewResults": "查看結果",
+  "fill.locked": "🔒 表單已鎖定，無法再填寫。",
+
+  "res.title": "{name} — 結果",
+  "res.modeAnon": "匿名模式",
+  "res.modeNamed": "具名模式",
+  "res.responsesTotal": "共 {n} 則回答",
+  "res.discussing": "討論中",
+  "res.inProgressTitle": "Session 進行中",
+  "res.inProgressDesc": "目前已有 {n} 人填寫。結束後才會顯示結果。",
+  "res.ownerCanEnd": "你是這場的發起者，準備好了就可以結束 session。",
+  "res.waitOrganizer":
+    "等發起者結束 session（或到截止時間）後，回到這頁就能看到結果。",
+  "res.noTemplate": "找不到問卷模板。",
+
+  "oc.title": "發起者控制台",
+  "oc.closeDiscussion": "關閉討論",
+  "oc.openDiscussion": "開啟討論",
+  "oc.processing": "處理中…",
+  "oc.regenReport": "重新生成 AI 報告",
+  "oc.genReport": "生成 AI 報告",
+  "oc.generating": "生成中…（約 10–20 秒）",
+  "oc.hint":
+    "討論與 AI 報告是獨立的，可以同時開。開啟討論後，分享連結的人就能一起選字留言。",
+  "oc.updateFail": "更新失敗",
+  "oc.genFail": "產生失敗",
+
+  "csb.confirm": "結束後成員就無法再填寫，確定要結束嗎？",
+  "csb.ending": "結束中…",
+  "csb.endBtn": "結束 session 並看結果",
+  "csb.endFail": "結束失敗",
+
+  "rv.title": "AI 報告",
+  "rv.generatedAt": "生成於 {date}",
+  "rv.none": "發起者還沒生成 AI 報告。",
+
+  "rc.hint": "選取任一段回答文字即可留言。",
+  "rc.asIdentity": "以「{name}」· 更改",
+  "rc.anonymous": "匿名",
+  "rc.responses": "{n} 則回答",
+  "rc.noAnswers": "還沒有人回答這題。",
+  "rc.commentBtn": "留言",
+  "rc.writeComment": "寫下你的留言…",
+  "rc.submit": "送出",
+  "rc.submitting": "送出中…",
+  "rc.cancel": "取消",
+  "rc.reply": "回覆…",
+  "rc.commentFail": "留言失敗",
+  "rc.replyFail": "回覆失敗",
+  "rc.whoTitle": "你是誰？",
+  "rc.whoDesc": "選擇留言時顯示的身分，也可以匿名。",
+  "rc.customName": "自行輸入名字",
+  "rc.use": "使用",
+  "rc.anonComment": "匿名留言",
+
+  "flb.trigger": "retro 表單",
+  "flb.inviteEyebrow": "邀請你的團隊",
+  "flb.shareTitle": "分享 retro 表單",
+  "flb.shareDesc": "任何拿到連結的人都能填寫回饋 — 不需要註冊帳號。",
+  "flb.formLink": "表單連結",
+  "flb.copy": "複製",
+  "flb.copied": "已複製",
+  "flb.openNewTab": "在新分頁開啟表單",
+
+  "am.login": "登入",
+  "am.register": "註冊",
+  "am.close": "關閉",
+  "am.email": "Email",
+  "am.password": "密碼",
+  "am.loggingIn": "登入中…",
+  "am.loginBtn": "登入",
+  "am.forgot": "忘記密碼？",
+  "am.loginFail": "登入失敗，請確認 email 與密碼。若還沒註冊，請切到「註冊」。",
+  "am.registerTitle": "註冊新帳號",
+  "am.resetTitle": "重設密碼",
+  "am.emailHint": "輸入 email，我們寄一組 6 位數驗證碼給你。",
+  "am.sending": "寄送中…",
+  "am.sendCode": "寄送驗證碼",
+  "am.codeSent": "驗證碼已寄出，請查看信箱（含垃圾信匣）。",
+  "am.sendFailReset": "找不到這個 email 或寄送失敗。",
+  "am.sendFail": "寄送失敗，請稍後再試。",
+  "am.enterCode": "輸入驗證碼",
+  "am.sentTo": "已寄到 {email}。",
+  "am.codeError": "驗證碼錯誤或已過期，請重新寄送。",
+  "am.verifying": "驗證中…",
+  "am.verify": "驗證",
+  "am.resend": "重新寄送",
+  "am.setPassword": "設定密碼",
+  "am.setPasswordHint": "設定一組密碼（至少 6 碼），之後就用 email + 密碼登入。",
+  "am.setPasswordFail": "設定密碼失敗，請換一組再試（至少 6 碼）。",
+  "am.settingUp": "設定中…",
+  "am.setAndEnter": "設定密碼並進入",
+
+  "lang.switch": "語言",
+
+  "common.back": "返回",
+};
+
+export const messages: Record<Locale, Dict> = { en, zh };
+
+export function translate(
+  locale: Locale,
+  key: string,
+  vars?: Record<string, string | number>,
+): string {
+  const s = messages[locale]?.[key] ?? messages.en[key] ?? key;
+  if (!vars) return s;
+  return s.replace(/\{(\w+)\}/g, (_, k) =>
+    vars[k] != null ? String(vars[k]) : `{${k}}`,
+  );
+}
+
+export type TFunc = (
+  key: string,
+  vars?: Record<string, string | number>,
+) => string;
