@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import AuthModal from "@/components/AuthModal";
+import Icon from "@/components/Icon";
 
 export const metadata: Metadata = {
   title: "Team Retro",
@@ -26,8 +27,14 @@ export default async function RootLayout({
           <div className="container-wide flex h-[60px] items-center justify-between">
             <Link
               href="/"
-              className="font-display text-[17px] font-extrabold tracking-tight"
+              className="flex items-center gap-2.5 font-display text-[17px] font-extrabold tracking-tight"
             >
+              <span
+                className="flex h-[26px] w-[26px] items-center justify-center rounded-md"
+                style={{ background: "var(--accent)", color: "var(--text-inverse)" }}
+              >
+                <Icon name="database" size={16} />
+              </span>
               Team&nbsp;Retro
             </Link>
             <nav className="flex items-center gap-5 text-sm">

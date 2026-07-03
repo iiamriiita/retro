@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Icon from "@/components/Icon";
 
 export default function BackButton({
   fallback = "/",
@@ -22,7 +23,8 @@ export default function BackButton({
         }
       }}
     >
-      ← {label}
+      <Icon name="arrow-left" size={15} />
+      {label}
     </button>
   );
 }

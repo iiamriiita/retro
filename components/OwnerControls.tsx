@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Icon from "@/components/Icon";
 
 export default function OwnerControls({
   sessionId,
@@ -59,6 +60,7 @@ export default function OwnerControls({
           onClick={toggleDiscussion}
           disabled={busy !== null}
         >
+          <Icon name={discussionEnabled ? "lock" : "unlock"} size={15} />
           {busy === "discussion"
             ? "處理中…"
             : discussionEnabled
@@ -70,6 +72,7 @@ export default function OwnerControls({
           onClick={generateReport}
           disabled={busy !== null}
         >
+          <Icon name="sparkles" size={15} />
           {busy === "report"
             ? "生成中…（約 10–20 秒）"
             : hasReport

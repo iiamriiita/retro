@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import { deriveState } from "@/lib/status";
 import FormLinkButton from "@/components/FormLinkButton";
+import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,8 @@ export default async function DashboardPage() {
           <p className="mt-1.5 text-sm text-muted">{user.email}</p>
         </div>
         <Link className="btn-primary" href="/dashboard/new">
-          + 發起新 retro
+          <Icon name="plus" size={15} />
+          發起新 retro
         </Link>
       </div>
 

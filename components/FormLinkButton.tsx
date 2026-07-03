@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Icon from "@/components/Icon";
 
 export default function FormLinkButton({ sessionId }: { sessionId: string }) {
   const [open, setOpen] = useState(false);
@@ -48,7 +49,8 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
                 className="btn-primary text-sm"
                 onClick={copy}
               >
-                {copied ? "已複製連結 ✓" : "複製連結"}
+                <Icon name={copied ? "check" : "link"} size={15} />
+                {copied ? "已複製連結" : "複製連結"}
               </button>
               <a
                 className="btn-ghost text-sm"
@@ -57,6 +59,7 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
               >
+                <Icon name="external-link" size={15} />
                 在新分頁開啟表單
               </a>
             </div>
