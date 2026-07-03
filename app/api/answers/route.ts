@@ -11,7 +11,8 @@ interface AnswerInput {
 }
 interface SubmitBody {
   session_id?: string;
-  display_name?: string;
+  participant_id?: string; // named: chosen from roster
+  display_name?: string; // named ad-hoc, or ignored for anonymous
   answers?: AnswerInput[];
 }
 
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
   const supabase = createServiceClient();
   const { data: session, error } = await supabase
     .from("retro_sessions")
-    .select("id, template_id, anonymity, status, deadline")
+    .select("id, template_id, anonymity, status, deadline, allow_adhoc")
     .eq("id", body.session_id)
     .single();
 
@@ -38,7 +39,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  // Writable only while open AND not past deadline.
   const expired = new Date(session.deadline).getTime() <= Date.now();
   if (session.status !== "open" || expired) {
     return NextResponse.json(
@@ -53,14 +53,6 @@ export async function POST(req: Request) {
   }
   const validKeys = new Set(template.questions.map((q) => q.key));
 
-  // Named mode requires a display name.
-  const displayName =
-    session.anonymity === "named" ? (body.display_name ?? "").trim() : null;
-  if (session.anonymity === "named" && !displayName) {
-    return NextResponse.json({ error: "請先填寫暱稱。" }, { status: 400 });
-  }
-
-  // Keep only valid, non-empty answers.
   const rows = body.answers
     .filter((a) => validKeys.has(a.question_key) && a.content?.trim())
     .map((a) => ({ question_key: a.question_key, content: a.content.trim() }));
@@ -69,14 +61,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "沒有可送出的內容。" }, { status: 400 });
   }
 
-  // Hard server-side gate against blatant personal insults (defence in depth —
-  // the client already runs moderation, this stops a bypassed request).
+  // Server-side hard gate against blatant personal insults.
   for (const r of rows) {
     if (checkBlocklist(r.content).hit) {
       return NextResponse.json(
         {
-          error:
-            "有內容包含人身攻擊字眼，請調整為對事不對人的回饋後再送出。",
+          error: "有內容包含人身攻擊字眼，請調整為對事不對人的回饋後再送出。",
           question_key: r.question_key,
         },
         { status: 422 },
@@ -84,21 +74,72 @@ export async function POST(req: Request) {
     }
   }
 
-  // Create the participant, then the answers.
-  const { data: participant, error: pErr } = await supabase
-    .from("retro_participants")
-    .insert({ session_id: session.id, display_name: displayName })
-    .select("id")
-    .single();
+  // Resolve the participant.
+  let participantId: string;
 
-  if (pErr || !participant) {
-    return NextResponse.json({ error: "Could not save" }, { status: 500 });
+  if (session.anonymity === "anonymous") {
+    const { data: p, error: pErr } = await supabase
+      .from("retro_participants")
+      .insert({ session_id: session.id, display_name: null, submitted_at: new Date().toISOString() })
+      .select("id")
+      .single();
+    if (pErr || !p) {
+      return NextResponse.json({ error: "Could not save" }, { status: 500 });
+    }
+    participantId = p.id;
+  } else if (body.participant_id) {
+    // Named: chosen from the roster. Must belong to the session and be unfilled.
+    const { data: p } = await supabase
+      .from("retro_participants")
+      .select("id, submitted_at")
+      .eq("id", body.participant_id)
+      .eq("session_id", session.id)
+      .single();
+    if (!p) {
+      return NextResponse.json({ error: "找不到這位成員" }, { status: 400 });
+    }
+    if (p.submitted_at) {
+      return NextResponse.json(
+        { error: "這位成員已經填過了。" },
+        { status: 409 },
+      );
+    }
+    await supabase
+      .from("retro_participants")
+      .update({ submitted_at: new Date().toISOString() })
+      .eq("id", p.id);
+    participantId = p.id;
+  } else {
+    // Named ad-hoc: add a new participant, if allowed.
+    const name = (body.display_name ?? "").trim();
+    if (!name) {
+      return NextResponse.json({ error: "請先選擇你是誰。" }, { status: 400 });
+    }
+    if (!session.allow_adhoc) {
+      return NextResponse.json(
+        { error: "這場只允許名單上的成員填寫。" },
+        { status: 403 },
+      );
+    }
+    const { data: p, error: pErr } = await supabase
+      .from("retro_participants")
+      .insert({
+        session_id: session.id,
+        display_name: name,
+        submitted_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+    if (pErr || !p) {
+      return NextResponse.json({ error: "Could not save" }, { status: 500 });
+    }
+    participantId = p.id;
   }
 
   const { error: aErr } = await supabase.from("retro_answers").insert(
     rows.map((r) => ({
       session_id: session.id,
-      participant_id: participant.id,
+      participant_id: participantId,
       question_key: r.question_key,
       content: r.content,
     })),

@@ -1,6 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
-import FillForm from "@/components/FillForm";
+import FillWizard, { type RosterMember } from "@/components/FillWizard";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export default async function FillPage({
 
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select("id, template_id, anonymity, status, deadline")
+    .select("id, template_id, anonymity, status, deadline, allow_adhoc")
     .eq("id", session_id)
     .single();
 
@@ -43,10 +43,7 @@ export default async function FillPage({
               ? "發起者已結束這場 session。"
               : "已超過截止時間，表單已鎖定。"}
           </p>
-          <a
-            className="btn-primary mt-4"
-            href={`/s/${session.id}/results`}
-          >
+          <a className="btn-primary mt-4" href={`/s/${session.id}/results`}>
             查看結果
           </a>
         </div>
@@ -54,15 +51,31 @@ export default async function FillPage({
     );
   }
 
+  // Named sessions: load the roster so the filler can pick who they are.
+  let roster: RosterMember[] = [];
+  if (session.anonymity === "named") {
+    const { data: participants } = await supabase
+      .from("retro_participants")
+      .select("id, display_name, submitted_at")
+      .eq("session_id", session.id)
+      .order("created_at", { ascending: true });
+    roster = (participants ?? []).map((p) => ({
+      id: p.id,
+      display_name: p.display_name,
+      submitted: !!p.submitted_at,
+    }));
+  }
+
   return (
     <div className="container-narrow">
-      <FillForm
+      <FillWizard
         sessionId={session.id}
         anonymity={session.anonymity}
-        deadline={session.deadline}
         templateName={template.name}
         templateDescription={template.description}
         questions={template.questions}
+        roster={roster}
+        allowAdhoc={session.allow_adhoc}
       />
     </div>
   );
