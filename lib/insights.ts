@@ -1,0 +1,240 @@
+import { getTemplate } from "./templates";
+
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+
+/* ============================================================
+   Real, computed-from-DB stats (no AI). Always available.
+   ============================================================ */
+
+export interface RetroRow {
+  id: string;
+  template_id: string;
+  status: "open" | "closed";
+  deadline: string;
+  created_at: string;
+}
+
+export interface TimelinePoint {
+  id: string;
+  dateLabel: string;
+  responses: number;
+}
+
+export interface TeamStats {
+  retroCount: number;
+  closedCount: number;
+  totalResponses: number;
+  totalComments: number;
+  avgResponses: number;
+  responsesDelta: number | null; // latest closed retro vs the one before
+  commentsDelta: number | null;
+  timeline: TimelinePoint[]; // chronological, up to last 8
+}
+
+function fmtDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return "";
+  }
+}
+
+/** Tally real stats from the owner's retros + per-session answer/comment counts. */
+export function computeTeamStats(
+  retros: RetroRow[],
+  responsesBySession: Map<string, number>,
+  commentsBySession: Map<string, number>,
+): TeamStats {
+  const byDate = [...retros].sort(
+    (a, b) =>
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+  );
+
+  const isClosed = (r: RetroRow) =>
+    r.status === "closed" || new Date(r.deadline).getTime() <= Date.now();
+
+  const totalResponses = retros.reduce(
+    (n, r) => n + (responsesBySession.get(r.id) ?? 0),
+    0,
+  );
+  const totalComments = retros.reduce(
+    (n, r) => n + (commentsBySession.get(r.id) ?? 0),
+    0,
+  );
+  const closed = byDate.filter(isClosed);
+  const closedCount = closed.length;
+
+  // Deltas: most recent closed retro vs the previous closed one.
+  let responsesDelta: number | null = null;
+  let commentsDelta: number | null = null;
+  if (closed.length >= 2) {
+    const last = closed[closed.length - 1];
+    const prev = closed[closed.length - 2];
+    responsesDelta =
+      (responsesBySession.get(last.id) ?? 0) -
+      (responsesBySession.get(prev.id) ?? 0);
+    commentsDelta =
+      (commentsBySession.get(last.id) ?? 0) -
+      (commentsBySession.get(prev.id) ?? 0);
+  }
+
+  const timeline: TimelinePoint[] = byDate.slice(-8).map((r) => ({
+    id: r.id,
+    dateLabel: fmtDate(r.created_at),
+    responses: responsesBySession.get(r.id) ?? 0,
+  }));
+
+  return {
+    retroCount: retros.length,
+    closedCount,
+    totalResponses,
+    totalComments,
+    avgResponses: retros.length
+      ? Math.round((totalResponses / retros.length) * 10) / 10
+      : 0,
+    responsesDelta,
+    commentsDelta,
+    timeline,
+  };
+}
+
+/* ============================================================
+   AI insights (on demand, cached per owner).
+   ============================================================ */
+
+export interface AiInsights {
+  sentiment: { label: string; score: number; note: string };
+  pulse: string;
+  themes: { label: string; count: number; direction: "up" | "warning" | "down" }[];
+  timeline: { label: string; score: number }[];
+}
+
+export interface RetroForAI {
+  dateLabel: string;
+  templateId: string;
+  answers: { question_key: string; content: string }[];
+}
+
+const INSIGHTS_SYSTEM = `你是一個團隊 retro（回顧會議）的資深教練。你會收到同一個團隊「多場」retro 的回答（依時間排序，已去識別化）。
+
+請跨場分析團隊的走向，並「只」輸出 JSON（繁體中文內容），欄位如下：
+- sentiment.label：整體氛圍，用「正面 / 中性 / 需要關注」其中一個。
+- sentiment.score：0–100 的整體健康分數。
+- sentiment.note：一句話趨勢註解，例如「連續 3 場改善中」。
+- pulse：2–4 句話的團隊近況敘述，點出走向、持續的優點、以及尚未解決的痛點。
+- themes：跨場重複出現的主題陣列，每個含 label（主題名，2–6 字）、count（大約出現次數）、direction（up=正在變好、warning=反覆出現的痛點、down=正在惡化）。最多 6 個，依重要性排序。
+- timeline：每一場的氛圍分數，label 用該場日期、score 0–100，順序與輸入相同。
+
+原則：對事不對人、忠實反映內容、不要杜撰沒出現的事。只輸出 JSON，不要多餘文字。`;
+
+function buildAiContext(retros: RetroForAI[]): string {
+  const blocks: string[] = [];
+  retros.forEach((r, i) => {
+    const template = getTemplate(r.templateId);
+    const questions = template?.questions ?? [];
+    const lines: string[] = [`## 第 ${i + 1} 場（${r.dateLabel}）`];
+    for (const q of questions) {
+      const group = r.answers.filter((a) => a.question_key === q.key);
+      if (group.length === 0) continue;
+      lines.push(`### ${q.label}`);
+      for (const a of group) lines.push(`- ${a.content}`);
+    }
+    blocks.push(lines.join("\n"));
+  });
+  return blocks.join("\n\n");
+}
+
+const RESPONSE_SCHEMA = {
+  type: "object",
+  properties: {
+    sentiment: {
+      type: "object",
+      properties: {
+        label: { type: "string" },
+        score: { type: "number" },
+        note: { type: "string" },
+      },
+      required: ["label", "score", "note"],
+    },
+    pulse: { type: "string" },
+    themes: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          label: { type: "string" },
+          count: { type: "number" },
+          direction: { type: "string", enum: ["up", "warning", "down"] },
+        },
+        required: ["label", "count", "direction"],
+      },
+    },
+    timeline: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          label: { type: "string" },
+          score: { type: "number" },
+        },
+        required: ["label", "score"],
+      },
+    },
+  },
+  required: ["sentiment", "pulse", "themes", "timeline"],
+};
+
+export async function geminiInsights(retros: RetroForAI[]): Promise<AiInsights> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("尚未設定 GEMINI_API_KEY，無法產生 AI 洞察。");
+
+  const context = buildAiContext(retros);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [
+          {
+            text: `${INSIGHTS_SYSTEM}\n\n以下是這個團隊依時間排序的多場 retro 回答：\n\n${context}`,
+          },
+        ],
+      },
+      contents: [
+        { role: "user", parts: [{ text: "請跨場分析並輸出 JSON。" }] },
+      ],
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 1200,
+        responseMimeType: "application/json",
+        responseSchema: RESPONSE_SCHEMA,
+      },
+    }),
+    signal: AbortSignal.timeout(30_000),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`AI 服務錯誤（${res.status}）：${detail.slice(0, 300)}`);
+  }
+
+  const data = await res.json();
+  const raw: string =
+    data?.candidates?.[0]?.content?.parts
+      ?.map((p: { text?: string }) => p.text ?? "")
+      .join("")
+      .trim() ?? "";
+  if (!raw) throw new Error("AI 沒有回覆內容，請再試一次。");
+
+  let parsed: AiInsights;
+  try {
+    parsed = JSON.parse(raw) as AiInsights;
+  } catch {
+    throw new Error("AI 回傳格式錯誤，請再試一次。");
+  }
+  return parsed;
+}

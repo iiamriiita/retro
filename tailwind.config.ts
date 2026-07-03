@@ -14,6 +14,7 @@ const config: Config = {
       colors: {
         ink: "var(--text)",
         muted: "var(--text-muted)",
+        subtle: "var(--text-subtle)",
         line: "var(--border)",
         accent: "var(--accent)",
         surface: "var(--surface)",

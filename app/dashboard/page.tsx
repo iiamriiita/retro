@@ -4,7 +4,9 @@ import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import { deriveState } from "@/lib/status";
+import { computeTeamStats, type RetroRow, type AiInsights } from "@/lib/insights";
 import FormLinkButton from "@/components/FormLinkButton";
+import TeamInsights from "@/components/TeamInsights";
 import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +23,39 @@ export default async function DashboardPage() {
     )
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false });
+
+  // Aggregate per-session answer & comment counts for the Team Insights panel.
+  const ids = (sessions ?? []).map((s) => s.id);
+  const responsesBySession = new Map<string, number>();
+  const commentsBySession = new Map<string, number>();
+  if (ids.length > 0) {
+    const [{ data: ans }, { data: cms }] = await Promise.all([
+      supabase.from("retro_answers").select("session_id").in("session_id", ids),
+      supabase.from("retro_comments").select("session_id").in("session_id", ids),
+    ]);
+    for (const a of ans ?? [])
+      responsesBySession.set(
+        a.session_id,
+        (responsesBySession.get(a.session_id) ?? 0) + 1,
+      );
+    for (const c of cms ?? [])
+      commentsBySession.set(
+        c.session_id,
+        (commentsBySession.get(c.session_id) ?? 0) + 1,
+      );
+  }
+
+  const stats = computeTeamStats(
+    (sessions ?? []) as RetroRow[],
+    responsesBySession,
+    commentsBySession,
+  );
+
+  const { data: insightRow } = await supabase
+    .from("retro_team_insights")
+    .select("data, generated_at")
+    .eq("owner_id", user.id)
+    .maybeSingle();
 
   return (
     <div className="container-wide">
@@ -42,7 +77,14 @@ export default async function DashboardPage() {
           </p>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <>
+          <TeamInsights
+            stats={stats}
+            initialInsights={(insightRow?.data as AiInsights | undefined) ?? null}
+            initialGeneratedAt={insightRow?.generated_at ?? null}
+          />
+          <h2 className="mb-3 text-sm font-bold">所有 retro</h2>
+          <ul className="space-y-3">
           {sessions.map((s) => {
             const state = deriveState({
               status: s.status,
@@ -90,7 +132,8 @@ export default async function DashboardPage() {
               </li>
             );
           })}
-        </ul>
+          </ul>
+        </>
       )}
     </div>
   );

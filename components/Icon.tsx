@@ -16,6 +16,10 @@ type IconName =
   | "external-link"
   | "message"
   | "x"
+  | "trending-up"
+  | "trending-down"
+  | "alert-triangle"
+  | "line-chart"
   | "check";
 
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -75,6 +79,31 @@ const PATHS: Record<IconName, React.ReactNode> = {
   check: <path d="M20 6 9 17l-5-5" />,
   message: (
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  ),
+  "trending-up": (
+    <>
+      <path d="M16 7h6v6" />
+      <path d="m22 7-8.5 8.5-5-5L2 17" />
+    </>
+  ),
+  "trending-down": (
+    <>
+      <path d="M16 17h6v-6" />
+      <path d="m22 17-8.5-8.5-5 5L2 7" />
+    </>
+  ),
+  "alert-triangle": (
+    <>
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </>
+  ),
+  "line-chart": (
+    <>
+      <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+      <path d="m19 9-5 5-4-4-3 3" />
+    </>
   ),
   x: (
     <>
