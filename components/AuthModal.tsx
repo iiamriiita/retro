@@ -14,7 +14,7 @@ export default function AuthModal({
   defaultOpen = false,
 }: {
   label: string;
-  variant?: "primary" | "nav";
+  variant?: "primary" | "nav" | "ghost";
   defaultTab?: "login" | "register";
   defaultOpen?: boolean;
 }) {
@@ -140,7 +140,9 @@ export default function AuthModal({
   const btnClass =
     variant === "nav"
       ? "text-muted hover:text-ink text-sm"
-      : "btn-primary";
+      : variant === "ghost"
+        ? "btn-ghost"
+        : "btn-primary";
 
   return (
     <>

@@ -1,65 +1,87 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import AuthModal from "@/components/AuthModal";
+import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
+
+const FEATURES = [
+  { icon: "shield" as const, label: "即時建設性把關" },
+  { icon: "message" as const, label: "選字逐句討論" },
+  { icon: "sparkles" as const, label: "AI 團隊洞察" },
+];
 
 export default async function LandingPage() {
   const user = await getCurrentUser();
 
   return (
-    <div className="container-narrow">
-      <section className="py-6">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          給小組的回顧工具
-        </h1>
-        <p className="mt-3 text-base text-muted">
-          2–5 人的小組互相給回饋。發起一場 retro、分享連結，成員填寫時系統會即時把關「有沒有建設性」；結束後大家一起看結果、逐句討論，還能讓 AI 助理歸納主題與具體調整方向。
+    <div
+      className="relative -my-10 flex min-h-[calc(100vh-60px)] flex-col items-center justify-center overflow-hidden px-4 text-center"
+      style={{
+        backgroundImage:
+          "radial-gradient(var(--border-strong) 1px, transparent 1px)",
+        backgroundSize: "22px 22px",
+      }}
+    >
+      <div className="mx-auto max-w-3xl py-10">
+        <p className="eyebrow" style={{ color: "var(--gold-700)" }}>
+          給小團隊的回顧工具
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
+          誠實的團隊回饋，
+          <br />
+          少一點<span style={{ color: "var(--accent-press)" }}>尷尬</span>。
+        </h1>
+
+        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+          發起一場 retro、分享連結，讓大家一起說真話。即時把關讓回饋保持建設性
+          —— 結束後一起討論，再讓 AI 幫你看見重點。
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {user ? (
-            <Link className="btn-primary" href="/dashboard">
-              前往我的 Dashboard
-            </Link>
+            <>
+              <Link className="btn-primary" href="/dashboard">
+                <Icon name="arrow-right" size={16} />
+                前往我的 Dashboard
+              </Link>
+              <Link className="btn-ghost" href="/dashboard/new">
+                <Icon name="plus" size={15} />
+                發起新 retro
+              </Link>
+            </>
           ) : (
             <>
               <AuthModal
-                label="免費註冊"
+                label="免費開始使用"
                 variant="primary"
                 defaultTab="register"
               />
-              <AuthModal label="登入" variant="nav" defaultTab="login" />
+              <AuthModal label="登入" variant="ghost" defaultTab="login" />
             </>
           )}
         </div>
-      </section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-3">
-        {[
-          {
-            t: "即時把關",
-            d: "關鍵字 + AI 雙重把關，擋掉人身攻擊與純情緒，保留有建設性的批評。",
-          },
-          {
-            t: "選字討論",
-            d: "結束後對任一段回答選字留言，像 Google Docs 一樣即時同步。",
-          },
-          {
-            t: "AI 總結",
-            d: "把整場回答歸納成主題、亮點、待改善與可行動的 next steps。",
-          },
-        ].map((f) => (
-          <div key={f.t} className="card">
-            <h3 className="text-sm font-semibold">{f.t}</h3>
-            <p className="mt-1 text-xs text-muted">{f.d}</p>
-          </div>
-        ))}
-      </section>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5">
+          {FEATURES.map((f) => (
+            <span
+              key={f.label}
+              className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold"
+              style={{ background: "var(--surface-2)", color: "var(--text)" }}
+            >
+              <span style={{ color: "var(--gold-700)" }}>
+                <Icon name={f.icon} size={15} />
+              </span>
+              {f.label}
+            </span>
+          ))}
+        </div>
 
-      <p className="mt-8 text-xs text-muted">
-        只有發起者需要登入；填寫與參與討論的人用連結進來即可。
-      </p>
+        <p className="mt-8 text-xs text-subtle">
+          只有發起者需要登入；填寫與討論的人用連結進來即可。
+        </p>
+      </div>
     </div>
   );
 }
