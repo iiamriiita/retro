@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import { deriveState } from "@/lib/status";
+import FormLinkButton from "@/components/FormLinkButton";
 
 export const dynamic = "force-dynamic";
 
@@ -79,9 +80,7 @@ export default async function DashboardPage() {
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <Link className="btn-ghost !py-1.5 text-xs" href={`/s/${s.id}`}>
-                    填寫頁
-                  </Link>
+                  <FormLinkButton sessionId={s.id} />
                   <Link
                     className="btn-primary !py-1.5 text-xs"
                     href={`/s/${s.id}/results`}
