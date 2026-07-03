@@ -443,7 +443,7 @@ export default function ResultsClient({
 
                 {/* replies */}
                 {replies.length > 0 && (
-                  <ul className="mt-3 space-y-2 border-l border-line pl-3">
+                  <ul className="mt-3 space-y-2 pl-3">
                     {replies.map((r) => (
                       <li key={r.id}>
                         <p className="whitespace-pre-wrap text-sm">{r.body}</p>
@@ -514,7 +514,7 @@ export default function ResultsClient({
           onClick={() => setIdentityOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-xl border border-line bg-white p-5 shadow-xl"
+            className="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-sm font-semibold">你是誰？</h3>

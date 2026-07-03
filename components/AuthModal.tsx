@@ -154,7 +154,7 @@ export default function AuthModal({
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-xl border border-line bg-white p-6 shadow-xl"
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">

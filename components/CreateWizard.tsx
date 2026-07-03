@@ -152,10 +152,10 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                   key={o.v}
                   type="button"
                   onClick={() => setAnonymity(o.v as Anonymity)}
-                  className={`rounded-lg border p-3 text-left ${
+                  className={`rounded-lg p-3 text-left transition-colors ${
                     anonymity === o.v
-                      ? "border-accent bg-[color:var(--accent-weak)]"
-                      : "border-line hover:bg-gray-50"
+                      ? "bg-[color:var(--accent-weak)]"
+                      : "bg-[color:var(--surface-2)] hover:bg-[color:var(--surface-3)]"
                   }`}
                 >
                   <span className="block text-sm font-medium">{o.t}</span>
@@ -187,7 +187,15 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
             const isSel = templateId === t.id;
             const open = preview === t.id;
             return (
-              <div key={t.id} className={`card ${isSel ? "border-accent" : ""}`}>
+              <div
+                key={t.id}
+                className="card"
+                style={
+                  isSel
+                    ? { background: "var(--accent-weak)" }
+                    : undefined
+                }
+              >
                 <div className="flex items-start gap-3">
                   <input
                     type="radio"
