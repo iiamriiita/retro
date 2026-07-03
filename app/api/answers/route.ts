@@ -11,8 +11,7 @@ interface AnswerInput {
 }
 interface SubmitBody {
   session_id?: string;
-  participant_id?: string; // named: chosen from roster
-  display_name?: string; // named ad-hoc, or ignored for anonymous
+  display_name?: string; // named: the filler's self-typed name
   answers?: AnswerInput[];
 }
 
@@ -31,7 +30,7 @@ export async function POST(req: Request) {
   const supabase = createServiceClient();
   const { data: session, error } = await supabase
     .from("retro_sessions")
-    .select("id, template_id, anonymity, status, deadline, allow_adhoc")
+    .select("id, template_id, anonymity, status, deadline")
     .eq("id", body.session_id)
     .single();
 
@@ -74,67 +73,28 @@ export async function POST(req: Request) {
     }
   }
 
-  // Resolve the participant.
-  let participantId: string;
-
-  if (session.anonymity === "anonymous") {
-    const { data: p, error: pErr } = await supabase
-      .from("retro_participants")
-      .insert({ session_id: session.id, display_name: null, submitted_at: new Date().toISOString() })
-      .select("id")
-      .single();
-    if (pErr || !p) {
-      return NextResponse.json({ error: "Could not save" }, { status: 500 });
+  // Named sessions: the filler types their own name. Anonymous: no name stored.
+  let displayName: string | null = null;
+  if (session.anonymity === "named") {
+    displayName = (body.display_name ?? "").trim();
+    if (!displayName) {
+      return NextResponse.json({ error: "請先填寫你的名字。" }, { status: 400 });
     }
-    participantId = p.id;
-  } else if (body.participant_id) {
-    // Named: chosen from the roster. Must belong to the session and be unfilled.
-    const { data: p } = await supabase
-      .from("retro_participants")
-      .select("id, submitted_at")
-      .eq("id", body.participant_id)
-      .eq("session_id", session.id)
-      .single();
-    if (!p) {
-      return NextResponse.json({ error: "找不到這位成員" }, { status: 400 });
-    }
-    if (p.submitted_at) {
-      return NextResponse.json(
-        { error: "這位成員已經填過了。" },
-        { status: 409 },
-      );
-    }
-    await supabase
-      .from("retro_participants")
-      .update({ submitted_at: new Date().toISOString() })
-      .eq("id", p.id);
-    participantId = p.id;
-  } else {
-    // Named ad-hoc: add a new participant, if allowed.
-    const name = (body.display_name ?? "").trim();
-    if (!name) {
-      return NextResponse.json({ error: "請先選擇你是誰。" }, { status: 400 });
-    }
-    if (!session.allow_adhoc) {
-      return NextResponse.json(
-        { error: "這場只允許名單上的成員填寫。" },
-        { status: 403 },
-      );
-    }
-    const { data: p, error: pErr } = await supabase
-      .from("retro_participants")
-      .insert({
-        session_id: session.id,
-        display_name: name,
-        submitted_at: new Date().toISOString(),
-      })
-      .select("id")
-      .single();
-    if (pErr || !p) {
-      return NextResponse.json({ error: "Could not save" }, { status: 500 });
-    }
-    participantId = p.id;
   }
+
+  const { data: participant, error: pErr } = await supabase
+    .from("retro_participants")
+    .insert({
+      session_id: session.id,
+      display_name: displayName,
+      submitted_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
+  if (pErr || !participant) {
+    return NextResponse.json({ error: "Could not save" }, { status: 500 });
+  }
+  const participantId = participant.id;
 
   const { error: aErr } = await supabase.from("retro_answers").insert(
     rows.map((r) => ({

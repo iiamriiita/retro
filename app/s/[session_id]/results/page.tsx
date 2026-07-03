@@ -84,16 +84,12 @@ export default async function ResultsPage({
     .order("created_at", { ascending: true });
 
   let nameById = new Map<string, string | null>();
-  let rosterNames: string[] = [];
   if (!anonymous) {
     const { data: participants } = await supabase
       .from("retro_participants")
       .select("id, display_name")
       .eq("session_id", session.id);
     nameById = new Map((participants ?? []).map((p) => [p.id, p.display_name]));
-    rosterNames = (participants ?? [])
-      .map((p) => (p.display_name ?? "").trim())
-      .filter((n) => n.length > 0);
   }
 
   const answers: PublicAnswer[] = (rawAnswers ?? []).map((a) => ({
@@ -155,7 +151,7 @@ export default async function ResultsPage({
             questions={template.questions}
             answers={answers}
             initialComments={initialComments}
-            rosterNames={rosterNames}
+            rosterNames={[]}
           />
           <ReportView
             report={session.ai_report}

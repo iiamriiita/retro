@@ -1,17 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type {
-  Anonymity,
-  ModerateResult,
-  Question,
-} from "@/lib/types";
-
-export interface RosterMember {
-  id: string;
-  display_name: string | null;
-  submitted: boolean;
-}
+import { useState } from "react";
+import type { Anonymity, ModerateResult, Question } from "@/lib/types";
 
 async function moderate(text: string): Promise<ModerateResult> {
   try {
@@ -32,37 +22,22 @@ export default function FillWizard({
   templateName,
   templateDescription,
   questions,
-  roster,
-  allowAdhoc,
 }: {
   sessionId: string;
   anonymity: Anonymity;
   templateName: string;
   templateDescription: string;
   questions: Question[];
-  roster: RosterMember[];
-  allowAdhoc: boolean;
 }) {
   const localKey = `retro_filled_${sessionId}`;
   const named = anonymity === "named";
-  const unfilled = useMemo(
-    () => roster.filter((r) => !r.submitted),
-    [roster],
-  );
 
-  // identity
-  const [identityMode, setIdentityMode] = useState<"roster" | "adhoc">(
-    unfilled.length > 0 ? "roster" : "adhoc",
-  );
-  const [participantId, setParticipantId] = useState<string>("");
-  const [adhocName, setAdhocName] = useState("");
-
-  // answers
+  const [name, setName] = useState("");
   const [values, setValues] = useState<Record<string, string>>({});
-  const [suggestion, setSuggestion] = useState<string>("");
+  const [suggestion, setSuggestion] = useState("");
   const [checking, setChecking] = useState(false);
 
-  const [step, setStep] = useState(0); // 0..(identityStep + questions + review)
+  const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -72,8 +47,7 @@ export default function FillWizard({
 
   const hasIdentity = named;
   const totalSteps = (hasIdentity ? 1 : 0) + questions.length + 1; // +review
-
-  const qIndex = hasIdentity ? step - 1 : step; // index into questions when in a question step
+  const qIndex = hasIdentity ? step - 1 : step;
   const inIdentity = hasIdentity && step === 0;
   const inReview = step === totalSteps - 1;
   const inQuestion = !inIdentity && !inReview;
@@ -86,21 +60,14 @@ export default function FillWizard({
 
   async function next() {
     setError(null);
-
     if (inIdentity) {
-      if (identityMode === "roster") {
-        if (!participantId) {
-          setError("請選擇你是誰。");
-          return;
-        }
-      } else if (!adhocName.trim()) {
+      if (!name.trim()) {
         setError("請輸入你的名字。");
         return;
       }
       setStep((s) => s + 1);
       return;
     }
-
     if (inQuestion && currentQuestion) {
       const text = (values[currentQuestion.key] ?? "").trim();
       if (text) {
@@ -109,12 +76,11 @@ export default function FillWizard({
         setChecking(false);
         if (res.verdict === "revise") {
           setSuggestion(res.suggestion);
-          return; // block until rewritten
+          return;
         }
       }
       setSuggestion("");
       setStep((s) => s + 1);
-      return;
     }
   }
 
@@ -133,7 +99,6 @@ export default function FillWizard({
     }
     setSubmitting(true);
     try {
-      // Final re-check of every answer.
       const results = await Promise.all(
         filled.map(async (q) => ({
           key: q.key,
@@ -155,10 +120,7 @@ export default function FillWizard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           session_id: sessionId,
-          participant_id:
-            named && identityMode === "roster" ? participantId : undefined,
-          display_name:
-            named && identityMode === "adhoc" ? adhocName.trim() : undefined,
+          display_name: named ? name.trim() : undefined,
           answers: filled.map((q) => ({
             question_key: q.key,
             content: values[q.key].trim(),
@@ -212,7 +174,6 @@ export default function FillWizard({
         <p className="mt-1 text-sm text-muted">{templateDescription}</p>
       </div>
 
-      {/* progress */}
       <div className="flex items-center gap-1">
         {Array.from({ length: totalSteps }).map((_, i) => (
           <div
@@ -224,71 +185,26 @@ export default function FillWizard({
         ))}
       </div>
 
-      {/* identity */}
       {inIdentity && (
-        <div className="card space-y-3">
-          <label className="field-label">你是誰？</label>
-          {unfilled.length > 0 && (
-            <div className="space-y-2">
-              {unfilled.map((m) => (
-                <label
-                  key={m.id}
-                  className={`flex cursor-pointer items-center gap-2 rounded-lg border p-2 text-sm ${
-                    identityMode === "roster" && participantId === m.id
-                      ? "border-accent bg-indigo-50/40"
-                      : "border-line hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    checked={identityMode === "roster" && participantId === m.id}
-                    onChange={() => {
-                      setIdentityMode("roster");
-                      setParticipantId(m.id);
-                    }}
-                  />
-                  {m.display_name || "（未命名）"}
-                </label>
-              ))}
-            </div>
-          )}
-
-          {allowAdhoc && (
-            <div>
-              <label
-                className={`flex cursor-pointer items-center gap-2 rounded-lg border p-2 text-sm ${
-                  identityMode === "adhoc"
-                    ? "border-accent bg-indigo-50/40"
-                    : "border-line hover:bg-gray-50"
-                }`}
-              >
-                <input
-                  type="radio"
-                  checked={identityMode === "adhoc"}
-                  onChange={() => setIdentityMode("adhoc")}
-                />
-                我不在名單上，自己輸入名字
-              </label>
-              {identityMode === "adhoc" && (
-                <input
-                  className="textarea mt-2"
-                  placeholder="你的名字"
-                  value={adhocName}
-                  onChange={(e) => setAdhocName(e.target.value)}
-                />
-              )}
-            </div>
-          )}
-
-          {unfilled.length === 0 && !allowAdhoc && (
-            <p className="text-sm text-muted">
-              名單上的成員都填完了，這場不開放臨時加入。
-            </p>
-          )}
+        <div className="card space-y-2">
+          <label className="field-label">你的名字</label>
+          <input
+            autoFocus
+            className="textarea"
+            placeholder="例：Alex"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void next();
+              }
+            }}
+          />
+          <p className="text-xs text-muted">結果與你的名字會一起顯示。</p>
         </div>
       )}
 
-      {/* question */}
       {inQuestion && currentQuestion && (
         <div className="card">
           <label className="field-label">{currentQuestion.label}</label>
@@ -316,10 +232,14 @@ export default function FillWizard({
         </div>
       )}
 
-      {/* review */}
       {inReview && (
         <div className="card space-y-3">
           <h2 className="text-sm font-semibold">確認送出</h2>
+          {named && (
+            <p className="text-xs text-muted">
+              以「<span className="font-medium">{name.trim() || "（未填）"}</span>」的身分
+            </p>
+          )}
           <ul className="space-y-3">
             {questions.map((q) => (
               <li key={q.key}>

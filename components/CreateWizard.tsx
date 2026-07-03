@@ -12,14 +12,12 @@ function defaultDeadline(): string {
   )}:${pad(d.getMinutes())}`;
 }
 
-const STEPS = ["身分 / 名單", "截止時間", "選問卷"];
+const STEPS = ["設定", "選問卷"];
 
 export default function CreateWizard({ templates }: { templates: Template[] }) {
   const [step, setStep] = useState(0);
 
   const [anonymity, setAnonymity] = useState<Anonymity>("named");
-  const [names, setNames] = useState<string[]>(["", "", "", ""]);
-  const [allowAdhoc, setAllowAdhoc] = useState(true);
   const [deadline, setDeadline] = useState(defaultDeadline());
   const [templateId, setTemplateId] = useState(templates[0]?.id ?? "");
   const [preview, setPreview] = useState<string | null>(null);
@@ -39,19 +37,9 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
       ? `${window.location.origin}/s/${createdId}`
       : "";
 
-  function setName(i: number, v: string) {
-    setNames((arr) => arr.map((n, idx) => (idx === i ? v : n)));
-  }
-  function addName() {
-    setNames((arr) => [...arr, ""]);
-  }
-  function removeName(i: number) {
-    setNames((arr) => arr.filter((_, idx) => idx !== i));
-  }
-
   function next() {
     setError(null);
-    if (step === 1) {
+    if (step === 0) {
       const d = new Date(deadline);
       if (Number.isNaN(d.getTime()) || d.getTime() <= Date.now()) {
         setError("截止時間必須在未來。");
@@ -76,12 +64,6 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
           template_id: templateId,
           anonymity,
           deadline: new Date(deadline).toISOString(),
-          group_size:
-            anonymity === "named"
-              ? names.filter((n) => n.trim()).length || names.length
-              : names.length,
-          allow_adhoc: anonymity === "named" ? allowAdhoc : true,
-          participants: anonymity === "named" ? names : [],
         }),
       });
       const data = await res.json();
@@ -94,7 +76,6 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
     }
   }
 
-  // ---- success ----
   if (createdId) {
     return (
       <div className="card">
@@ -135,7 +116,6 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
 
   return (
     <div className="space-y-6">
-      {/* progress */}
       <ol className="flex items-center gap-2 text-xs">
         {STEPS.map((label, i) => (
           <li key={label} className="flex items-center gap-2">
@@ -158,14 +138,14 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
         ))}
       </ol>
 
-      {/* Step 1: identity / roster */}
+      {/* Step 1: anonymity + deadline */}
       {step === 0 && (
         <div className="card space-y-5">
           <div>
             <label className="field-label">這場要匿名嗎？</label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { v: "named", t: "具名", d: "顯示填寫者名字" },
+                { v: "named", t: "具名", d: "填寫時自己打名字，結果會顯示" },
                 { v: "anonymous", t: "匿名", d: "不顯示身分" },
               ].map((o) => (
                 <button
@@ -185,110 +165,29 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
             </div>
           </div>
 
-          {anonymity === "named" ? (
-            <div className="space-y-3">
-              <div>
-                <label className="field-label">成員名單</label>
-                <p className="mb-2 text-xs text-muted">
-                  先列出成員的名字，填寫時他們從名單選自己。可留空的之後再補。
-                </p>
-                <div className="space-y-2">
-                  {names.map((n, i) => (
-                    <div key={i} className="flex gap-2">
-                      <input
-                        className="textarea !py-2"
-                        placeholder={`成員 ${i + 1}`}
-                        value={n}
-                        onChange={(e) => setName(i, e.target.value)}
-                      />
-                      {names.length > 1 && (
-                        <button
-                          type="button"
-                          className="btn-ghost !px-3"
-                          onClick={() => removeName(i)}
-                          aria-label="移除"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className="mt-2 text-xs text-accent hover:underline"
-                  onClick={addName}
-                >
-                  + 新增一位
-                </button>
-              </div>
-
-              <label className="flex items-start gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  className="mt-1"
-                  checked={allowAdhoc}
-                  onChange={(e) => setAllowAdhoc(e.target.checked)}
-                />
-                <span>
-                  允許填寫時<strong>臨時新增</strong>不在名單上的成員
-                  <span className="block text-xs text-muted">
-                    關掉的話，只有名單上的人能填。
-                  </span>
-                </span>
-              </label>
-            </div>
-          ) : (
-            <div>
-              <label className="field-label">預計人數（提示用）</label>
-              <select
-                className="textarea"
-                value={names.length}
-                onChange={(e) =>
-                  setNames(Array(Number(e.target.value)).fill(""))
-                }
-              >
-                {[2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>
-                    {n} 人
-                  </option>
-                ))}
-              </select>
-              <p className="mt-1 text-xs text-muted">
-                匿名場不需要名單，填寫者不會顯示身分。
-              </p>
-            </div>
-          )}
+          <div>
+            <label className="field-label">截止時間</label>
+            <input
+              type="datetime-local"
+              className="textarea"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+            />
+            <p className="mt-1 text-xs text-muted">
+              過了截止時間，表單會自動鎖定不能再填。
+            </p>
+          </div>
         </div>
       )}
 
-      {/* Step 2: deadline */}
+      {/* Step 2: template */}
       {step === 1 && (
-        <div className="card space-y-2">
-          <label className="field-label">截止時間</label>
-          <input
-            type="datetime-local"
-            className="textarea"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-          />
-          <p className="text-xs text-muted">
-            過了截止時間，表單會自動鎖定不能再填。
-          </p>
-        </div>
-      )}
-
-      {/* Step 3: template */}
-      {step === 2 && (
         <div className="space-y-3">
           {templates.map((t) => {
             const isSel = templateId === t.id;
             const open = preview === t.id;
             return (
-              <div
-                key={t.id}
-                className={`card ${isSel ? "border-accent" : ""}`}
-              >
+              <div key={t.id} className={`card ${isSel ? "border-accent" : ""}`}>
                 <div className="flex items-start gap-3">
                   <input
                     type="radio"
@@ -347,7 +246,6 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
         </p>
       )}
 
-      {/* nav */}
       <div className="flex justify-between">
         <button
           type="button"

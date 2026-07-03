@@ -1,6 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
-import FillWizard, { type RosterMember } from "@/components/FillWizard";
+import FillWizard from "@/components/FillWizard";
 import BackButton from "@/components/BackButton";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export default async function FillPage({
 
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select("id, template_id, anonymity, status, deadline, allow_adhoc")
+    .select("id, template_id, anonymity, status, deadline")
     .eq("id", session_id)
     .single();
 
@@ -52,21 +52,6 @@ export default async function FillPage({
     );
   }
 
-  // Named sessions: load the roster so the filler can pick who they are.
-  let roster: RosterMember[] = [];
-  if (session.anonymity === "named") {
-    const { data: participants } = await supabase
-      .from("retro_participants")
-      .select("id, display_name, submitted_at")
-      .eq("session_id", session.id)
-      .order("created_at", { ascending: true });
-    roster = (participants ?? []).map((p) => ({
-      id: p.id,
-      display_name: p.display_name,
-      submitted: !!p.submitted_at,
-    }));
-  }
-
   return (
     <div className="container-narrow">
       <BackButton fallback="/" label="返回" />
@@ -76,8 +61,6 @@ export default async function FillPage({
         templateName={template.name}
         templateDescription={template.description}
         questions={template.questions}
-        roster={roster}
-        allowAdhoc={session.allow_adhoc}
       />
     </div>
   );
