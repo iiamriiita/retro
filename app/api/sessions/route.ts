@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { getTemplate } from "@/lib/templates";
-import { newOwnerToken, setOwnerCookie } from "@/lib/owner";
 import type { Anonymity } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -10,9 +10,18 @@ interface CreateBody {
   template_id?: string;
   anonymity?: Anonymity;
   deadline?: string; // ISO datetime
+  group_size?: number;
+  allow_adhoc?: boolean;
+  participants?: string[]; // named-mode roster
 }
 
 export async function POST(req: Request) {
+  // Only a logged-in organizer can create a session.
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "請先登入" }, { status: 401 });
+  }
+
   let body: CreateBody;
   try {
     body = await req.json();
@@ -34,22 +43,23 @@ export async function POST(req: Request) {
   }
   if (deadline.getTime() <= Date.now()) {
     return NextResponse.json(
-      { error: "Deadline must be in the future" },
+      { error: "截止時間必須在未來" },
       { status: 400 },
     );
   }
 
-  const ownerToken = newOwnerToken();
   const supabase = createServiceClient();
 
   const { data, error } = await supabase
     .from("retro_sessions")
     .insert({
-      owner_token: ownerToken,
+      owner_id: user.id,
       template_id: template.id,
       anonymity,
       deadline: deadline.toISOString(),
       status: "open",
+      group_size: typeof body.group_size === "number" ? body.group_size : null,
+      allow_adhoc: body.allow_adhoc !== false,
     })
     .select("id")
     .single();
@@ -62,7 +72,19 @@ export async function POST(req: Request) {
     );
   }
 
-  await setOwnerCookie(data.id, ownerToken);
+  // Named mode: pre-create the roster from the provided names.
+  const roster = (body.participants ?? [])
+    .map((n) => n.trim())
+    .filter((n) => n.length > 0);
+  if (anonymity === "named" && roster.length > 0) {
+    const { error: rErr } = await supabase.from("retro_participants").insert(
+      roster.map((display_name) => ({
+        session_id: data.id,
+        display_name,
+      })),
+    );
+    if (rErr) console.error("roster insert failed:", rErr);
+  }
 
   return NextResponse.json({ id: data.id });
 }

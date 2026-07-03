@@ -1,20 +1,25 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
-import { getOwnerCookie } from "@/lib/owner";
+import { getCurrentUser } from "@/lib/supabase/auth-server";
 
 export const runtime = "nodejs";
 
-// Only the owner (holding the owner-token cookie) may close a session.
+// Only the owner (the logged-in account that created the session) may close it.
 export async function POST(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
 
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "請先登入" }, { status: 401 });
+  }
+
   const supabase = createServiceClient();
   const { data: session, error } = await supabase
     .from("retro_sessions")
-    .select("id, owner_token, status")
+    .select("id, owner_id, status")
     .eq("id", id)
     .single();
 
@@ -22,8 +27,7 @@ export async function POST(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const cookieToken = await getOwnerCookie(id);
-  if (!cookieToken || cookieToken !== session.owner_token) {
+  if (session.owner_id !== user.id) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 

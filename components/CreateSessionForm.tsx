@@ -89,15 +89,18 @@ export default function CreateSessionForm({
           </button>
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
-          <a className="btn-primary" href={`/s/${createdId}`}>
-            前往填寫頁
+          <a className="btn-primary" href={`/s/${createdId}/results`}>
+            管理 / 結果
           </a>
-          <a className="btn-ghost" href={`/s/${createdId}/results`}>
-            查看結果 / 結束 session
+          <a className="btn-ghost" href={`/s/${createdId}`}>
+            預覽填寫頁
+          </a>
+          <a className="btn-ghost" href="/dashboard">
+            回 Dashboard
           </a>
         </div>
         <p className="mt-4 text-xs text-muted">
-          你是這場的發起者（身分存在這台裝置的 cookie）。只有你能結束 session。
+          這場綁在你的帳號下，隨時可以從 Dashboard 進來管理。只有你能結束 session。
         </p>
       </div>
     );

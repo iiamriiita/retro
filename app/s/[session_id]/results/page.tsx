@@ -1,6 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
-import { getOwnerCookie } from "@/lib/owner";
+import { getCurrentUser } from "@/lib/supabase/auth-server";
 import type { PublicAnswer, PublicComment } from "@/lib/types";
 import ResultsClient from "@/components/ResultsClient";
 import AiSummary from "@/components/AiSummary";
@@ -18,7 +18,7 @@ export default async function ResultsPage({
 
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select("id, owner_token, template_id, anonymity, status, deadline")
+    .select("id, owner_id, template_id, anonymity, status, deadline")
     .eq("id", session_id)
     .single();
 
@@ -33,8 +33,8 @@ export default async function ResultsPage({
   }
 
   const template = getTemplate(session.template_id);
-  const cookieToken = await getOwnerCookie(session.id);
-  const isOwner = !!cookieToken && cookieToken === session.owner_token;
+  const user = await getCurrentUser();
+  const isOwner = !!user && user.id === session.owner_id;
   const expired = new Date(session.deadline).getTime() <= Date.now();
   const viewable = session.status === "closed" || expired;
   const anonymous = session.anonymity === "anonymous";
