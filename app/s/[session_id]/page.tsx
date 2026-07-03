@@ -34,19 +34,51 @@ export default async function FillPage({
   const expired = new Date(session.deadline).getTime() <= Date.now();
   const locked = session.status === "closed" || expired;
 
-  if (locked || !template) {
+  if (!template) {
     return (
       <div className="container-narrow">
+        <BackButton fallback="/" label="返回" />
         <div className="card">
+          <h1 className="text-lg font-semibold">找不到問卷</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (locked) {
+    return (
+      <div className="container-narrow space-y-5">
+        <BackButton fallback="/" label="返回" />
+        <div className="card bg-gray-50">
           <h1 className="text-lg font-semibold">此 Retro 已結束</h1>
           <p className="mt-2 text-sm text-muted">
             {session.status === "closed"
-              ? "發起者已結束這場 session。"
+              ? "發起者已結束這場 session，表單已鎖定。"
               : "已超過截止時間，表單已鎖定。"}
           </p>
           <a className="btn-primary mt-4" href={`/s/${session.id}/results`}>
             查看結果
           </a>
+        </div>
+
+        {/* Locked (read-only) view of the original questionnaire */}
+        <div>
+          <h2 className="text-lg font-semibold">{template.name}</h2>
+          <p className="mt-1 text-sm text-muted">{template.description}</p>
+          <div className="mt-4 space-y-3 opacity-70">
+            {template.questions.map((q) => (
+              <div key={q.key} className="card">
+                <label className="field-label">{q.label}</label>
+                <textarea
+                  rows={3}
+                  disabled
+                  className="textarea cursor-not-allowed bg-gray-50"
+                  placeholder={q.placeholder}
+                />
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-muted">🔒 表單已鎖定，無法再填寫。</p>
         </div>
       </div>
     );
