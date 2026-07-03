@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
+import AuthModal from "@/components/AuthModal";
 
 export const metadata: Metadata = {
   title: "Team Retro",
@@ -34,9 +35,7 @@ export default async function RootLayout({
                   </form>
                 </>
               ) : (
-                <Link href="/login" className="text-muted hover:text-ink">
-                  登入
-                </Link>
+                <AuthModal label="登入" variant="nav" defaultTab="login" />
               )}
             </nav>
           </div>

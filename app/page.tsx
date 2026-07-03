@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
+import AuthModal from "@/components/AuthModal";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +23,14 @@ export default async function LandingPage() {
               前往我的 Dashboard
             </Link>
           ) : (
-            <Link className="btn-primary" href="/login">
-              登入 / 開始發起
-            </Link>
+            <>
+              <AuthModal
+                label="免費註冊"
+                variant="primary"
+                defaultTab="register"
+              />
+              <AuthModal label="登入" variant="nav" defaultTab="login" />
+            </>
           )}
         </div>
       </section>
