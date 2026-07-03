@@ -58,7 +58,7 @@ function renderHighlighted(content: string, ranges: PublicComment[]) {
     const chunk = content.slice(s, e);
     out.push(
       marked ? (
-        <mark key={i} className="rounded bg-amber-100 px-0.5">
+        <mark key={i} className="hl-mark">
           {chunk}
         </mark>
       ) : (
@@ -386,7 +386,7 @@ export default function ResultsClient({
         {/* New anchored comment composer */}
         {composer && (
           <form onSubmit={submitComment} className="card mb-4 space-y-2">
-            <p className="border-l-2 border-amber-300 pl-2 text-xs italic text-muted">
+            <p className="mb-2 inline-block rounded-[5px] bg-[color:var(--surface-2)] px-2 py-0.5 text-xs text-muted">
               「{composer.quote.slice(0, 120)}」
             </p>
             <textarea
@@ -430,9 +430,13 @@ export default function ResultsClient({
           {topLevel.map((c) => {
             const replies = repliesByParent.get(c.id) ?? [];
             return (
-              <li key={c.id} className="card">
+              <li
+                key={c.id}
+                className="card"
+                style={{ borderLeft: "3px solid var(--accent)" }}
+              >
                 {c.quote && (
-                  <p className="border-l-2 border-amber-300 pl-2 text-xs italic text-muted">
+                  <p className="mb-2 inline-block rounded-[5px] bg-[color:var(--surface-2)] px-2 py-0.5 text-xs text-muted">
                     「{c.quote.slice(0, 120)}」
                   </p>
                 )}

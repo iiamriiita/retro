@@ -25,8 +25,8 @@ export default async function DashboardPage() {
     <div className="container-wide">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">我的 Retro</h1>
-          <p className="mt-1 text-sm text-muted">{user.email}</p>
+          <h1 className="text-3xl font-extrabold tracking-tight">我的 Retro</h1>
+          <p className="mt-1.5 text-sm text-muted">{user.email}</p>
         </div>
         <Link className="btn-primary" href="/dashboard/new">
           + 發起新 retro
@@ -53,23 +53,20 @@ export default async function DashboardPage() {
               <li key={s.id} className="card flex items-center justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="truncate text-sm font-medium">
+                    <span className="truncate text-[15px] font-bold">
                       {template?.name ?? s.template_id}
                     </span>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs ${
+                      className={
                         state.primary.tone === "open"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-gray-100 text-muted"
-                      }`}
+                          ? "badge badge-success"
+                          : "badge"
+                      }
                     >
                       {state.primary.label}
                     </span>
                     {state.badges.map((b) => (
-                      <span
-                        key={b}
-                        className="rounded-full bg-[color:var(--accent-weak)] px-2 py-0.5 text-xs text-[color:var(--gold-700)]"
-                      >
+                      <span key={b} className="badge badge-accent">
                         {b}
                       </span>
                     ))}

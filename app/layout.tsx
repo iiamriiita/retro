@@ -19,15 +19,24 @@ export default async function RootLayout({
   return (
     <html lang="zh-Hant">
       <body>
-        <header className="border-b border-line">
-          <div className="container-wide flex h-14 items-center justify-between">
-            <Link href="/" className="text-sm font-semibold tracking-tight">
+        <header
+          className="sticky top-0 z-10 border-b border-line"
+          style={{ background: "var(--surface)" }}
+        >
+          <div className="container-wide flex h-[60px] items-center justify-between">
+            <Link
+              href="/"
+              className="font-display text-[17px] font-extrabold tracking-tight"
+            >
               Team&nbsp;Retro
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
+            <nav className="flex items-center gap-5 text-sm">
               {user ? (
                 <>
-                  <Link href="/dashboard" className="text-muted hover:text-ink">
+                  <Link
+                    href="/dashboard"
+                    className="font-semibold text-muted hover:text-ink"
+                  >
                     Dashboard
                   </Link>
                   <form action="/auth/signout" method="post">
