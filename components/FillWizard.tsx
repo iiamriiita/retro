@@ -25,14 +25,12 @@ export default function FillWizard({
   anonymity,
   templateName,
   templateDescription,
-  intro,
   questions,
 }: {
   sessionId: string;
   anonymity: Anonymity;
   templateName: string;
   templateDescription: string;
-  intro?: string;
   questions: Question[];
 }) {
   const { t, locale } = useT();
@@ -249,15 +247,6 @@ export default function FillWizard({
         <h1 className="text-xl font-semibold tracking-tight">{templateName}</h1>
         <p className="mt-1 text-sm text-muted">{templateDescription}</p>
       </div>
-
-      {intro && step === 0 && (
-        <div
-          className="card text-sm leading-relaxed"
-          style={{ background: "var(--accent-weak)" }}
-        >
-          {intro}
-        </div>
-      )}
 
       <div className="flex items-center gap-1">
         {Array.from({ length: totalSteps }).map((_, i) => (

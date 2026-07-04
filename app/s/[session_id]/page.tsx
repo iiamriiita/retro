@@ -92,7 +92,6 @@ export default async function FillPage({
         anonymity={session.anonymity}
         templateName={template.name}
         templateDescription={template.description}
-        intro={template.intro}
         questions={template.questions}
       />
     </div>
