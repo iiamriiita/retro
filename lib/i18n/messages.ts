@@ -101,7 +101,7 @@ const en: Dict = {
   "ti.endedAll": "Ended / total",
   "ti.chartTitle": "Participation per retro",
   "ti.chartTip":
-    "Bar height = submissions / expected team size. Colour reflects overall momentum; grey = no submissions.",
+    "Height & colour show each retro's turnout (submissions / team size): green = strong, gold = ok, red = low, grey = none.",
   "ti.barTipParticipation": "{date}: {n}/{size} submitted ({pct}%)",
   "ti.barTipResponses": "{date}: {n} responses",
   "ti.lastN": "Last {n}",
@@ -380,7 +380,7 @@ const zh: Dict = {
   "ti.cardCompleted": "完成場次",
   "ti.endedAll": "已結束 / 全部",
   "ti.chartTitle": "每場參與率",
-  "ti.chartTip": "長度＝填寫人數／預計人數；顏色代表整體走向，灰色表示沒人填。",
+  "ti.chartTip": "長度與顏色代表每場出席率（填寫人數／預計人數）：綠＝高、金＝中、紅＝低、灰＝沒人填。",
   "ti.barTipParticipation": "{date}：{n}/{size} 人填寫（{pct}%）",
   "ti.barTipResponses": "{date}：{n} 則回饋",
   "ti.lastN": "最近 {n} 場",

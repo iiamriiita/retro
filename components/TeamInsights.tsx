@@ -169,6 +169,16 @@ export default function TeamInsights({
   function barEmpty(pt: (typeof stats.timeline)[number]): boolean {
     return stats.teamSize ? pt.submitted === 0 : pt.responses === 0;
   }
+  // Per-retro colour by that session's turnout: green strong, gold ok, red low,
+  // grey none. Without a team size we can't judge turnout → neutral gold.
+  function barColor(pt: (typeof stats.timeline)[number]): string {
+    if (barEmpty(pt)) return "var(--surface-3)";
+    if (!stats.teamSize) return "var(--accent)";
+    const pct = barPct(pt);
+    if (pct >= 67) return "var(--green-500)";
+    if (pct >= 34) return "var(--accent)";
+    return "var(--red-500)";
+  }
   function barTip(pt: (typeof stats.timeline)[number]): string {
     return stats.teamSize
       ? tr("ti.barTipParticipation", {
@@ -275,7 +285,6 @@ export default function TeamInsights({
             <div className="flex h-40 items-stretch gap-2">
               {stats.timeline.map((t, i) => {
                 const last = i === stats.timeline.length - 1;
-                const empty = barEmpty(t);
                 return (
                   <div
                     key={t.id}
@@ -287,10 +296,7 @@ export default function TeamInsights({
                         className="w-full rounded-md transition-all"
                         style={{
                           height: `${Math.max(6, barPct(t))}%`,
-                          background: empty
-                            ? "var(--surface-3)"
-                            : sentiment.color,
-                          opacity: empty || last ? 1 : 0.55,
+                          background: barColor(t),
                         }}
                       />
                     </div>

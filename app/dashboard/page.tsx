@@ -144,10 +144,23 @@ export default async function DashboardPage() {
                           : "badge"
                       }
                     >
+                      <span
+                        className="inline-block h-1.5 w-1.5 rounded-full"
+                        style={{
+                          background:
+                            state.primary.tone === "open"
+                              ? "var(--green-500)"
+                              : "var(--text-subtle)",
+                        }}
+                      />
                       {t(state.primary.key)}
                     </span>
                     {state.badgeKeys.map((b) => (
                       <span key={b} className="badge badge-accent">
+                        <Icon
+                          name={b === "status.discussing" ? "message" : "sparkles"}
+                          size={12}
+                        />
                         {t(b)}
                       </span>
                     ))}
