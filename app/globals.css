@@ -244,10 +244,10 @@ input[type="checkbox"] {
   transform-origin: 510px 150px;
   animation: lp-sun 6s ease-in-out infinite;
 }
-/* speech bubbles */
+/* speech bubbles — no tail; anchored to the object it belongs to */
 .lp-bubble {
   position: absolute;
-  max-width: 240px;
+  max-width: 250px;
   background: #fff;
   color: var(--text);
   font-size: 15px;
@@ -256,18 +256,13 @@ input[type="checkbox"] {
   padding: 12px 15px;
   border-radius: 16px;
   box-shadow: var(--shadow-md);
-  opacity: 0;
-  transform: translateY(8px) scale(0.92);
-  transform-origin: bottom center;
-  transition:
-    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: lp-bubble-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
   z-index: 4;
 }
-.lp-bubble.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+@keyframes lp-bubble-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .lp-who {
   display: block;
@@ -278,21 +273,7 @@ input[type="checkbox"] {
   color: var(--gold-700);
   margin-bottom: 3px;
 }
-.lp-bubble::after {
-  content: "";
-  position: absolute;
-  bottom: -8px;
-  width: 16px;
-  height: 16px;
-  background: #fff;
-  transform: rotate(45deg);
-  box-shadow: var(--shadow-md);
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-}
-.lp-tail-left::after { left: 26px; }
-.lp-tail-right::after { right: 26px; }
 @media (prefers-reduced-motion: reduce) {
   #lp-boat, #lp-sun { animation: none; }
-  .lp-bubble { transition: opacity 0.2s; transform: none; }
-  .lp-bubble.show { transform: none; }
+  .lp-bubble { animation: none; }
 }

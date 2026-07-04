@@ -8,7 +8,7 @@ import { LocaleProvider } from "@/lib/i18n/client";
 import AuthModal from "@/components/AuthModal";
 import LangSwitcher from "@/components/LangSwitcher";
 import UserMenu from "@/components/UserMenu";
-import LogoWordmark from "@/components/LogoWordmark";
+import Image from "next/image";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -44,7 +44,13 @@ export default async function RootLayout({
           >
             <div className="container-wide flex h-[60px] items-center justify-between">
               <Link href="/" className="flex items-center">
-                <LogoWordmark className="text-[19px]" />
+                <Image
+                  src="/logo.png"
+                  alt="Team Retro"
+                  width={132}
+                  height={22}
+                  priority
+                />
               </Link>
               <nav className="flex items-center gap-4 text-sm">
                 {user ? (

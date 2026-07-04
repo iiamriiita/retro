@@ -1,45 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useT } from "@/lib/i18n/client";
 
-// Sailboat scene. Hover an object (boat / anchor / sun) to reveal its line.
+type Active = {
+  who: string;
+  text: string;
+  x: number;
+  y: number;
+  place: "above" | "below";
+};
+
+// Sailboat scene. Hover an object (boat / anchor / sun) to reveal its line;
+// the bubble is measured against the object's real box so it stays anchored.
 export default function LandingScene() {
   const { t } = useT();
-  const [hovered, setHovered] = useState<string | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState<Active | null>(null);
 
-  const bubbles = [
-    {
-      id: "boat",
-      who: t("landing.bubSailWho"),
-      text: t("landing.bubSailText"),
-      tail: "lp-tail-left",
-      pos: { left: "30%", top: "9%" } as const,
-    },
-    {
-      id: "anchor",
-      who: t("landing.bubAnchorWho"),
-      text: t("landing.bubAnchorText"),
-      tail: "lp-tail-right",
-      pos: { right: "10%", top: "48%" } as const,
-    },
-    {
-      id: "sun",
-      who: t("landing.bubLookoutWho"),
-      text: t("landing.bubLookoutText"),
-      tail: "lp-tail-right",
-      pos: { right: "6%", top: "6%" } as const,
-    },
-  ];
+  function show(who: string, text: string) {
+    return (e: React.MouseEvent<SVGGElement>) => {
+      const wrap = wrapRef.current;
+      if (!wrap) return;
+      const cr = wrap.getBoundingClientRect();
+      const br = e.currentTarget.getBoundingClientRect();
+      const cx = br.left - cr.left + br.width / 2;
+      const topGap = br.top - cr.top;
+      // Prefer sitting just above the object; flip below if there's no room.
+      const place: "above" | "below" = topGap < 120 ? "below" : "above";
+      const y = place === "above" ? br.top - cr.top : br.bottom - cr.top;
+      const x = Math.max(140, Math.min(cr.width - 140, cx));
+      setActive({ who, text, x, y, place });
+    };
+  }
+  const clear = () => setActive(null);
 
-  const hover = (id: string) => ({
+  const obj = (who: string, text: string) => ({
     style: { cursor: "pointer" } as const,
-    onMouseEnter: () => setHovered(id),
-    onMouseLeave: () => setHovered((h) => (h === id ? null : h)),
+    onMouseEnter: show(who, text),
+    onMouseLeave: clear,
   });
 
   return (
-    <div className="lp-scene h-full min-h-[320px] w-full">
+    <div ref={wrapRef} className="lp-scene h-full min-h-[320px] w-full">
       <svg
         className="bg"
         viewBox="0 0 640 760"
@@ -49,7 +52,7 @@ export default function LandingScene() {
         <rect width="640" height="760" fill="#FBF6EE" />
 
         {/* sun */}
-        <g {...hover("sun")}>
+        <g {...obj(t("landing.bubLookoutWho"), t("landing.bubLookoutText"))}>
           <circle id="lp-sun" cx="510" cy="150" r="66" fill="#F0B90B" />
         </g>
 
@@ -70,7 +73,11 @@ export default function LandingScene() {
         />
 
         {/* boat — sits on the water */}
-        <g id="lp-boat" transform="translate(320,368)" {...hover("boat")}>
+        <g
+          id="lp-boat"
+          transform="translate(320,368)"
+          {...obj(t("landing.bubSailWho"), t("landing.bubSailText"))}
+        >
           <rect x="-66" y="-8" width="132" height="140" fill="transparent" />
           <path d="M-64 92h128l-18 30h-92z" fill="#7E5232" />
           <path d="M-64 92h128l-4 6h-120z" fill="#603E27" />
@@ -80,7 +87,10 @@ export default function LandingScene() {
         </g>
 
         {/* anchor */}
-        <g transform="translate(470,600)" {...hover("anchor")}>
+        <g
+          transform="translate(470,600)"
+          {...obj(t("landing.bubAnchorWho"), t("landing.bubAnchorText"))}
+        >
           <rect x="-36" y="-52" width="72" height="116" fill="transparent" />
           <circle
             cx="0"
@@ -106,16 +116,22 @@ export default function LandingScene() {
         <circle cx="250" cy="80" r="5" fill="#D9A400" />
       </svg>
 
-      {bubbles.map((b) => (
+      {active && (
         <div
-          key={b.id}
-          className={`lp-bubble ${b.tail} ${hovered === b.id ? "show" : ""}`}
-          style={b.pos}
+          className="lp-bubble show"
+          style={{
+            left: active.x,
+            top: active.y,
+            transform:
+              active.place === "above"
+                ? "translate(-50%, calc(-100% - 12px))"
+                : "translate(-50%, 12px)",
+          }}
         >
-          <span className="lp-who">{b.who}</span>
-          {b.text}
+          <span className="lp-who">{active.who}</span>
+          {active.text}
         </div>
-      ))}
+      )}
     </div>
   );
 }
