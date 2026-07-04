@@ -23,7 +23,7 @@ export default async function ResultsPage({
   const { data: session } = await supabase
     .from("retro_sessions")
     .select(
-      "id, owner_id, template_id, anonymity, status, deadline, discussion_enabled, ai_report, ai_report_at",
+      "id, name, owner_id, template_id, anonymity, status, deadline, discussion_enabled, ai_report, ai_report_at",
     )
     .eq("id", session_id)
     .single();
@@ -150,7 +150,7 @@ export default async function ResultsPage({
       <BackButton fallback="/" />
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold tracking-tight">
-          {t("res.title", { name: template?.name ?? "Retro" })}
+          {t("res.title", { name: session.name || template?.name || "Retro" })}
         </h1>
         <p className="mt-1 text-sm text-muted">
           {anonymous ? t("res.modeAnon") : t("res.modeNamed")} ·{" "}

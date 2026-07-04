@@ -134,6 +134,7 @@ const en: Dict = {
   // create wizard
   "cw.stepSetup": "Setup",
   "cw.stepTemplate": "Template",
+  "cw.retroName": "Retro name",
   "cw.anonTitle": "Anonymous this round?",
   "cw.named": "Named",
   "cw.namedDesc": "People type their name; results show it.",
@@ -425,6 +426,7 @@ const zh: Dict = {
 
   "cw.stepSetup": "設定",
   "cw.stepTemplate": "選問卷",
+  "cw.retroName": "Retro 名稱",
   "cw.anonTitle": "這場要匿名嗎？",
   "cw.named": "具名",
   "cw.namedDesc": "填寫時自己打名字，結果會顯示。",

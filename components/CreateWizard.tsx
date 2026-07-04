@@ -13,11 +13,25 @@ function defaultDeadline(): string {
   )}:${pad(d.getMinutes())}`;
 }
 
-export default function CreateWizard({ templates }: { templates: Template[] }) {
+function defaultName(teamName?: string): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const date = `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`;
+  return `${(teamName ?? "").trim() || "Retro"} · ${date}`;
+}
+
+export default function CreateWizard({
+  templates,
+  teamName,
+}: {
+  templates: Template[];
+  teamName?: string | null;
+}) {
   const { t: tr } = useT();
   const STEPS = [tr("cw.stepSetup"), tr("cw.stepTemplate")];
   const [step, setStep] = useState(0);
 
+  const [name, setName] = useState(defaultName(teamName ?? undefined));
   const [anonymity, setAnonymity] = useState<Anonymity>("named");
   const [deadline, setDeadline] = useState(defaultDeadline());
   const [templateId, setTemplateId] = useState(templates[0]?.id ?? "");
@@ -62,6 +76,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          name: name.trim(),
           template_id: templateId,
           anonymity,
           deadline: new Date(deadline).toISOString(),
@@ -126,9 +141,19 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
         ))}
       </div>
 
-      {/* Step 1: anonymity + deadline */}
+      {/* Step 1: name + anonymity + deadline */}
       {step === 0 && (
         <div className="card space-y-5">
+          <div>
+            <label className="field-label">{tr("cw.retroName")}</label>
+            <input
+              className="textarea"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={tr("cw.retroName")}
+            />
+          </div>
+
           <div>
             <label className="field-label">{tr("cw.anonTitle")}</label>
             <div className="grid grid-cols-2 gap-2">

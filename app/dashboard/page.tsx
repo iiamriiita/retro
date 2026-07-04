@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   const { data: sessions } = await supabase
     .from("retro_sessions")
     .select(
-      "id, template_id, anonymity, status, deadline, discussion_enabled, ai_report_at, created_at",
+      "id, name, template_id, anonymity, status, deadline, discussion_enabled, ai_report_at, created_at",
     )
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false });
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="truncate text-[15px] font-bold">
-                      {template?.name ?? s.template_id}
+                      {s.name || template?.name || s.template_id}
                     </span>
                     <span
                       className={

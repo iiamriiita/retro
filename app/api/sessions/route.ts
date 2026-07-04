@@ -8,6 +8,7 @@ import type { Anonymity } from "@/lib/types";
 export const runtime = "nodejs";
 
 interface CreateBody {
+  name?: string;
   template_id?: string;
   anonymity?: Anonymity;
   deadline?: string; // ISO datetime
@@ -59,6 +60,7 @@ export async function POST(req: Request) {
     .from("retro_sessions")
     .insert({
       owner_id: user.id,
+      name: (body.name ?? "").trim().slice(0, 120) || null,
       template_id: template.id,
       anonymity,
       deadline: deadline.toISOString(),
