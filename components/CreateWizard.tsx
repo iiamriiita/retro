@@ -115,27 +115,16 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
 
   return (
     <div className="space-y-6">
-      <ol className="flex items-center gap-2 text-xs">
-        {STEPS.map((label, i) => (
-          <li key={label} className="flex items-center gap-2">
-            <span
-              className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] ${
-                i === step
-                  ? "bg-accent text-[color:var(--accent-ink)]"
-                  : i < step
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "bg-gray-100 text-muted"
-              }`}
-            >
-              {i < step ? "✓" : i + 1}
-            </span>
-            <span className={i === step ? "font-medium" : "text-muted"}>
-              {label}
-            </span>
-            {i < STEPS.length - 1 && <span className="text-line">—</span>}
-          </li>
+      <div className="flex items-center gap-1">
+        {STEPS.map((_, i) => (
+          <div
+            key={i}
+            className={`h-1.5 flex-1 rounded-full ${
+              i <= step ? "bg-accent" : "bg-gray-200"
+            }`}
+          />
         ))}
-      </ol>
+      </div>
 
       {/* Step 1: anonymity + deadline */}
       {step === 0 && (
