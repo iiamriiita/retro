@@ -70,7 +70,7 @@ export default async function LandingPage() {
           )}
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5">
+        <div className="mt-14 flex flex-wrap items-center justify-center gap-2.5">
           {FEATURES.map((f) => (
             <span
               key={f.key}
