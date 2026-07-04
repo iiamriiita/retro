@@ -1,5 +1,6 @@
-// Flat illustrations for the Sailboat template's five roles, keyed by the
-// role emoji. Falls back to rendering the emoji itself for any other role.
+// Flat illustrations for the Sailboat, Garden and Space Mission templates'
+// roles, keyed by the role emoji. Falls back to rendering the emoji itself
+// for any other role.
 export default function RoleIcon({
   emoji,
   size = 40,
@@ -262,6 +263,98 @@ export default function RoleIcon({
             strokeWidth="12"
             strokeLinecap="round"
           />
+        </>,
+      );
+    case "👩‍🚀": // Commander — astronaut
+      return svg(
+        <>
+          <path
+            d="M150 300 C 150 216 198 158 256 158 C 314 158 362 216 362 300
+               L 362 356 C 362 380 342 396 316 396 L 196 396 C 170 396 150 380 150 356 Z"
+            fill={CREAM}
+          />
+          <rect x="212" y="112" width="88" height="30" rx="15" fill={BROWN} />
+          <circle cx="256" cy="214" r="86" fill={DARK} />
+          <path
+            d="M198 214 C 198 176 224 152 256 152 C 288 152 314 176 314 214
+               C 314 232 300 244 278 244 L 234 244 C 212 244 198 232 198 214 Z"
+            fill={GOLD}
+          />
+          <circle cx="284" cy="192" r="18" fill="#FFF6DC" opacity="0.8" />
+          <rect x="214" y="392" width="34" height="40" rx="8" fill={BROWN} />
+          <rect x="264" y="392" width="34" height="40" rx="8" fill={BROWN} />
+        </>,
+      );
+    case "🛰️": // Mission control — orbiting satellite
+      return svg(
+        <>
+          <g transform="rotate(-30 256 256)">
+            <rect x="90" y="222" width="120" height="68" rx="10" fill={GOLD} />
+            <rect x="302" y="222" width="120" height="68" rx="10" fill={GOLD} />
+            <rect x="126" y="222" width="4" height="68" fill={DARK} />
+            <rect x="168" y="222" width="4" height="68" fill={DARK} />
+            <rect x="342" y="222" width="4" height="68" fill={DARK} />
+            <rect x="384" y="222" width="4" height="68" fill={DARK} />
+            <rect x="210" y="222" width="92" height="68" rx="10" fill={BROWN} />
+            <circle cx="256" cy="256" r="26" fill={CREAM} />
+          </g>
+          <path
+            d="M356 150 a150 150 0 0 1 30 92"
+            stroke={DARK}
+            strokeWidth="14"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </>,
+      );
+    case "🔧": // Engineer — wrench
+      return svg(
+        <g transform="rotate(45 256 256)">
+          <rect x="232" y="150" width="48" height="230" rx="20" fill={DARK} />
+          <path
+            d="M256 96 C 214 96 180 130 180 172 C 180 200 196 224 220 236
+               L 220 268 L 292 268 L 292 236 C 316 224 332 200 332 172
+               C 332 130 298 96 256 96 Z M256 128 a30 30 0 1 1 0 60 a30 30 0 0 1 0 -60 Z"
+            fill={GOLD}
+          />
+          <rect x="220" y="360" width="72" height="40" rx="16" fill={BROWN} />
+        </g>,
+      );
+    case "📡": // Comms officer — satellite dish
+      return svg(
+        <>
+          <path
+            d="M112 356 C 112 240 206 146 322 146 C 322 262 228 356 112 356 Z"
+            fill={CREAM}
+            stroke={DARK}
+            strokeWidth="24"
+          />
+          <line
+            x1="322"
+            y1="146"
+            x2="216"
+            y2="252"
+            stroke={DARK}
+            strokeWidth="20"
+            strokeLinecap="round"
+          />
+          <circle cx="322" cy="146" r="26" fill={GOLD} />
+          <rect x="204" y="330" width="24" height="96" rx="10" fill={BROWN} />
+          <path d="M170 430 L262 430 L282 452 L150 452 Z" fill={DARK} />
+        </>,
+      );
+    case "⭐": // Stargazer — star
+      return svg(
+        <>
+          <path
+            d="M256 96 L306 208 L426 220 L336 302 L362 424 L256 360
+               L150 424 L176 302 L86 220 L206 208 Z"
+            fill={GOLD}
+            stroke={DARK}
+            strokeWidth="18"
+            strokeLinejoin="round"
+          />
+          <circle cx="256" cy="252" r="30" fill="#FFF6DC" opacity="0.55" />
         </>,
       );
     default:
