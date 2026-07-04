@@ -221,8 +221,40 @@ export default function FillWizard({
 
   if (done) {
     return (
-      <div className="card">
-        <h1 className="text-lg font-semibold">{t("fw.doneTitle")}</h1>
+      <div className="card flex flex-col items-center text-center">
+        <svg
+          width="96"
+          height="96"
+          viewBox="0 0 512 512"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          {/* confetti */}
+          <rect x="78" y="120" width="36" height="36" rx="8" fill="#F0B90B" transform="rotate(-16 96 138)" />
+          <rect x="408" y="104" width="36" height="36" rx="8" fill="#8A5A34" transform="rotate(14 426 122)" />
+          <line x1="52" y1="214" x2="86" y2="226" stroke="#F0B90B" strokeWidth="14" strokeLinecap="round" />
+          <line x1="460" y1="200" x2="426" y2="214" stroke="#F0B90B" strokeWidth="14" strokeLinecap="round" />
+          <circle cx="92" cy="292" r="14" fill="#8A5A34" />
+          <circle cx="424" cy="286" r="16" fill="#F0B90B" />
+          <line x1="118" y1="368" x2="136" y2="398" stroke="#8A5A34" strokeWidth="14" strokeLinecap="round" />
+          <line x1="398" y1="356" x2="382" y2="384" stroke="#B98C67" strokeWidth="14" strokeLinecap="round" />
+          <rect x="392" y="398" width="34" height="34" rx="8" fill="#F0B90B" transform="rotate(-18 409 415)" />
+          {/* ring */}
+          <path d="M256 108 A 148 148 0 0 0 256 404" stroke="#F0B90B" strokeWidth="40" fill="none" />
+          <path d="M256 108 A 148 148 0 0 1 256 404" stroke="#E0A800" strokeWidth="40" fill="none" />
+          {/* inner disc + check */}
+          <circle cx="256" cy="256" r="122" fill="#F5EFE3" />
+          <path
+            d="M206 262 L242 300 L312 222"
+            stroke="#7E5232"
+            strokeWidth="30"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <h1 className="mt-4 text-lg font-semibold">{t("fw.doneTitle")}</h1>
         <p className="mt-2 text-sm text-muted">{t("fw.doneDesc")}</p>
       </div>
     );
