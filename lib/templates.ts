@@ -31,6 +31,7 @@ interface I18nTemplate {
   name: LStr;
   description: LStr;
   intro: LStr;
+  invite: LStr;
   questions: I18nQuestion[];
 }
 
@@ -60,6 +61,10 @@ const TEMPLATES_I18N: I18nTemplate[] = [
     intro: {
       en: "This stretch has been like sailing a boat together. First pick the role that best fits how you've been, then answer the questions!",
       zh: "我們這段時間就像一起航行的一艘船。先選一個最像你這陣子狀態的角色，再回答問題吧！",
+    },
+    invite: {
+      en: "As part of {team}, share this voyage — what's pushing us forward, what's holding us back, and the island we're heading for.",
+      zh: "身為 {team} 的一員，聊聊這趟航行——什麼在推我們前進、什麼拖住了船，還有我們想抵達的島。",
     },
     questions: [
       roleQuestion(
@@ -221,6 +226,10 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       en: "Think of this stretch as a garden we tend together. Pick the role closest to you!",
       zh: "把這段時間想成一座我們一起照顧的花園。選一個最貼近你的角色吧！",
     },
+    invite: {
+      en: "As part of {team}, tend our garden — what's blooming, what needs water, and the seeds you'd like to plant.",
+      zh: "身為 {team} 的一員，照顧我們這座花園——哪裡開花了、哪裡需要澆水，還有你想種下的種子。",
+    },
     questions: [
       roleQuestion(
         {
@@ -377,6 +386,10 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       en: "We just wrapped a space mission! Before the debrief, pick your role for this trip.",
       zh: "我們剛完成一趟太空任務！在任務報告前，選一個你這趟的角色。",
     },
+    invite: {
+      en: "As part of {team}, debrief this mission — what launched well, what pulled us down, and where to head next.",
+      zh: "身為 {team} 的一員，回顧這趟任務——哪裡順利發射、哪裡被重力拖住，還有下一趟的座標。",
+    },
     questions: [
       roleQuestion(
         {
@@ -525,6 +538,7 @@ function flatten(tpl: I18nTemplate, locale: Locale): Template {
     name: tpl.name[locale],
     description: tpl.description[locale],
     intro: tpl.intro[locale],
+    invite: tpl.invite[locale],
     questions: tpl.questions.map((q) => ({
       key: q.key,
       label: q.label[locale],

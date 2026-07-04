@@ -16,7 +16,7 @@ export default async function FillPage({
 
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select("id, template_id, anonymity, status, deadline")
+    .select("id, owner_id, template_id, anonymity, status, deadline")
     .eq("id", session_id)
     .single();
 
@@ -85,13 +85,26 @@ export default async function FillPage({
     );
   }
 
+  // Personalised fill-page invitation: substitute the organizer's team name.
+  const { data: team } = await supabase
+    .from("retro_teams")
+    .select("name")
+    .eq("owner_id", session.owner_id)
+    .maybeSingle();
+  const teamName =
+    (team?.name ?? "").trim() || (locale === "en" ? "the team" : "團隊");
+  const invite = (template.invite ?? template.description).replace(
+    /\{team\}/g,
+    teamName,
+  );
+
   return (
     <div className="container-narrow">
       <FillWizard
         sessionId={session.id}
         anonymity={session.anonymity}
         templateName={template.name}
-        templateDescription={template.description}
+        templateDescription={invite}
         questions={template.questions}
       />
     </div>

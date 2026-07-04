@@ -28,6 +28,7 @@ export interface Template {
   name: string;
   description: string;
   intro?: string; // opening line shown at the top of the fill flow
+  invite?: string; // fill-page invitation; may contain a {team} placeholder
   questions: Question[];
 }
 
