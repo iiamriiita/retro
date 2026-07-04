@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
-import { getTemplate } from "@/lib/templates";
+import { getTemplate, MOOD_KEY } from "@/lib/templates";
 import { checkBlocklist } from "@/lib/blocklist";
 import { getLocale } from "@/lib/i18n/server";
 
@@ -69,8 +69,9 @@ export async function POST(req: Request) {
     );
   }
 
-  // Server-side hard gate against blatant personal insults.
+  // Server-side hard gate against blatant personal insults (skip the rating).
   for (const r of rows) {
+    if (r.question_key === MOOD_KEY) continue;
     if (checkBlocklist(r.content).hit) {
       return NextResponse.json(
         {

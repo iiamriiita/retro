@@ -5,6 +5,7 @@ export interface Question {
   key: string;
   label: string;
   placeholder?: string;
+  type?: "text" | "rating"; // rating = 1–5 mood score; default text
 }
 
 export interface Template {

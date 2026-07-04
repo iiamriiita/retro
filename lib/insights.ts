@@ -20,6 +20,7 @@ export interface TimelinePoint {
   dateLabel: string;
   responses: number;
   submitted: number; // people who submitted (for participation height)
+  rating: number | null; // avg 1–5 mood for this retro (for bar colour)
 }
 
 export interface TeamStats {
@@ -35,10 +36,11 @@ export interface TeamStats {
   participationAvg: number | null; // 0–100, only when teamSize is set
   participationDelta: number | null;
   discussionRate: number | null; // % of finished retros that had discussion
-  // Engagement momentum across finished retros (computed, no AI).
+  // Team sentiment from 1–5 mood ratings (computed, no AI).
+  avgRating: number | null; // overall average across rated finished retros
   momentum: "up" | "down" | "flat";
-  improvingStreak: number; // consecutive increases at the tail
-  hasTrend: boolean; // ≥2 finished retros to compare
+  improvingStreak: number; // consecutive rating increases at the tail
+  hasTrend: boolean; // ≥2 rated finished retros to compare
 }
 
 function fmtDate(iso: string): string {
@@ -59,6 +61,7 @@ export function computeTeamStats(
   commentsBySession: Map<string, number>,
   submittedBySession: Map<string, number> = new Map(),
   teamSize: number | null = null,
+  ratingBySession: Map<string, number> = new Map(),
 ): TeamStats {
   const byDate = [...retros].sort(
     (a, b) =>
@@ -98,6 +101,7 @@ export function computeTeamStats(
     dateLabel: fmtDate(r.created_at),
     responses: responsesBySession.get(r.id) ?? 0,
     submitted: submittedBySession.get(r.id) ?? 0,
+    rating: ratingBySession.has(r.id) ? ratingBySession.get(r.id)! : null,
   }));
 
   // Participation = submissions / expected team size, per closed retro, averaged.
@@ -115,21 +119,23 @@ export function computeTeamStats(
     }
   }
 
-  // Engagement momentum: trend of submissions (fallback: responses) across
-  // finished retros. Drives the computed "Team sentiment" card — no AI.
-  const subSeries = closed.map((r) => submittedBySession.get(r.id) ?? 0);
-  const series = subSeries.some((v) => v > 0)
-    ? subSeries
-    : closed.map((r) => responsesBySession.get(r.id) ?? 0);
-  const hasTrend = closed.length >= 2;
+  // Team sentiment is driven by the 1–5 mood ratings. Momentum = trend of the
+  // per-retro average rating across finished retros that have ratings.
+  const ratedClosed = closed.filter((r) => ratingBySession.has(r.id));
+  const ratingSeries = ratedClosed.map((r) => ratingBySession.get(r.id)!);
+  const avgRating =
+    ratingSeries.length > 0
+      ? ratingSeries.reduce((n, v) => n + v, 0) / ratingSeries.length
+      : null;
+  const hasTrend = ratingSeries.length >= 2;
   let momentum: "up" | "down" | "flat" = "flat";
   let improvingStreak = 0;
   if (hasTrend) {
-    const last = series[series.length - 1];
-    const prev = series[series.length - 2];
+    const last = ratingSeries[ratingSeries.length - 1];
+    const prev = ratingSeries[ratingSeries.length - 2];
     momentum = last > prev ? "up" : last < prev ? "down" : "flat";
-    for (let i = series.length - 1; i > 0; i--) {
-      if (series[i] > series[i - 1]) improvingStreak++;
+    for (let i = ratingSeries.length - 1; i > 0; i--) {
+      if (ratingSeries[i] > ratingSeries[i - 1]) improvingStreak++;
       else break;
     }
   }
@@ -159,6 +165,7 @@ export function computeTeamStats(
     participationAvg,
     participationDelta,
     discussionRate,
+    avgRating,
     momentum,
     improvingStreak,
     hasTrend,
@@ -215,6 +222,7 @@ function buildAiContext(retros: RetroForAI[], locale: Locale): string {
     const questions = template?.questions ?? [];
     const lines: string[] = [nth(i, r.dateLabel)];
     for (const q of questions) {
+      if (q.type === "rating") continue;
       const group = r.answers.filter((a) => a.question_key === q.key);
       if (group.length === 0) continue;
       lines.push(`### ${q.label}`);

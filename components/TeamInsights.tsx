@@ -74,28 +74,41 @@ function StatCard({
 
 type Tr = (key: string, vars?: Record<string, string | number>) => string;
 
-// Computed engagement "sentiment" from real stats — no AI, always localized.
-function deriveSentiment(stats: TeamStats, tr: Tr) {
-  const { momentum, improvingStreak, hasTrend } = stats;
+// Colour band for a 1–5 mood score.
+function moodColor(score: number): string {
+  if (score >= 4) return "var(--green-500)";
+  if (score >= 3) return "var(--accent)";
+  return "var(--red-500)";
+}
 
-  let label: string;
-  let color: string;
-  if (!hasTrend || momentum === "flat") {
-    label = tr("ti.sentNeutral");
-    color = "var(--accent)";
-  } else if (momentum === "up") {
-    label = tr("ti.sentPositive");
-    color = "var(--green-500)";
-  } else {
-    label = tr("ti.sentAttention");
-    color = "var(--red-500)";
+// Team sentiment from the 1–5 mood ratings — no AI, always localized.
+function deriveSentiment(stats: TeamStats, tr: Tr) {
+  const { avgRating, momentum, improvingStreak, hasTrend } = stats;
+
+  // No ratings collected yet.
+  if (avgRating == null) {
+    return {
+      label: tr("ti.sentNeutral"),
+      color: "var(--text-subtle)",
+      note: tr("ti.sentNoData"),
+      noteColor: "var(--text-subtle)",
+      icon: null as "trending-up" | "trending-down" | null,
+    };
   }
+
+  const label =
+    avgRating >= 4
+      ? tr("ti.sentPositive")
+      : avgRating >= 3
+        ? tr("ti.sentNeutral")
+        : tr("ti.sentAttention");
+  const color = moodColor(avgRating);
 
   let note: string;
   let noteColor = "var(--text-subtle)";
   let icon: "trending-up" | "trending-down" | null = null;
   if (!hasTrend) {
-    note = tr("ti.sentFirst");
+    note = tr("ti.sentScore", { avg: avgRating.toFixed(1) });
   } else if (improvingStreak >= 2) {
     note = tr("ti.sentImproving", { n: improvingStreak + 1 });
     noteColor = "var(--green-500)";
@@ -166,20 +179,17 @@ export default function TeamInsights({
       return Math.min(100, Math.round((pt.submitted / stats.teamSize) * 100));
     return Math.round((pt.responses / maxResp) * 100);
   }
-  function barEmpty(pt: (typeof stats.timeline)[number]): boolean {
-    return stats.teamSize ? pt.submitted === 0 : pt.responses === 0;
-  }
-  // Per-retro colour by that session's turnout: green strong, gold ok, red low,
-  // grey none. Without a team size we can't judge turnout → neutral gold.
+  // Per-retro colour by that session's average mood rating; grey when unrated.
   function barColor(pt: (typeof stats.timeline)[number]): string {
-    if (barEmpty(pt)) return "var(--surface-3)";
-    if (!stats.teamSize) return "var(--accent)";
-    const pct = barPct(pt);
-    if (pct >= 67) return "var(--green-500)";
-    if (pct >= 34) return "var(--accent)";
-    return "var(--red-500)";
+    return pt.rating == null ? "var(--surface-3)" : moodColor(pt.rating);
   }
   function barTip(pt: (typeof stats.timeline)[number]): string {
+    if (pt.rating != null && stats.teamSize)
+      return tr("ti.barTipMood", {
+        date: pt.dateLabel,
+        pct: barPct(pt),
+        mood: pt.rating.toFixed(1),
+      });
     return stats.teamSize
       ? tr("ti.barTipParticipation", {
           date: pt.dateLabel,

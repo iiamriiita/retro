@@ -68,7 +68,9 @@ export default async function FillPage({
           <h2 className="text-lg font-semibold">{template.name}</h2>
           <p className="mt-1 text-sm text-muted">{template.description}</p>
           <div className="mt-4 space-y-3 opacity-70">
-            {template.questions.map((q) => (
+            {template.questions
+              .filter((q) => q.type !== "rating")
+              .map((q) => (
               <div key={q.key} className="card">
                 <label className="field-label">{q.label}</label>
                 <textarea

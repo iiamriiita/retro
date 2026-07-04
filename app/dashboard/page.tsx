@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getTemplate } from "@/lib/templates";
 import { deriveState } from "@/lib/status";
 import { computeTeamStats, type RetroRow, type AiInsights } from "@/lib/insights";
+import { MOOD_KEY } from "@/lib/templates";
 import { getT } from "@/lib/i18n/server";
 import FormLinkButton from "@/components/FormLinkButton";
 import TeamInsights from "@/components/TeamInsights";
@@ -32,16 +33,28 @@ export default async function DashboardPage() {
   const responsesBySession = new Map<string, number>();
   const commentsBySession = new Map<string, number>();
   const submittedBySession = new Map<string, number>();
+  const ratingBySession = new Map<string, number>();
   if (ids.length > 0) {
-    const [{ data: ans }, { data: cms }, { data: parts }] = await Promise.all([
-      supabase.from("retro_answers").select("session_id").in("session_id", ids),
-      supabase.from("retro_comments").select("session_id").in("session_id", ids),
-      supabase
-        .from("retro_participants")
-        .select("session_id")
-        .in("session_id", ids)
-        .not("submitted_at", "is", null),
-    ]);
+    const [{ data: ans }, { data: cms }, { data: parts }, { data: moods }] =
+      await Promise.all([
+        // Text answers only (exclude the mood rating) for the feedback count.
+        supabase
+          .from("retro_answers")
+          .select("session_id")
+          .in("session_id", ids)
+          .neq("question_key", MOOD_KEY),
+        supabase.from("retro_comments").select("session_id").in("session_id", ids),
+        supabase
+          .from("retro_participants")
+          .select("session_id")
+          .in("session_id", ids)
+          .not("submitted_at", "is", null),
+        supabase
+          .from("retro_answers")
+          .select("session_id, content")
+          .in("session_id", ids)
+          .eq("question_key", MOOD_KEY),
+      ]);
     for (const a of ans ?? [])
       responsesBySession.set(
         a.session_id,
@@ -57,6 +70,17 @@ export default async function DashboardPage() {
         p.session_id,
         (submittedBySession.get(p.session_id) ?? 0) + 1,
       );
+    // Average the 1–5 mood ratings per session.
+    const moodSum = new Map<string, number>();
+    const moodCount = new Map<string, number>();
+    for (const m of moods ?? []) {
+      const v = parseInt(m.content, 10);
+      if (!Number.isFinite(v)) continue;
+      moodSum.set(m.session_id, (moodSum.get(m.session_id) ?? 0) + v);
+      moodCount.set(m.session_id, (moodCount.get(m.session_id) ?? 0) + 1);
+    }
+    for (const [sid, sum] of moodSum)
+      ratingBySession.set(sid, sum / (moodCount.get(sid) || 1));
   }
 
   const { data: team } = await supabase
@@ -71,6 +95,7 @@ export default async function DashboardPage() {
     commentsBySession,
     submittedBySession,
     team?.team_size ?? null,
+    ratingBySession,
   );
 
   const { data: insightRow } = await supabase

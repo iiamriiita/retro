@@ -74,6 +74,15 @@ export default function FillWizard({
       return;
     }
     if (inQuestion && currentQuestion) {
+      // Rating question: require a choice, no moderation.
+      if (currentQuestion.type === "rating") {
+        if (!(values[currentQuestion.key] ?? "").trim()) {
+          setError(t("fw.ratingRequired"));
+          return;
+        }
+        setStep((s) => s + 1);
+        return;
+      }
       const text = (values[currentQuestion.key] ?? "").trim();
       if (text) {
         setChecking(true);
@@ -105,10 +114,12 @@ export default function FillWizard({
     setSubmitting(true);
     try {
       const results = await Promise.all(
-        filled.map(async (q) => ({
-          key: q.key,
-          result: await moderate(values[q.key].trim(), locale),
-        })),
+        filled
+          .filter((q) => q.type !== "rating")
+          .map(async (q) => ({
+            key: q.key,
+            result: await moderate(values[q.key].trim(), locale),
+          })),
       );
       const bad = results.find((r) => r.result.verdict === "revise");
       if (bad) {
@@ -206,7 +217,40 @@ export default function FillWizard({
         </div>
       )}
 
-      {inQuestion && currentQuestion && (
+      {inQuestion && currentQuestion && currentQuestion.type === "rating" && (
+        <div className="card">
+          <label className="field-label">{currentQuestion.label}</label>
+          <div className="mt-3 flex items-stretch gap-2">
+            {[1, 2, 3, 4, 5].map((n) => {
+              const sel = (values[currentQuestion.key] ?? "") === String(n);
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setValue(currentQuestion.key, String(n))}
+                  className="flex-1 rounded-lg py-3 text-lg font-bold transition-colors"
+                  style={
+                    sel
+                      ? { background: "var(--accent)", color: "var(--text-inverse)" }
+                      : { background: "var(--surface-2)", color: "var(--text-muted)" }
+                  }
+                >
+                  {n}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-1.5 flex justify-between text-xs text-subtle">
+            <span>{t("fw.ratingLow")}</span>
+            <span>{t("fw.ratingHigh")}</span>
+          </div>
+          <p className="mt-2 text-xs text-muted">
+            {t("fw.qProgressRating", { i: qIndex + 1, n: questions.length })}
+          </p>
+        </div>
+      )}
+
+      {inQuestion && currentQuestion && currentQuestion.type !== "rating" && (
         <div className="card">
           <label className="field-label">{currentQuestion.label}</label>
           <textarea
@@ -246,7 +290,11 @@ export default function FillWizard({
               <li key={q.key}>
                 <p className="text-xs font-medium">{q.label}</p>
                 <p className="mt-0.5 whitespace-pre-wrap text-sm text-muted">
-                  {(values[q.key] ?? "").trim() || t("fw.blank")}
+                  {(values[q.key] ?? "").trim()
+                    ? q.type === "rating"
+                      ? `${values[q.key]} / 5`
+                      : values[q.key]
+                    : t("fw.blank")}
                 </p>
               </li>
             ))}

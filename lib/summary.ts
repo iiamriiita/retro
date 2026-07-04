@@ -52,6 +52,7 @@ export function buildContext(
   const questions = template?.questions ?? [];
   const lines: string[] = [];
   for (const q of questions) {
+    if (q.type === "rating") continue;
     const group = answers.filter((a) => a.question_key === q.key);
     lines.push(`### ${q.label}`);
     if (group.length === 0)

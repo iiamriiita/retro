@@ -1,17 +1,27 @@
 import type { Template } from "./types";
 import type { Locale } from "./i18n/messages";
 
+// Shared reserved key for the 1–5 mood rating. Every template asks it (with its
+// own phrasing) but stores under the same key so it aggregates uniformly.
+export const MOOD_KEY = "__mood";
+
 type LStr = { en: string; zh: string };
 interface I18nQuestion {
   key: string;
   label: LStr;
-  placeholder: LStr;
+  placeholder?: LStr;
+  type?: "text" | "rating";
 }
 interface I18nTemplate {
   id: string;
   name: LStr;
   description: LStr;
   questions: I18nQuestion[];
+}
+
+// The mood-rating question, phrased per template but stored under MOOD_KEY.
+function moodQuestion(label: LStr): I18nQuestion {
+  return { key: MOOD_KEY, type: "rating", label };
 }
 
 // Three built-in questionnaires. Placeholders show an example sentence to nudge
@@ -61,6 +71,10 @@ const TEMPLATES_I18N: I18nTemplate[] = [
           zh: "例：繼續每天早上 15 分鐘同步進度，資訊很順暢。",
         },
       },
+      moodQuestion({
+        en: "Overall, how do you feel about how the team is working together right now?",
+        zh: "整體而言，你對團隊目前的合作氛圍感覺如何？",
+      }),
     ],
   },
   {
@@ -112,6 +126,10 @@ const TEMPLATES_I18N: I18nTemplate[] = [
           zh: "例：期待能有固定的技術分享時間，但一直排不進去。",
         },
       },
+      moodQuestion({
+        en: "How satisfied are you with this period overall?",
+        zh: "這段期間整體下來，你的滿意度如何？",
+      }),
     ],
   },
   {
@@ -158,6 +176,10 @@ const TEMPLATES_I18N: I18nTemplate[] = [
           zh: "例：希望你能多在設計階段就丟出想法，讓大家早點對齊。",
         },
       },
+      moodQuestion({
+        en: "How positive does the working relationship with this teammate feel right now?",
+        zh: "目前和這位夥伴的合作關係，你覺得有多正向？",
+      }),
     ],
   },
 ];
@@ -170,7 +192,8 @@ function flatten(tpl: I18nTemplate, locale: Locale): Template {
     questions: tpl.questions.map((q) => ({
       key: q.key,
       label: q.label[locale],
-      placeholder: q.placeholder[locale],
+      placeholder: q.placeholder?.[locale],
+      type: q.type ?? "text",
     })),
   };
 }

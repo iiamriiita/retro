@@ -1,5 +1,5 @@
 import { createServiceClient } from "@/lib/supabase/server";
-import { getTemplate } from "@/lib/templates";
+import { getTemplate, MOOD_KEY } from "@/lib/templates";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { getT } from "@/lib/i18n/server";
 import type { PublicAnswer, PublicComment } from "@/lib/types";
@@ -90,12 +90,25 @@ export default async function ResultsPage({
     nameById = new Map((participants ?? []).map((p) => [p.id, p.display_name]));
   }
 
-  const answers: PublicAnswer[] = (rawAnswers ?? []).map((a) => ({
-    id: a.id,
-    question_key: a.question_key,
-    content: a.content,
-    author_name: anonymous ? null : (nameById.get(a.participant_id) ?? null),
-  }));
+  // Split the mood rating out of the displayed answers and average it.
+  const moodRows = (rawAnswers ?? []).filter((a) => a.question_key === MOOD_KEY);
+  const moodValues = moodRows
+    .map((a) => parseInt(a.content, 10))
+    .filter((v) => Number.isFinite(v));
+  const avgMood =
+    moodValues.length > 0
+      ? Math.round((moodValues.reduce((n, v) => n + v, 0) / moodValues.length) * 10) /
+        10
+      : null;
+
+  const answers: PublicAnswer[] = (rawAnswers ?? [])
+    .filter((a) => a.question_key !== MOOD_KEY)
+    .map((a) => ({
+      id: a.id,
+      question_key: a.question_key,
+      content: a.content,
+      author_name: anonymous ? null : (nameById.get(a.participant_id) ?? null),
+    }));
 
   // Comment threads. Author names come from the commenter's discussion identity,
   // so they are shown as stored (not tied to answer anonymity).
@@ -131,6 +144,27 @@ export default async function ResultsPage({
           {t("res.responsesTotal", { n: answers.length })}
           {session.discussion_enabled && ` · ${t("res.discussing")}`}
         </p>
+        {avgMood != null && (
+          <span
+            className="badge mt-3"
+            style={{
+              background:
+                avgMood >= 4
+                  ? "var(--green-weak)"
+                  : avgMood >= 3
+                    ? "var(--accent-weak)"
+                    : "var(--danger-weak, rgba(213,84,74,.12))",
+              color:
+                avgMood >= 4
+                  ? "var(--green-500)"
+                  : avgMood >= 3
+                    ? "var(--gold-700)"
+                    : "var(--red-500)",
+            }}
+          >
+            {t("res.avgMood", { avg: avgMood })}
+          </span>
+        )}
       </div>
 
       {isOwner && (
@@ -147,7 +181,7 @@ export default async function ResultsPage({
             sessionId={session.id}
             anonymous={anonymous}
             discussionEnabled={session.discussion_enabled}
-            questions={template.questions}
+            questions={template.questions.filter((q) => q.type !== "rating")}
             answers={answers}
             initialComments={initialComments}
             rosterNames={[]}
