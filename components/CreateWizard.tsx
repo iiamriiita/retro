@@ -263,29 +263,39 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
         </p>
       )}
 
-      <div className="flex justify-between">
-        <button
-          type="button"
-          className="btn-ghost"
-          onClick={back}
-          disabled={step === 0 || submitting}
+      <div className="flex items-center justify-between">
+        <a
+          href="/dashboard"
+          className="text-sm text-muted hover:text-ink"
         >
-          {tr("cw.prev")}
-        </button>
-        {step < STEPS.length - 1 ? (
-          <button type="button" className="btn-primary" onClick={next}>
-            {tr("cw.next")}
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={submit}
-            disabled={submitting || !templateId}
-          >
-            {submitting ? tr("cw.creating") : tr("cw.create")}
-          </button>
-        )}
+          {tr("cw.cancel")}
+        </a>
+        <div className="flex gap-2">
+          {step > 0 && (
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={back}
+              disabled={submitting}
+            >
+              {tr("cw.prev")}
+            </button>
+          )}
+          {step < STEPS.length - 1 ? (
+            <button type="button" className="btn-primary" onClick={next}>
+              {tr("cw.next")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={submit}
+              disabled={submitting || !templateId}
+            >
+              {submitting ? tr("cw.creating") : tr("cw.create")}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

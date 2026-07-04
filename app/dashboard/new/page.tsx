@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { getTemplates } from "@/lib/templates";
 import { getT } from "@/lib/i18n/server";
 import CreateWizard from "@/components/CreateWizard";
-import BackButton from "@/components/BackButton";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +14,6 @@ export default async function NewSessionPage() {
 
   return (
     <div className="container-narrow">
-      <BackButton fallback="/dashboard" label={t("new.back")} />
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">
           {t("new.title")}
