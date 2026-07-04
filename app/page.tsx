@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { getT } from "@/lib/i18n/server";
 import AuthModal from "@/components/AuthModal";
 import Icon from "@/components/Icon";
+import LandingScene from "@/components/LandingScene";
 
 export const dynamic = "force-dynamic";
 
@@ -17,40 +18,35 @@ export default async function LandingPage() {
   const { t } = await getT();
 
   return (
-    <div
-      className="relative -my-10 flex min-h-[calc(100vh-60px)] flex-col items-center justify-center overflow-hidden px-4 text-center"
-      style={{
-        backgroundImage:
-          "radial-gradient(var(--border-strong) 1px, transparent 1px)",
-        backgroundSize: "22px 22px",
-      }}
-    >
-      <div className="mx-auto max-w-3xl py-10">
-        <p className="eyebrow" style={{ color: "var(--gold-700)" }}>
-          {t("landing.eyebrow")}
-        </p>
+    <div className="-my-10 grid min-h-[calc(100vh-60px)] grid-cols-1 md:grid-cols-[1.05fr_1fr]">
+      {/* Left — copy + CTAs */}
+      <div className="flex flex-col justify-center gap-6 px-6 py-14 sm:px-10 md:px-16">
+        <span className="lp-eyebrow">{t("landing.eyebrow")}</span>
 
-        <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
+        <h1 className="lp-headline">
           {t("landing.headlineLead")}
-          <span style={{ color: "var(--accent-press)" }}>
+          <span style={{ color: "var(--accent)" }}>
             {t("landing.headlineAccent")}
           </span>
           {t("landing.headlineTail")}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+        <p className="max-w-[460px] text-lg leading-relaxed text-muted">
           {t("landing.subtitle")}
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <div className="flex flex-wrap gap-3">
           {user ? (
             <>
-              <Link className="btn-primary" href="/dashboard">
-                <Icon name="arrow-right" size={16} />
+              <Link className="btn-primary !h-12 !px-6 !text-base" href="/dashboard">
+                <Icon name="arrow-right" size={17} />
                 {t("landing.ctaDashboard")}
               </Link>
-              <Link className="btn-ghost" href="/dashboard/new">
-                <Icon name="plus" size={15} />
+              <Link
+                className="btn-ghost !h-12 !px-6 !text-base"
+                href="/dashboard/new"
+              >
+                <Icon name="plus" size={16} />
                 {t("landing.ctaNew")}
               </Link>
             </>
@@ -70,11 +66,11 @@ export default async function LandingPage() {
           )}
         </div>
 
-        <div className="mt-14 flex flex-wrap items-center justify-center gap-2.5">
+        <div className="flex flex-wrap gap-3">
           {FEATURES.map((f) => (
             <span
               key={f.key}
-              className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold"
+              className="inline-flex h-[38px] items-center gap-2 rounded-full px-4 text-sm font-semibold"
               style={{ background: "var(--surface-2)", color: "var(--text)" }}
             >
               <span style={{ color: "var(--gold-700)" }}>
@@ -84,6 +80,11 @@ export default async function LandingPage() {
             </span>
           ))}
         </div>
+      </div>
+
+      {/* Right — animated sailboat scene */}
+      <div className="relative min-h-[340px] md:min-h-0">
+        <LandingScene />
       </div>
     </div>
   );

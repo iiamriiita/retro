@@ -202,3 +202,97 @@ input[type="checkbox"] {
   text-transform: uppercase;
   color: var(--text-subtle);
 }
+
+/* ---------------- Landing hero scene ---------------- */
+.lp-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-700);
+}
+.lp-headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  font-size: clamp(38px, 4.4vw, 66px);
+}
+.lp-scene {
+  position: relative;
+  overflow: hidden;
+  background: #fbf6ee;
+}
+.lp-scene svg.bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* gentle life: boat bobs, sun breathes */
+@keyframes lp-boat {
+  0%, 100% { transform: translate(330px, 300px); }
+  50% { transform: translate(330px, 289px); }
+}
+@keyframes lp-sun {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+#lp-boat { animation: lp-boat 4.6s ease-in-out infinite; }
+#lp-sun {
+  transform-box: view-box;
+  transform-origin: 510px 150px;
+  animation: lp-sun 6s ease-in-out infinite;
+}
+/* speech bubbles */
+.lp-bubble {
+  position: absolute;
+  max-width: 240px;
+  background: #fff;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  padding: 12px 15px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(8px) scale(0.92);
+  transform-origin: bottom center;
+  transition:
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  z-index: 4;
+}
+.lp-bubble.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.lp-who {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-700);
+  margin-bottom: 3px;
+}
+.lp-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  transform: rotate(45deg);
+  box-shadow: var(--shadow-md);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+.lp-tail-left::after { left: 26px; }
+.lp-tail-right::after { right: 26px; }
+@media (prefers-reduced-motion: reduce) {
+  #lp-boat, #lp-sun { animation: none; }
+  .lp-bubble { transition: opacity 0.2s; transform: none; }
+  .lp-bubble.show { transform: none; }
+}

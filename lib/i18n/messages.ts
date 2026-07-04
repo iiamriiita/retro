@@ -47,6 +47,15 @@ const en: Dict = {
   "landing.featAI": "AI insights",
   "landing.footnote":
     "Only the organizer needs an account — everyone else joins with a link.",
+  "landing.bubSailWho": "Sail",
+  "landing.bubSailText": "I feel like the wind — pushing everyone forward.",
+  "landing.bubAnchorWho": "Anchor",
+  "landing.bubAnchorText": "Honestly? I've been hitting the brakes lately.",
+  "landing.bubLookoutWho": "Lookout",
+  "landing.bubLookoutText": "I notice the things everyone else misses.",
+  "landing.bubHelmWho": "Helm",
+  "landing.bubHelmText":
+    "I've been steering — thinking about where we head next.",
 
   // meta
   "meta.title": "Team Retro",
@@ -360,6 +369,14 @@ const zh: Dict = {
   "landing.featDiscussion": "選字逐句討論",
   "landing.featAI": "AI 團隊洞察",
   "landing.footnote": "只有發起者需要登入；填寫與討論的人用連結進來即可。",
+  "landing.bubSailWho": "風帆",
+  "landing.bubSailText": "我覺得自己像風——推著大家往前。",
+  "landing.bubAnchorWho": "船錨",
+  "landing.bubAnchorText": "老實說？我最近一直在踩煞車。",
+  "landing.bubLookoutWho": "瞭望",
+  "landing.bubLookoutText": "我常注意到別人漏掉的地方。",
+  "landing.bubHelmWho": "舵手",
+  "landing.bubHelmText": "我一直在掌舵——想著我們接下來要往哪走。",
 
   "meta.title": "Team Retro",
   "meta.description": "給小組的回顧工具 — 即時把關有建設性的回饋。",
