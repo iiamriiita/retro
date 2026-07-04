@@ -39,7 +39,7 @@ export interface TeamStats {
   // Team sentiment from 1–5 mood ratings (computed, no AI).
   avgRating: number | null; // overall average across rated finished retros
   momentum: "up" | "down" | "flat";
-  improvingStreak: number; // consecutive rating increases at the tail
+  streak: number; // consecutive steps in the momentum direction at the tail
   hasTrend: boolean; // ≥2 rated finished retros to compare
 }
 
@@ -129,14 +129,18 @@ export function computeTeamStats(
       : null;
   const hasTrend = ratingSeries.length >= 2;
   let momentum: "up" | "down" | "flat" = "flat";
-  let improvingStreak = 0;
+  let streak = 0; // consecutive steps in the momentum direction, from the tail
   if (hasTrend) {
     const last = ratingSeries[ratingSeries.length - 1];
     const prev = ratingSeries[ratingSeries.length - 2];
     momentum = last > prev ? "up" : last < prev ? "down" : "flat";
-    for (let i = ratingSeries.length - 1; i > 0; i--) {
-      if (ratingSeries[i] > ratingSeries[i - 1]) improvingStreak++;
-      else break;
+    if (momentum !== "flat") {
+      for (let i = ratingSeries.length - 1; i > 0; i--) {
+        const up = ratingSeries[i] > ratingSeries[i - 1];
+        const down = ratingSeries[i] < ratingSeries[i - 1];
+        if ((momentum === "up" && up) || (momentum === "down" && down)) streak++;
+        else break;
+      }
     }
   }
 
@@ -167,7 +171,7 @@ export function computeTeamStats(
     discussionRate,
     avgRating,
     momentum,
-    improvingStreak,
+    streak,
     hasTrend,
   };
 }

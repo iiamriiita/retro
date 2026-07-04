@@ -83,7 +83,7 @@ function moodColor(score: number): string {
 
 // Team sentiment from the 1–5 mood ratings — no AI, always localized.
 function deriveSentiment(stats: TeamStats, tr: Tr) {
-  const { avgRating, momentum, improvingStreak, hasTrend } = stats;
+  const { avgRating, momentum, streak, hasTrend } = stats;
 
   // No ratings collected yet.
   if (avgRating == null) {
@@ -104,21 +104,26 @@ function deriveSentiment(stats: TeamStats, tr: Tr) {
         : tr("ti.sentAttention");
   const color = moodColor(avgRating);
 
+  // Note describes the trend of the last rated retros: improving / declining
+  // for N in a row, or up / down / steady vs the previous one.
   let note: string;
   let noteColor = "var(--text-subtle)";
   let icon: "trending-up" | "trending-down" | null = null;
+  const inARow = streak + 1; // retros in the run
   if (!hasTrend) {
     note = tr("ti.sentScore", { avg: avgRating.toFixed(1) });
-  } else if (improvingStreak >= 2) {
-    note = tr("ti.sentImproving", { n: improvingStreak + 1 });
-    noteColor = "var(--green-500)";
-    icon = "trending-up";
   } else if (momentum === "up") {
-    note = tr("ti.sentUp");
+    note =
+      streak >= 2
+        ? tr("ti.sentImproving", { n: inARow })
+        : tr("ti.sentUp");
     noteColor = "var(--green-500)";
     icon = "trending-up";
   } else if (momentum === "down") {
-    note = tr("ti.sentDown");
+    note =
+      streak >= 2
+        ? tr("ti.sentDeclining", { n: inARow })
+        : tr("ti.sentDown");
     noteColor = "var(--red-500)";
     icon = "trending-down";
   } else {
