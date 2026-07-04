@@ -50,8 +50,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
   {
     id: "sailboat",
     name: {
-      en: "🚢 Set sail! Our boat",
-      zh: "🚢 出航吧！我們這艘船",
+      en: "Set sail! Our boat",
+      zh: "出航吧！我們這艘船",
     },
     description: {
       en: "A voyage metaphor — wind, anchors, rocks, and the island we're heading for.",
@@ -212,7 +212,7 @@ const TEMPLATES_I18N: I18nTemplate[] = [
   /* ───────────────────────── Garden ───────────────────────── */
   {
     id: "garden",
-    name: { en: "🌱 Little Garden", zh: "🌱 小小花園" },
+    name: { en: "Little Garden", zh: "小小花園" },
     description: {
       en: "A garden metaphor — what's blooming, what needs water, weeds, and seeds.",
       zh: "花園的比喻——開花的、需要澆水的、該除的雜草、想播的種子。",
@@ -366,8 +366,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
   {
     id: "space-mission",
     name: {
-      en: "🚀 Mission Control",
-      zh: "🚀 任務控制中心",
+      en: "Mission Control",
+      zh: "任務控制中心",
     },
     description: {
       en: "A space-mission metaphor — liftoff, gravity, alerts, and the next coordinates.",
