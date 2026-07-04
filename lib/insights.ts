@@ -33,6 +33,7 @@ export interface TeamStats {
   teamSize: number | null;
   participationAvg: number | null; // 0–100, only when teamSize is set
   participationDelta: number | null;
+  discussionRate: number | null; // % of finished retros that had discussion
 }
 
 function fmtDate(iso: string): string {
@@ -108,6 +109,16 @@ export function computeTeamStats(
     }
   }
 
+  // Discussion activity = share of finished retros that sparked any comment.
+  const discussionRate =
+    closedCount > 0
+      ? Math.round(
+          (closed.filter((r) => (commentsBySession.get(r.id) ?? 0) > 0).length /
+            closedCount) *
+            100,
+        )
+      : null;
+
   return {
     retroCount: retros.length,
     closedCount,
@@ -122,6 +133,7 @@ export function computeTeamStats(
     teamSize,
     participationAvg,
     participationDelta,
+    discussionRate,
   };
 }
 

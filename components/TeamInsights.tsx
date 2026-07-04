@@ -48,6 +48,27 @@ function StatCard({
   );
 }
 
+function sentimentColor(label: string): string {
+  const s = label.toLowerCase();
+  if (
+    s.includes("positive") ||
+    label.includes("正") ||
+    s.includes("good") ||
+    s.includes("healthy")
+  )
+    return "var(--green-500)";
+  if (
+    s.includes("attention") ||
+    s.includes("risk") ||
+    s.includes("negative") ||
+    label.includes("關注") ||
+    label.includes("需要") ||
+    label.includes("負")
+  )
+    return "var(--red-500)";
+  return "var(--accent)";
+}
+
 function themeTone(direction: "up" | "warning" | "down") {
   if (direction === "up")
     return { color: "var(--green-500)", icon: "trending-up" as const };
@@ -113,9 +134,44 @@ export default function TeamInsights({
       </div>
 
       {/* Real stat cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {/* Team sentiment (from AI insights) */}
+        <div className="card flex flex-col">
+          <span className="eyebrow">{tr("ti.cardSentiment")}</span>
+          {insights ? (
+            <>
+              <span className="mt-2 inline-flex items-center gap-2 font-display text-3xl font-extrabold tracking-tight">
+                <span
+                  className="inline-block h-3 w-3 rounded-full"
+                  style={{ background: sentimentColor(insights.sentiment.label) }}
+                />
+                {insights.sentiment.label}
+              </span>
+              {insights.sentiment.note && (
+                <span
+                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold"
+                  style={{ color: "var(--green-500)" }}
+                >
+                  <Icon name="trending-up" size={14} />
+                  {insights.sentiment.note}
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <span className="mt-2 font-display text-3xl font-extrabold tracking-tight text-subtle">
+                —
+              </span>
+              <span className="mt-1 text-xs text-subtle">
+                {tr("ti.sentimentNoAI")}
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Submission (form) rate */}
         <StatCard
-          label={tr("ti.cardParticipation")}
+          label={tr("ti.cardSubmission")}
           value={stats.participationAvg != null ? `${stats.participationAvg}%` : "—"}
         >
           <span className="mt-1 text-xs text-subtle">
@@ -125,21 +181,13 @@ export default function TeamInsights({
           </span>
           <Delta value={stats.participationDelta} unit={tr("ti.vsLast")} />
         </StatCard>
-        <StatCard label={tr("ti.cardFeedback")} value={String(stats.totalResponses)}>
-          <span className="mt-1 text-xs text-subtle">
-            {tr("ti.avgPerRetro", { n: stats.avgResponses })}
-          </span>
-          <Delta value={stats.responsesDelta} unit={tr("ti.vsLast")} />
-        </StatCard>
-        <StatCard label={tr("ti.cardComments")} value={String(stats.totalComments)}>
-          <span className="mt-1 text-xs text-subtle">{tr("ti.acrossAll")}</span>
-          <Delta value={stats.commentsDelta} unit={tr("ti.vsLast")} />
-        </StatCard>
+
+        {/* Discussion activity rate */}
         <StatCard
-          label={tr("ti.cardCompleted")}
-          value={`${stats.closedCount} / ${stats.retroCount}`}
+          label={tr("ti.cardActivity")}
+          value={stats.discussionRate != null ? `${stats.discussionRate}%` : "—"}
         >
-          <span className="mt-1 text-xs text-subtle">{tr("ti.endedAll")}</span>
+          <span className="mt-1 text-xs text-subtle">{tr("ti.activityHint")}</span>
         </StatCard>
       </div>
 
@@ -233,18 +281,6 @@ export default function TeamInsights({
             </div>
           ) : (
             <>
-              <div className="mb-2 flex items-baseline gap-2">
-                <span className="inline-flex items-center gap-2 text-lg font-extrabold">
-                  <span
-                    className="inline-block h-2.5 w-2.5 rounded-full"
-                    style={{ background: "var(--green-500)" }}
-                  />
-                  {insights.sentiment.label}
-                </span>
-                <span className="text-xs text-muted">
-                  {insights.sentiment.note}
-                </span>
-              </div>
               <p className="text-sm leading-relaxed text-ink">
                 {insights.pulse}
               </p>
