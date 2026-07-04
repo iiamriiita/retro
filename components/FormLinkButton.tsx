@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Icon from "@/components/Icon";
-import LogoMark from "@/components/LogoMark";
+import ShareHeroArt from "@/components/ShareHeroArt";
 import { useT } from "@/lib/i18n/client";
 
 export default function FormLinkButton({
@@ -51,14 +51,6 @@ export default function FormLinkButton({
     }
   }
 
-  // Faint decorative database marks scattered across the hero.
-  const decos = [
-    { top: "20%", left: "10%", size: 30, rotate: -12 },
-    { top: "58%", left: "26%", size: 24, rotate: 8 },
-    { top: "22%", left: "80%", size: 26, rotate: 14 },
-    { top: "62%", left: "72%", size: 22, rotate: -8 },
-  ];
-
   return (
     <>
       <button
@@ -78,61 +70,26 @@ export default function FormLinkButton({
             className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Full-bleed hero */}
+            {/* Full-bleed hero illustration */}
             <div
-              className="relative flex flex-col items-center justify-center px-6 py-9"
+              className="relative flex items-center justify-center overflow-hidden px-4 pt-4"
               style={{
                 background:
                   "linear-gradient(180deg, var(--accent-hover), var(--accent))",
               }}
             >
-              {/* dotted grid */}
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(rgba(44,28,18,0.18) 1px, transparent 1px)",
-                  backgroundSize: "22px 22px",
-                }}
-              />
-              {/* scattered marks */}
-              {decos.map((d, i) => (
-                <span
-                  key={i}
-                  className="pointer-events-none absolute"
-                  style={{
-                    top: d.top,
-                    left: d.left,
-                    transform: `translate(-50%,-50%) rotate(${d.rotate}deg)`,
-                    color: "var(--text-inverse)",
-                    opacity: 0.25,
-                  }}
-                >
-                  <Icon name="database" size={d.size} />
-                </span>
-              ))}
-
               {/* close */}
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={t("am.close")}
-                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-lg text-[color:var(--text-inverse)] transition-colors"
+                className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-lg text-[color:var(--text-inverse)] transition-colors"
                 style={{ background: "rgba(255,255,255,0.55)" }}
               >
                 <Icon name="x" size={18} />
               </button>
 
-              {/* logo mark */}
-              <div className="relative rounded-2xl bg-white p-2.5 shadow-md">
-                <LogoMark size={56} className="rounded-xl" />
-              </div>
-              <p
-                className="eyebrow relative mt-4"
-                style={{ color: "var(--text-inverse)", opacity: 0.85 }}
-              >
-                {tx.eyebrow}
-              </p>
+              <ShareHeroArt className="w-full max-w-[440px]" />
             </div>
 
             {/* Body */}
