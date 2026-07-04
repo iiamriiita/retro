@@ -15,12 +15,9 @@ export default function TemplateIcon({
     xmlns: "http://www.w3.org/2000/svg",
     "aria-hidden": true,
   };
-  const bg = <rect width="512" height="512" rx="116" fill="#FAF5EF" />;
-
   if (id === "sailboat") {
     return (
       <svg {...common}>
-        {bg}
         <circle cx="372" cy="150" r="42" fill="#F0B90B" />
         <rect x="248" y="92" width="16" height="160" rx="8" fill="#6B4A2E" />
         <path d="M256 96 L166 250 L256 250 Z" fill="#2C1C12" />
@@ -43,7 +40,6 @@ export default function TemplateIcon({
   if (id === "garden") {
     return (
       <svg {...common}>
-        {bg}
         <circle cx="356" cy="150" r="42" fill="#F0B90B" />
         <rect x="248" y="212" width="16" height="150" rx="4" fill="#6B4A2E" />
         <path
@@ -64,7 +60,6 @@ export default function TemplateIcon({
   if (id === "space-mission") {
     return (
       <svg {...common}>
-        {bg}
         <path
           d="M256 92 C 302 128 322 190 322 244 L 190 244 C 190 190 210 128 256 92 Z"
           fill="#EAE0D0"

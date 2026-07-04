@@ -323,23 +323,29 @@ export default function FillWizard({
                     <span>{t("fw.ratingHigh")}</span>
                   </div>
                 )}
-                <textarea
-                  rows={3}
-                  className={`textarea mt-3 ${
-                    suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
-                  }`}
-                  placeholder={t("fw.ratingWhy")}
-                  value={values[q.key + "__why"] ?? ""}
-                  onChange={(e) => setValue(q.key + "__why", e.target.value)}
-                />
-                <div className="mt-2 min-h-[1.25rem] text-xs">
-                  {checking && <span className="text-muted">{t("fw.checking")}</span>}
-                  {suggestion && (
-                    <div className="rounded-lg bg-amber-50 p-2 text-amber-800">
-                      {suggestion}
+                {chosen && (
+                  <>
+                    <textarea
+                      rows={3}
+                      className={`textarea mt-3 ${
+                        suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
+                      }`}
+                      placeholder={t("fw.ratingWhy")}
+                      value={values[q.key + "__why"] ?? ""}
+                      onChange={(e) => setValue(q.key + "__why", e.target.value)}
+                    />
+                    <div className="mt-2 min-h-[1.25rem] text-xs">
+                      {checking && (
+                        <span className="text-muted">{t("fw.checking")}</span>
+                      )}
+                      {suggestion && (
+                        <div className="rounded-lg bg-amber-50 p-2 text-amber-800">
+                          {suggestion}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
               </>
             );
           })()}
@@ -379,23 +385,29 @@ export default function FillWizard({
               );
             })}
           </div>
-          <textarea
-            rows={3}
-            className={`textarea mt-3 ${
-              suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
-            }`}
-            placeholder={t("fw.roleWhy")}
-            value={values[currentQuestion.key] ?? ""}
-            onChange={(e) => setValue(currentQuestion.key, e.target.value)}
-          />
-          <div className="mt-2 min-h-[1.25rem] text-xs">
-            {checking && <span className="text-muted">{t("fw.checking")}</span>}
-            {suggestion && (
-              <div className="rounded-lg bg-amber-50 p-2 text-amber-800">
-                {suggestion}
+          {roleSel[currentQuestion.key] && (
+            <>
+              <textarea
+                rows={3}
+                className={`textarea mt-3 ${
+                  suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
+                }`}
+                placeholder={t("fw.roleWhy")}
+                value={values[currentQuestion.key] ?? ""}
+                onChange={(e) => setValue(currentQuestion.key, e.target.value)}
+              />
+              <div className="mt-2 min-h-[1.25rem] text-xs">
+                {checking && (
+                  <span className="text-muted">{t("fw.checking")}</span>
+                )}
+                {suggestion && (
+                  <div className="rounded-lg bg-amber-50 p-2 text-amber-800">
+                    {suggestion}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
           <p className="mt-1 text-xs text-muted">
             {t("fw.qProgressRating", { i: qIndex + 1, n: questions.length })}
           </p>
