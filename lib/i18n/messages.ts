@@ -70,6 +70,7 @@ const en: Dict = {
   "dash.named": "Named",
   "dash.anonymous": "Anonymous",
   "dash.due": "Due {date}",
+  "dash.responses": "{n} responses",
 
   // session status
   "status.open": "In progress",
@@ -373,6 +374,7 @@ const zh: Dict = {
   "dash.named": "具名",
   "dash.anonymous": "匿名",
   "dash.due": "截止 {date}",
+  "dash.responses": "{n} 則回覆",
 
   "status.open": "進行中",
   "status.closed": "已結束",
