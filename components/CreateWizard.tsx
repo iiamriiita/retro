@@ -153,13 +153,18 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
               <div
                 key={t.id}
                 onClick={() => setTemplateId(t.id)}
-                className="cursor-pointer rounded-xl p-4 transition-colors"
+                className="relative cursor-pointer rounded-xl p-4 transition-colors"
                 style={{
                   background: isSel
                     ? "var(--accent-weak)"
                     : "var(--surface-2)",
                 }}
               >
+                {isSel && (
+                  <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
+                    <Icon name="check" size={12} />
+                  </span>
+                )}
                 <div className="flex items-start gap-3">
                   <TemplateIcon id={t.id} size={44} />
                   <div className="flex-1">
@@ -228,12 +233,17 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                   key={o.v}
                   type="button"
                   onClick={() => setAnonymity(o.v as Anonymity)}
-                  className={`rounded-lg p-3 text-left transition-colors ${
+                  className={`relative rounded-lg p-3 text-left transition-colors ${
                     anonymity === o.v
                       ? "bg-[color:var(--accent-weak)]"
                       : "bg-[color:var(--surface-2)] hover:bg-[color:var(--surface-3)]"
                   }`}
                 >
+                  {anonymity === o.v && (
+                    <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
+                      <Icon name="check" size={12} />
+                    </span>
+                  )}
                   <span className="block text-sm font-medium">{o.t}</span>
                   <span className="block text-xs text-muted">{o.d}</span>
                 </button>

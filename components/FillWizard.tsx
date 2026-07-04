@@ -367,13 +367,18 @@ export default function FillWizard({
                   key={o.label}
                   type="button"
                   onClick={() => selectRole(currentQuestion.key, roleStr)}
-                  className="flex flex-col items-center gap-1.5 rounded-lg p-3 text-center transition-colors"
+                  className="relative flex flex-col items-center gap-1.5 rounded-lg p-3 text-center transition-colors"
                   style={
                     sel
                       ? { background: "var(--accent-weak)" }
                       : { background: "var(--surface-2)" }
                   }
                 >
+                  {sel && (
+                    <span className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
+                      <Icon name="check" size={12} />
+                    </span>
+                  )}
                   <RoleIcon emoji={o.emoji} size={40} />
                   <span className="text-sm font-semibold leading-tight">
                     {o.label}
