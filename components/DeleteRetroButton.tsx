@@ -37,9 +37,9 @@ export default function DeleteRetroButton({ sessionId }: { sessionId: string }) 
         }}
         aria-label={t("dash.delete")}
         title={t("dash.delete")}
-        className="btn-ghost !px-2.5 text-muted hover:text-[color:var(--red-500)]"
+        className="inline-flex h-9 items-center justify-center px-2.5 text-[color:var(--text-subtle)] transition-colors hover:text-[color:var(--text)]"
       >
-        <Icon name="trash" size={15} />
+        <Icon name="trash" size={16} />
       </button>
 
       {open && (
