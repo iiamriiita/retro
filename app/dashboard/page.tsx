@@ -86,7 +86,9 @@ export default async function DashboardPage() {
             initialInsights={(insightRow?.data as AiInsights | undefined) ?? null}
             initialGeneratedAt={insightRow?.generated_at ?? null}
           />
-          <h2 className="mb-3 text-sm font-bold">{t("dash.allRetros")}</h2>
+          <h2 className="mb-4 text-lg font-extrabold tracking-tight">
+            {t("dash.allRetros")}
+          </h2>
           <ul className="space-y-3">
           {sessions.map((s) => {
             const state = deriveState({
