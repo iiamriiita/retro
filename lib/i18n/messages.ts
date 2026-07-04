@@ -238,7 +238,9 @@ const en: Dict = {
   "oc.genFail": "Generation failed",
 
   // close session
+  "csb.title": "End this retro?",
   "csb.confirm": "Once ended, members can no longer fill it in. End now?",
+  "csb.endConfirm": "End now",
   "csb.ending": "Ending…",
   "csb.endBtn": "End session & see results",
   "csb.endFail": "Failed to end",
@@ -527,7 +529,9 @@ const zh: Dict = {
   "oc.updateFail": "更新失敗",
   "oc.genFail": "產生失敗",
 
+  "csb.title": "結束這場 retro？",
   "csb.confirm": "結束後成員就無法再填寫，確定要結束嗎？",
+  "csb.endConfirm": "確定結束",
   "csb.ending": "結束中…",
   "csb.endBtn": "結束 session 並看結果",
   "csb.endFail": "結束失敗",
