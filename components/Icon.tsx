@@ -26,6 +26,7 @@ type IconName =
   | "chevron-down"
   | "log-out"
   | "settings"
+  | "info"
   | "check";
 
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -131,6 +132,13 @@ const PATHS: Record<IconName, React.ReactNode> = {
     </>
   ),
   "chevron-down": <path d="m6 9 6 6 6-6" />,
+  info: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </>
+  ),
   "log-out": (
     <>
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

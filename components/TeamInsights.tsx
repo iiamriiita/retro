@@ -28,21 +28,22 @@ function Delta({ value, unit }: { value: number | null; unit: string }) {
   );
 }
 
-// Eyebrow label with an on-hover tooltip carrying the metric's explanation.
+// Eyebrow label with a small "i" info icon that reveals the explanation on hover.
 function CardEyebrow({ label, tip }: { label: string; tip?: string }) {
   return (
-    <span className="group relative w-fit">
-      <span
-        className={`eyebrow ${tip ? "cursor-help border-b border-dotted border-[color:var(--border-strong)]" : ""}`}
-      >
-        {label}
-      </span>
+    <span className="flex items-center gap-1.5">
+      <span className="eyebrow">{label}</span>
       {tip && (
-        <span
-          className="pointer-events-none absolute bottom-full left-0 z-20 mb-1.5 hidden w-max max-w-[220px] rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
-          style={{ background: "#452C1C" }}
-        >
-          {tip}
+        <span className="group relative inline-flex">
+          <span className="cursor-help text-[color:var(--text-subtle)] transition-colors hover:text-[color:var(--text-muted)]">
+            <Icon name="info" size={13} />
+          </span>
+          <span
+            className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[220px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
+            style={{ background: "#452C1C" }}
+          >
+            {tip}
+          </span>
         </span>
       )}
     </span>
