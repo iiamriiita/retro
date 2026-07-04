@@ -98,6 +98,12 @@ export default function FillWizard({
     }
   }
 
+  function back() {
+    setError(null);
+    setSuggestion("");
+    setStep((s) => Math.max(0, s - 1));
+  }
+
 
   async function submit() {
     setError(null);
@@ -303,7 +309,19 @@ export default function FillWizard({
         </p>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        {step > 0 ? (
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={back}
+            disabled={submitting}
+          >
+            {t("fw.prev")}
+          </button>
+        ) : (
+          <span />
+        )}
         {inReview ? (
           <button
             type="button"
