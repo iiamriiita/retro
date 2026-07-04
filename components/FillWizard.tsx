@@ -263,10 +263,10 @@ export default function FillWizard({
 
       {inIdentity && (
         <div className="card space-y-2">
-          <label className="field-label">{t("fw.yourName")}</label>
+          <label className="field-label !text-[15px]">{t("fw.yourName")}</label>
           <input
             autoFocus
-            className="textarea"
+            className="textarea !text-[15px]"
             placeholder={t("fw.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -283,7 +283,7 @@ export default function FillWizard({
 
       {inQuestion && currentQuestion && currentQuestion.type === "rating" && (
         <div className="card">
-          <label className="field-label">{currentQuestion.label}</label>
+          <label className="field-label !text-[15px]">{currentQuestion.label}</label>
           {(() => {
             const q = currentQuestion;
             const scale =
@@ -314,7 +314,7 @@ export default function FillWizard({
                   })}
                 </div>
                 {chosenLevel ? (
-                  <p className="mt-3 text-sm font-medium">
+                  <p className="mt-3 text-[15px] font-medium">
                     {chosenLevel.emoji} {chosenLevel.label}
                   </p>
                 ) : (
@@ -325,7 +325,7 @@ export default function FillWizard({
                 )}
                 <textarea
                   rows={3}
-                  className={`textarea mt-3 ${
+                  className={`textarea mt-3 !text-[15px] ${
                     suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
                   }`}
                   placeholder={t("fw.ratingWhy")}
@@ -351,7 +351,7 @@ export default function FillWizard({
 
       {inQuestion && currentQuestion && currentQuestion.type === "role" && (
         <div className="card">
-          <label className="field-label">{currentQuestion.label}</label>
+          <label className="field-label !text-[15px]">{currentQuestion.label}</label>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {(currentQuestion.options ?? []).map((o) => {
               const roleStr = `${o.emoji} ${o.label}`;
@@ -369,10 +369,10 @@ export default function FillWizard({
                   }
                 >
                   <RoleIcon emoji={o.emoji} size={40} />
-                  <span className="text-sm font-semibold leading-tight">
+                  <span className="text-[15px] font-semibold leading-tight">
                     {o.label}
                   </span>
-                  <span className="text-xs leading-snug text-muted">
+                  <span className="text-[13px] leading-snug text-muted">
                     {o.desc}
                   </span>
                 </button>
@@ -381,7 +381,7 @@ export default function FillWizard({
           </div>
           <textarea
             rows={3}
-            className={`textarea mt-3 ${
+            className={`textarea mt-3 !text-[15px] ${
               suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
             }`}
             placeholder={t("fw.roleWhy")}
@@ -407,11 +407,11 @@ export default function FillWizard({
         currentQuestion.type !== "rating" &&
         currentQuestion.type !== "role" && (
           <div className="card">
-            <label className="field-label">{currentQuestion.label}</label>
+            <label className="field-label !text-[15px]">{currentQuestion.label}</label>
             <textarea
               autoFocus
               rows={4}
-              className={`textarea ${
+              className={`textarea !text-[15px] ${
                 suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
               }`}
               placeholder={currentQuestion.placeholder}
@@ -460,7 +460,7 @@ export default function FillWizard({
               return (
                 <li key={q.key}>
                   <p className="text-xs font-medium">{q.label}</p>
-                  <p className="mt-0.5 whitespace-pre-wrap text-sm text-muted">
+                  <p className="mt-0.5 whitespace-pre-wrap text-[15px] text-muted">
                     {shown}
                   </p>
                 </li>
