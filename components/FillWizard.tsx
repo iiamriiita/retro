@@ -25,12 +25,14 @@ export default function FillWizard({
   anonymity,
   templateName,
   templateDescription,
+  intro,
   questions,
 }: {
   sessionId: string;
   anonymity: Anonymity;
   templateName: string;
   templateDescription: string;
+  intro?: string;
   questions: Question[];
 }) {
   const { t, locale } = useT();
@@ -39,6 +41,7 @@ export default function FillWizard({
 
   const [name, setName] = useState("");
   const [values, setValues] = useState<Record<string, string>>({});
+  const [roleSel, setRoleSel] = useState<Record<string, string>>({});
   const [suggestion, setSuggestion] = useState("");
   const [checking, setChecking] = useState(false);
 
@@ -62,6 +65,16 @@ export default function FillWizard({
     setValues((s) => ({ ...s, [key]: v }));
     setSuggestion("");
   }
+  function selectRole(key: string, role: string) {
+    setRoleSel((s) => ({ ...s, [key]: role }));
+    setError(null);
+  }
+  // Whether a question has an answer (role = picked; else non-empty text/rating).
+  function isFilled(q: Question) {
+    return q.type === "role"
+      ? !!roleSel[q.key]
+      : !!(values[q.key] ?? "").trim();
+  }
 
   async function next() {
     setError(null);
@@ -80,6 +93,26 @@ export default function FillWizard({
           setError(t("fw.ratingRequired"));
           return;
         }
+        setStep((s) => s + 1);
+        return;
+      }
+      // Role question: require a pick; moderate the "why" if written.
+      if (currentQuestion.type === "role") {
+        if (!roleSel[currentQuestion.key]) {
+          setError(t("fw.pickRole"));
+          return;
+        }
+        const why = (values[currentQuestion.key] ?? "").trim();
+        if (why) {
+          setChecking(true);
+          const res = await moderate(why, locale);
+          setChecking(false);
+          if (res.verdict === "revise") {
+            setSuggestion(res.suggestion);
+            return;
+          }
+        }
+        setSuggestion("");
         setStep((s) => s + 1);
         return;
       }
@@ -107,20 +140,22 @@ export default function FillWizard({
 
   async function submit() {
     setError(null);
-    const filled = questions.filter((q) => (values[q.key] ?? "").trim());
+    const filled = questions.filter(isFilled);
     if (filled.length === 0) {
       setError(t("fw.atLeastOne"));
       return;
     }
     setSubmitting(true);
     try {
+      // Moderate free text (text questions + any role "why"), not the rating.
+      const toModerate = questions.filter(
+        (q) => q.type !== "rating" && (values[q.key] ?? "").trim(),
+      );
       const results = await Promise.all(
-        filled
-          .filter((q) => q.type !== "rating")
-          .map(async (q) => ({
-            key: q.key,
-            result: await moderate(values[q.key].trim(), locale),
-          })),
+        toModerate.map(async (q) => ({
+          key: q.key,
+          result: await moderate((values[q.key] ?? "").trim(), locale),
+        })),
       );
       const bad = results.find((r) => r.result.verdict === "revise");
       if (bad) {
@@ -138,10 +173,16 @@ export default function FillWizard({
         body: JSON.stringify({
           session_id: sessionId,
           display_name: named ? name.trim() : undefined,
-          answers: filled.map((q) => ({
-            question_key: q.key,
-            content: values[q.key].trim(),
-          })),
+          answers: filled.map((q) => {
+            if (q.type === "role") {
+              const why = (values[q.key] ?? "").trim();
+              return {
+                question_key: q.key,
+                content: why ? `${roleSel[q.key]}｜${why}` : roleSel[q.key],
+              };
+            }
+            return { question_key: q.key, content: (values[q.key] ?? "").trim() };
+          }),
         }),
       });
       const data = await res.json();
@@ -187,6 +228,15 @@ export default function FillWizard({
         <p className="mt-1 text-sm text-muted">{templateDescription}</p>
       </div>
 
+      {intro && step === 0 && (
+        <div
+          className="card text-sm leading-relaxed"
+          style={{ background: "var(--accent-weak)" }}
+        >
+          {intro}
+        </div>
+      )}
+
       <div className="flex items-center gap-1">
         {Array.from({ length: totalSteps }).map((_, i) => (
           <div
@@ -221,46 +271,92 @@ export default function FillWizard({
       {inQuestion && currentQuestion && currentQuestion.type === "rating" && (
         <div className="card">
           <label className="field-label">{currentQuestion.label}</label>
-          <div className="mt-3 flex items-stretch gap-2">
-            {[1, 2, 3, 4, 5].map((n) => {
-              const sel = (values[currentQuestion.key] ?? "") === String(n);
-              return (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => setValue(currentQuestion.key, String(n))}
-                  className="flex-1 rounded-lg py-3 text-lg font-bold transition-colors"
-                  style={
-                    sel
-                      ? { background: "var(--accent)", color: "var(--text-inverse)" }
-                      : { background: "var(--surface-2)", color: "var(--text-muted)" }
-                  }
-                >
-                  {n}
-                </button>
-              );
-            })}
-          </div>
-          <div className="mt-1.5 flex justify-between text-xs text-subtle">
-            <span>{t("fw.ratingLow")}</span>
-            <span>{t("fw.ratingHigh")}</span>
-          </div>
+          {(() => {
+            const q = currentQuestion;
+            const scale =
+              q.scale ?? [1, 2, 3, 4, 5].map((v) => ({ value: v, emoji: "", label: "" }));
+            const chosen = values[q.key] ?? "";
+            const chosenLevel = scale.find((s) => String(s.value) === chosen);
+            return (
+              <>
+                <div className="mt-3 grid grid-cols-5 gap-2">
+                  {scale.map((s) => {
+                    const sel = chosen === String(s.value);
+                    return (
+                      <button
+                        key={s.value}
+                        type="button"
+                        onClick={() => setValue(q.key, String(s.value))}
+                        className="flex flex-col items-center gap-1 rounded-lg py-3 transition-colors"
+                        style={
+                          sel
+                            ? { background: "var(--accent)", color: "var(--text-inverse)" }
+                            : { background: "var(--surface-2)", color: "var(--text-muted)" }
+                        }
+                      >
+                        {s.emoji && <span className="text-xl leading-none">{s.emoji}</span>}
+                        <span className="text-sm font-bold">{s.value}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {chosenLevel ? (
+                  <p className="mt-3 text-sm font-medium">
+                    {chosenLevel.emoji} {chosenLevel.label}
+                  </p>
+                ) : (
+                  <div className="mt-2 flex justify-between text-xs text-subtle">
+                    <span>{t("fw.ratingLow")}</span>
+                    <span>{t("fw.ratingHigh")}</span>
+                  </div>
+                )}
+                {q.lowNudge && chosen && Number(chosen) <= 2 && (
+                  <div className="mt-2 rounded-lg bg-amber-50 p-2 text-xs text-amber-800">
+                    {q.lowNudge}
+                  </div>
+                )}
+              </>
+            );
+          })()}
           <p className="mt-2 text-xs text-muted">
             {t("fw.qProgressRating", { i: qIndex + 1, n: questions.length })}
           </p>
         </div>
       )}
 
-      {inQuestion && currentQuestion && currentQuestion.type !== "rating" && (
+      {inQuestion && currentQuestion && currentQuestion.type === "role" && (
         <div className="card">
           <label className="field-label">{currentQuestion.label}</label>
+          <div className="mt-3 space-y-2">
+            {(currentQuestion.options ?? []).map((o) => {
+              const roleStr = `${o.emoji} ${o.label}`;
+              const sel = roleSel[currentQuestion.key] === roleStr;
+              return (
+                <button
+                  key={o.label}
+                  type="button"
+                  onClick={() => selectRole(currentQuestion.key, roleStr)}
+                  className="w-full rounded-lg p-3 text-left transition-colors"
+                  style={
+                    sel
+                      ? { background: "var(--accent-weak)" }
+                      : { background: "var(--surface-2)" }
+                  }
+                >
+                  <span className="block text-sm font-semibold">
+                    {o.emoji} {o.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-muted">{o.desc}</span>
+                </button>
+              );
+            })}
+          </div>
           <textarea
-            autoFocus
-            rows={4}
-            className={`textarea ${
+            rows={3}
+            className={`textarea mt-3 ${
               suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
             }`}
-            placeholder={currentQuestion.placeholder}
+            placeholder={t("fw.roleWhy")}
             value={values[currentQuestion.key] ?? ""}
             onChange={(e) => setValue(currentQuestion.key, e.target.value)}
           />
@@ -273,10 +369,40 @@ export default function FillWizard({
             )}
           </div>
           <p className="mt-1 text-xs text-muted">
-            {t("fw.qProgress", { i: qIndex + 1, n: questions.length })}
+            {t("fw.qProgressRating", { i: qIndex + 1, n: questions.length })}
           </p>
         </div>
       )}
+
+      {inQuestion &&
+        currentQuestion &&
+        currentQuestion.type !== "rating" &&
+        currentQuestion.type !== "role" && (
+          <div className="card">
+            <label className="field-label">{currentQuestion.label}</label>
+            <textarea
+              autoFocus
+              rows={4}
+              className={`textarea ${
+                suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
+              }`}
+              placeholder={currentQuestion.placeholder}
+              value={values[currentQuestion.key] ?? ""}
+              onChange={(e) => setValue(currentQuestion.key, e.target.value)}
+            />
+            <div className="mt-2 min-h-[1.25rem] text-xs">
+              {checking && <span className="text-muted">{t("fw.checking")}</span>}
+              {suggestion && (
+                <div className="rounded-lg bg-amber-50 p-2 text-amber-800">
+                  {suggestion}
+                </div>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-muted">
+              {t("fw.qProgress", { i: qIndex + 1, n: questions.length })}
+            </p>
+          </div>
+        )}
 
       {inReview && (
         <div className="card space-y-3">
@@ -287,18 +413,31 @@ export default function FillWizard({
             </p>
           )}
           <ul className="space-y-3">
-            {questions.map((q) => (
-              <li key={q.key}>
-                <p className="text-xs font-medium">{q.label}</p>
-                <p className="mt-0.5 whitespace-pre-wrap text-sm text-muted">
-                  {(values[q.key] ?? "").trim()
-                    ? q.type === "rating"
-                      ? `${values[q.key]} / 5`
-                      : values[q.key]
-                    : t("fw.blank")}
-                </p>
-              </li>
-            ))}
+            {questions.map((q) => {
+              let shown: string;
+              if (q.type === "role") {
+                const why = (values[q.key] ?? "").trim();
+                shown = roleSel[q.key]
+                  ? why
+                    ? `${roleSel[q.key]}｜${why}`
+                    : roleSel[q.key]
+                  : t("fw.blank");
+              } else if (q.type === "rating") {
+                shown = (values[q.key] ?? "").trim()
+                  ? `${values[q.key]} / 5`
+                  : t("fw.blank");
+              } else {
+                shown = (values[q.key] ?? "").trim() || t("fw.blank");
+              }
+              return (
+                <li key={q.key}>
+                  <p className="text-xs font-medium">{q.label}</p>
+                  <p className="mt-0.5 whitespace-pre-wrap text-sm text-muted">
+                    {shown}
+                  </p>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

@@ -1,17 +1,33 @@
 export type Anonymity = "anonymous" | "named";
 export type SessionStatus = "open" | "closed";
 
+export interface RoleOption {
+  emoji: string;
+  label: string;
+  desc: string;
+}
+export interface ScaleLevel {
+  value: number; // 1–5
+  emoji: string;
+  label: string;
+}
+
 export interface Question {
   key: string;
   label: string;
   placeholder?: string;
-  type?: "text" | "rating"; // rating = 1–5 mood score; default text
+  // text = free text (default); rating = 1–5 mood scale; role = pick one + why
+  type?: "text" | "rating" | "role";
+  options?: RoleOption[]; // role picker choices
+  scale?: ScaleLevel[]; // themed 1–5 rating levels
+  lowNudge?: string; // gentle prompt shown when a rating of ≤2 is picked
 }
 
 export interface Template {
   id: string;
   name: string;
   description: string;
+  intro?: string; // opening line shown at the top of the fill flow
   questions: Question[];
 }
 

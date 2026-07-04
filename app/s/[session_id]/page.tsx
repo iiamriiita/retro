@@ -66,7 +66,7 @@ export default async function FillPage({
           <p className="mt-1 text-sm text-muted">{template.description}</p>
           <div className="mt-4 space-y-3 opacity-70">
             {template.questions
-              .filter((q) => q.type !== "rating")
+              .filter((q) => q.type !== "rating" && q.type !== "role")
               .map((q) => (
               <div key={q.key} className="card">
                 <label className="field-label">{q.label}</label>
@@ -92,6 +92,7 @@ export default async function FillPage({
         anonymity={session.anonymity}
         templateName={template.name}
         templateDescription={template.description}
+        intro={template.intro}
         questions={template.questions}
       />
     </div>
