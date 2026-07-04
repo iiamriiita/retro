@@ -126,6 +126,14 @@ a {
 .btn-ghost:hover:not(:disabled) {
   background: var(--surface-3);
 }
+.btn-danger {
+  @apply btn;
+  background: var(--red-500);
+  color: var(--text-inverse);
+}
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(0.93);
+}
 
 /* ---------------- Badge ---------------- */
 .badge {

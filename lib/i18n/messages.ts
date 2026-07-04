@@ -64,6 +64,7 @@ const en: Dict = {
   "dash.allRetros": "All retros",
   "dash.manage": "Manage",
   "dash.delete": "Delete",
+  "dash.deleteTitle": "Delete this retro?",
   "dash.deleteConfirm":
     "Delete this retro and all its responses? This can't be undone.",
   "dash.deleteFail": "Couldn't delete — please try again.",
@@ -369,6 +370,7 @@ const zh: Dict = {
   "dash.allRetros": "所有 retro",
   "dash.manage": "管理",
   "dash.delete": "刪除",
+  "dash.deleteTitle": "刪除這場 retro？",
   "dash.deleteConfirm": "刪除這場 retro 和所有回覆？此動作無法復原。",
   "dash.deleteFail": "刪除失敗，請再試一次。",
   "dash.named": "具名",
