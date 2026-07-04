@@ -317,6 +317,12 @@ export async function geminiInsights(
   });
 
   if (!res.ok) {
+    if (res.status === 429)
+      throw new Error(
+        locale === "en"
+          ? "The AI is over its usage quota right now. Please try again in a little while."
+          : "AI 目前已超過用量額度，請稍後再試（Gemini 免費額度有限）。",
+      );
     const detail = await res.text().catch(() => "");
     throw new Error(
       (locale === "en" ? "AI service error" : "AI 服務錯誤") +
