@@ -143,18 +143,21 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
 
       {/* Step 1: pick a template */}
       {step === 0 && (
-        <div className="space-y-3">
+        <div className="card space-y-4">
           <h2 className="text-base font-bold">{tr("cw.headingTemplate")}</h2>
+          <div className="space-y-2">
           {templates.map((t) => {
             const isSel = templateId === t.id;
             const open = preview === t.id;
             return (
               <div
                 key={t.id}
-                className="card"
-                style={
-                  isSel ? { background: "var(--accent-weak)" } : undefined
-                }
+                className="rounded-xl p-4 transition-colors"
+                style={{
+                  background: isSel
+                    ? "var(--accent-weak)"
+                    : "var(--surface-2)",
+                }}
               >
                 <div className="flex items-start gap-3">
                   <input
@@ -183,7 +186,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                       {open ? tr("cw.previewHide") : tr("cw.previewShow")}
                     </button>
                     {open && (
-                      <ul className="mt-2 space-y-2 rounded-lg bg-gray-50 p-3">
+                      <ul className="mt-2 space-y-2 rounded-lg bg-white p-3">
                         {t.questions.map((q) => (
                           <li key={q.key} className="text-xs">
                             <span className="font-medium">{q.label}</span>
@@ -201,6 +204,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
               </div>
             );
           })}
+          </div>
         </div>
       )}
 
