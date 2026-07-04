@@ -8,6 +8,7 @@ import ReportView from "@/components/ReportView";
 import OwnerControls from "@/components/OwnerControls";
 import CloseSessionButton from "@/components/CloseSessionButton";
 import BackButton from "@/components/BackButton";
+import TemplateBanner from "@/components/TemplateBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -163,6 +164,9 @@ export default async function ResultsPage({
   return (
     <div className="container-narrow">
       <BackButton fallback="/" />
+      <div className="mb-6 mt-1 overflow-hidden rounded-2xl">
+        <TemplateBanner id={session.template_id} />
+      </div>
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold tracking-tight">
           {t("res.title", { name: session.name || template?.name || "Retro" })}

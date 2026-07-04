@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useT } from "@/lib/i18n/client";
 import RoleIcon from "@/components/RoleIcon";
 import Icon from "@/components/Icon";
+import TemplateBanner from "@/components/TemplateBanner";
 import type { Anonymity, ModerateResult, Question } from "@/lib/types";
 
 async function moderate(
@@ -24,12 +25,14 @@ async function moderate(
 
 export default function FillWizard({
   sessionId,
+  templateId,
   anonymity,
   templateName,
   templateDescription,
   questions,
 }: {
   sessionId: string;
+  templateId: string;
   anonymity: Anonymity;
   templateName: string;
   templateDescription: string;
@@ -277,6 +280,11 @@ export default function FillWizard({
 
   return (
     <div className="space-y-5">
+      {step === 0 && (
+        <div className="overflow-hidden rounded-2xl">
+          <TemplateBanner id={templateId} />
+        </div>
+      )}
       <div>
         <h1 className="text-xl font-semibold tracking-tight">{templateName}</h1>
         <p className="mt-1 text-sm text-muted">{templateDescription}</p>

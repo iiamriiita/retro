@@ -102,6 +102,7 @@ export default async function FillPage({
     <div className="container-narrow">
       <FillWizard
         sessionId={session.id}
+        templateId={session.template_id}
         anonymity={session.anonymity}
         templateName={template.name}
         templateDescription={invite}
