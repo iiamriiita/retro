@@ -134,6 +134,8 @@ const en: Dict = {
   // create wizard
   "cw.stepSetup": "Setup",
   "cw.stepTemplate": "Template",
+  "cw.headingTemplate": "Pick a template",
+  "cw.headingSetup": "Retro settings",
   "cw.retroName": "Retro name",
   "cw.anonTitle": "Anonymous this round?",
   "cw.named": "Named",
@@ -426,6 +428,8 @@ const zh: Dict = {
 
   "cw.stepSetup": "設定",
   "cw.stepTemplate": "選問卷",
+  "cw.headingTemplate": "請選擇問卷模板",
+  "cw.headingSetup": "問卷設定",
   "cw.retroName": "Retro 名稱",
   "cw.anonTitle": "這場要匿名嗎？",
   "cw.named": "具名",

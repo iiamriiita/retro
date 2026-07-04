@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useT } from "@/lib/i18n/client";
 import type { Anonymity, Template } from "@/lib/types";
 
@@ -13,28 +13,23 @@ function defaultDeadline(): string {
   )}:${pad(d.getMinutes())}`;
 }
 
-function defaultName(teamName?: string): string {
+function nameFor(templateName?: string): string {
   const d = new Date();
   const pad = (n: number) => String(n).padStart(2, "0");
   const date = `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`;
-  return `${(teamName ?? "").trim() || "Retro"} · ${date}`;
+  return `${(templateName ?? "").trim() || "Retro"} · ${date}`;
 }
 
-export default function CreateWizard({
-  templates,
-  teamName,
-}: {
-  templates: Template[];
-  teamName?: string | null;
-}) {
+export default function CreateWizard({ templates }: { templates: Template[] }) {
   const { t: tr } = useT();
-  const STEPS = [tr("cw.stepSetup"), tr("cw.stepTemplate")];
+  const STEPS = [tr("cw.stepTemplate"), tr("cw.stepSetup")];
   const [step, setStep] = useState(0);
 
-  const [name, setName] = useState(defaultName(teamName ?? undefined));
+  const [templateId, setTemplateId] = useState(templates[0]?.id ?? "");
+  const [name, setName] = useState(nameFor(templates[0]?.name));
+  const [nameTouched, setNameTouched] = useState(false);
   const [anonymity, setAnonymity] = useState<Anonymity>("named");
   const [deadline, setDeadline] = useState(defaultDeadline());
-  const [templateId, setTemplateId] = useState(templates[0]?.id ?? "");
   const [preview, setPreview] = useState<string | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
@@ -47,6 +42,11 @@ export default function CreateWizard({
     [templates, templateId],
   );
 
+  // Keep the name defaulted to "<template> · <date>" until the user edits it.
+  useEffect(() => {
+    if (!nameTouched) setName(nameFor(selected?.name));
+  }, [selected, nameTouched]);
+
   const shareUrl =
     createdId && typeof window !== "undefined"
       ? `${window.location.origin}/s/${createdId}`
@@ -54,13 +54,6 @@ export default function CreateWizard({
 
   function next() {
     setError(null);
-    if (step === 0) {
-      const d = new Date(deadline);
-      if (Number.isNaN(d.getTime()) || d.getTime() <= Date.now()) {
-        setError(tr("cw.deadlineErr"));
-        return;
-      }
-    }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   }
   function back() {
@@ -70,6 +63,11 @@ export default function CreateWizard({
 
   async function submit() {
     setError(null);
+    const d = new Date(deadline);
+    if (Number.isNaN(d.getTime()) || d.getTime() <= Date.now()) {
+      setError(tr("cw.deadlineErr"));
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/sessions", {
@@ -141,59 +139,10 @@ export default function CreateWizard({
         ))}
       </div>
 
-      {/* Step 1: name + anonymity + deadline */}
+      {/* Step 1: pick a template */}
       {step === 0 && (
-        <div className="card space-y-5">
-          <div>
-            <label className="field-label">{tr("cw.retroName")}</label>
-            <input
-              className="textarea"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={tr("cw.retroName")}
-            />
-          </div>
-
-          <div>
-            <label className="field-label">{tr("cw.anonTitle")}</label>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { v: "named", t: tr("cw.named"), d: tr("cw.namedDesc") },
-                { v: "anonymous", t: tr("cw.anon"), d: tr("cw.anonDesc") },
-              ].map((o) => (
-                <button
-                  key={o.v}
-                  type="button"
-                  onClick={() => setAnonymity(o.v as Anonymity)}
-                  className={`rounded-lg p-3 text-left transition-colors ${
-                    anonymity === o.v
-                      ? "bg-[color:var(--accent-weak)]"
-                      : "bg-[color:var(--surface-2)] hover:bg-[color:var(--surface-3)]"
-                  }`}
-                >
-                  <span className="block text-sm font-medium">{o.t}</span>
-                  <span className="block text-xs text-muted">{o.d}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="field-label">{tr("cw.deadline")}</label>
-            <input
-              type="datetime-local"
-              className="textarea"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-            />
-            <p className="mt-1 text-xs text-muted">{tr("cw.deadlineHint")}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2: template */}
-      {step === 1 && (
         <div className="space-y-3">
+          <h2 className="text-base font-bold">{tr("cw.headingTemplate")}</h2>
           {templates.map((t) => {
             const isSel = templateId === t.id;
             const open = preview === t.id;
@@ -202,9 +151,7 @@ export default function CreateWizard({
                 key={t.id}
                 className="card"
                 style={
-                  isSel
-                    ? { background: "var(--accent-weak)" }
-                    : undefined
+                  isSel ? { background: "var(--accent-weak)" } : undefined
                 }
               >
                 <div className="flex items-start gap-3">
@@ -251,11 +198,60 @@ export default function CreateWizard({
               </div>
             );
           })}
-          {selected && (
-            <p className="text-xs text-muted">
-              {tr("cw.selected", { name: selected.name })}
-            </p>
-          )}
+        </div>
+      )}
+
+      {/* Step 2: name + anonymity + deadline */}
+      {step === 1 && (
+        <div className="card space-y-5">
+          <h2 className="text-base font-bold">{tr("cw.headingSetup")}</h2>
+          <div>
+            <label className="field-label">{tr("cw.retroName")}</label>
+            <input
+              className="textarea"
+              value={name}
+              onChange={(e) => {
+                setNameTouched(true);
+                setName(e.target.value);
+              }}
+              placeholder={tr("cw.retroName")}
+            />
+          </div>
+
+          <div>
+            <label className="field-label">{tr("cw.anonTitle")}</label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { v: "named", t: tr("cw.named"), d: tr("cw.namedDesc") },
+                { v: "anonymous", t: tr("cw.anon"), d: tr("cw.anonDesc") },
+              ].map((o) => (
+                <button
+                  key={o.v}
+                  type="button"
+                  onClick={() => setAnonymity(o.v as Anonymity)}
+                  className={`rounded-lg p-3 text-left transition-colors ${
+                    anonymity === o.v
+                      ? "bg-[color:var(--accent-weak)]"
+                      : "bg-[color:var(--surface-2)] hover:bg-[color:var(--surface-3)]"
+                  }`}
+                >
+                  <span className="block text-sm font-medium">{o.t}</span>
+                  <span className="block text-xs text-muted">{o.d}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="field-label">{tr("cw.deadline")}</label>
+            <input
+              type="datetime-local"
+              className="textarea"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+            />
+            <p className="mt-1 text-xs text-muted">{tr("cw.deadlineHint")}</p>
+          </div>
         </div>
       )}
 
