@@ -242,13 +242,13 @@ export default function TeamInsights({
           {stats.timeline.length === 0 ? (
             <p className="text-sm text-muted">{tr("ti.noData")}</p>
           ) : (
-            <div className="flex h-40 items-end gap-2">
+            <div className="flex h-40 items-stretch gap-2">
               {stats.timeline.map((t, i) => {
                 const last = i === stats.timeline.length - 1;
                 return (
                   <div
                     key={t.id}
-                    className="flex flex-1 flex-col items-center gap-2"
+                    className="flex h-full flex-1 flex-col items-center gap-2"
                   >
                     <div className="flex w-full flex-1 items-end">
                       <div
