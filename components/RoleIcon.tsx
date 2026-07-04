@@ -265,96 +265,176 @@ export default function RoleIcon({
           />
         </>,
       );
-    case "👩‍🚀": // Commander — astronaut
+    case "👩‍🚀": // Commander — astronaut / robot head
       return svg(
         <>
+          {/* shoulders */}
           <path
-            d="M150 300 C 150 216 198 158 256 158 C 314 158 362 216 362 300
-               L 362 356 C 362 380 342 396 316 396 L 196 396 C 170 396 150 380 150 356 Z"
-            fill={CREAM}
-          />
-          <rect x="212" y="112" width="88" height="30" rx="15" fill={BROWN} />
-          <circle cx="256" cy="214" r="86" fill={DARK} />
-          <path
-            d="M198 214 C 198 176 224 152 256 152 C 288 152 314 176 314 214
-               C 314 232 300 244 278 244 L 234 244 C 212 244 198 232 198 214 Z"
+            d="M150 446 C 150 380 198 338 256 338 C 314 338 362 380 362 446 Z"
             fill={GOLD}
           />
-          <circle cx="284" cy="192" r="18" fill="#FFF6DC" opacity="0.8" />
-          <rect x="214" y="392" width="34" height="40" rx="8" fill={BROWN} />
-          <rect x="264" y="392" width="34" height="40" rx="8" fill={BROWN} />
+          {/* ears */}
+          <rect x="88" y="176" width="48" height="92" rx="24" fill="#E7DCCB" />
+          <rect x="376" y="176" width="48" height="92" rx="24" fill="#E7DCCB" />
+          {/* head */}
+          <circle cx="256" cy="206" r="140" fill={CREAM} />
+          {/* visor */}
+          <rect x="182" y="156" width="148" height="100" rx="50" fill={DARK} />
+          {/* eye */}
+          <rect x="214" y="190" width="46" height="38" rx="16" fill={GOLD} />
+          {/* chest badge */}
+          <rect x="232" y="352" width="48" height="34" rx="11" fill={CREAM} />
         </>,
       );
-    case "🛰️": // Mission control — orbiting satellite
+    case "🛰️": // Mission control — satellite with solar panels
       return svg(
         <>
-          <g transform="rotate(-30 256 256)">
-            <rect x="90" y="222" width="120" height="68" rx="10" fill={GOLD} />
-            <rect x="302" y="222" width="120" height="68" rx="10" fill={GOLD} />
-            <rect x="126" y="222" width="4" height="68" fill={DARK} />
-            <rect x="168" y="222" width="4" height="68" fill={DARK} />
-            <rect x="342" y="222" width="4" height="68" fill={DARK} />
-            <rect x="384" y="222" width="4" height="68" fill={DARK} />
-            <rect x="210" y="222" width="92" height="68" rx="10" fill={BROWN} />
-            <circle cx="256" cy="256" r="26" fill={CREAM} />
+          {/* connecting rods */}
+          <rect x="120" y="242" width="272" height="16" rx="8" fill={BROWN} />
+          {/* solar panels */}
+          <rect x="70" y="210" width="112" height="80" rx="12" fill={GOLD} />
+          <rect x="330" y="210" width="112" height="80" rx="12" fill={GOLD} />
+          <g fill={DARK}>
+            <rect x="99" y="210" width="9" height="80" />
+            <rect x="127" y="210" width="9" height="80" />
+            <rect x="155" y="210" width="9" height="80" />
+            <rect x="356" y="210" width="9" height="80" />
+            <rect x="384" y="210" width="9" height="80" />
+            <rect x="412" y="210" width="9" height="80" />
           </g>
-          <path
-            d="M356 150 a150 150 0 0 1 30 92"
+          <rect
+            x="70"
+            y="210"
+            width="112"
+            height="80"
+            rx="12"
+            fill="none"
             stroke={DARK}
             strokeWidth="14"
-            fill="none"
-            strokeLinecap="round"
           />
+          <rect
+            x="330"
+            y="210"
+            width="112"
+            height="80"
+            rx="12"
+            fill="none"
+            stroke={DARK}
+            strokeWidth="14"
+          />
+          {/* body */}
+          <rect x="204" y="236" width="104" height="146" rx="32" fill={DARK} />
+          <rect x="222" y="256" width="68" height="108" rx="22" fill={CREAM} />
+          {/* docking port */}
+          <circle cx="256" cy="204" r="48" fill={DARK} />
+          <circle cx="256" cy="204" r="30" fill={CREAM} />
+          <rect x="248" y="150" width="16" height="34" rx="8" fill={DARK} />
         </>,
       );
-    case "🔧": // Engineer — wrench
-      return svg(
-        <g transform="rotate(45 256 256)">
-          <rect x="232" y="150" width="48" height="230" rx="20" fill={DARK} />
-          <path
-            d="M256 96 C 214 96 180 130 180 172 C 180 200 196 224 220 236
-               L 220 268 L 292 268 L 292 236 C 316 224 332 200 332 172
-               C 332 130 298 96 256 96 Z M256 128 a30 30 0 1 1 0 60 a30 30 0 0 1 0 -60 Z"
-            fill={GOLD}
-          />
-          <rect x="220" y="360" width="72" height="40" rx="16" fill={BROWN} />
-        </g>,
-      );
-    case "📡": // Comms officer — satellite dish
+    case "🔧": // Engineer — crossed wrench and screwdriver
       return svg(
         <>
-          <path
-            d="M112 356 C 112 240 206 146 322 146 C 322 262 228 356 112 356 Z"
-            fill={CREAM}
-            stroke={DARK}
-            strokeWidth="24"
-          />
+          {/* wrench (\) */}
+          <g transform="rotate(-45 256 256)">
+            <rect x="236" y="150" width="40" height="212" rx="20" fill={GOLD} />
+            <path
+              d="M284 100 A 40 40 0 1 1 228 100"
+              stroke={GOLD}
+              strokeWidth="30"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <path
+              d="M228 412 A 40 40 0 1 1 284 412"
+              stroke={GOLD}
+              strokeWidth="30"
+              fill="none"
+              strokeLinecap="round"
+            />
+          </g>
+          {/* screwdriver (/) */}
+          <g transform="rotate(45 256 256)">
+            <path d="M242 96 L270 96 L276 168 L236 168 Z" fill={CREAM} />
+            <rect x="242" y="160" width="28" height="152" fill={GOLD} />
+            <rect x="228" y="300" width="56" height="24" rx="8" fill="#C9A24A" />
+            <rect x="220" y="318" width="72" height="104" rx="24" fill={BROWN} />
+            <g stroke="#5E3D24" strokeWidth="8" strokeLinecap="round">
+              <line x1="244" y1="342" x2="244" y2="400" />
+              <line x1="256" y1="342" x2="256" y2="400" />
+              <line x1="268" y1="342" x2="268" y2="400" />
+            </g>
+          </g>
+        </>,
+      );
+    case "📡": // Comms officer — satellite dish on a tripod
+      return svg(
+        <>
+          {/* tripod legs */}
           <line
-            x1="322"
-            y1="146"
-            x2="216"
-            y2="252"
+            x1="248"
+            y1="298"
+            x2="198"
+            y2="452"
             stroke={DARK}
-            strokeWidth="20"
+            strokeWidth="22"
             strokeLinecap="round"
           />
-          <circle cx="322" cy="146" r="26" fill={GOLD} />
-          <rect x="204" y="330" width="24" height="96" rx="10" fill={BROWN} />
-          <path d="M170 430 L262 430 L282 452 L150 452 Z" fill={DARK} />
+          <line
+            x1="262"
+            y1="300"
+            x2="262"
+            y2="456"
+            stroke={DARK}
+            strokeWidth="22"
+            strokeLinecap="round"
+          />
+          <line
+            x1="272"
+            y1="298"
+            x2="330"
+            y2="448"
+            stroke={DARK}
+            strokeWidth="22"
+            strokeLinecap="round"
+          />
+          {/* dish */}
+          <g transform="rotate(-28 256 236)">
+            <ellipse
+              cx="256"
+              cy="236"
+              rx="152"
+              ry="106"
+              fill={CREAM}
+              stroke={DARK}
+              strokeWidth="22"
+            />
+            <ellipse cx="256" cy="236" rx="64" ry="44" fill={GOLD} />
+            <line
+              x1="252"
+              y1="228"
+              x2="198"
+              y2="116"
+              stroke={DARK}
+              strokeWidth="20"
+              strokeLinecap="round"
+            />
+            <circle cx="194" cy="108" r="24" fill={GOLD} />
+          </g>
         </>,
       );
     case "⭐": // Stargazer — star
       return svg(
         <>
           <path
-            d="M256 96 L306 208 L426 220 L336 302 L362 424 L256 360
-               L150 424 L176 302 L86 220 L206 208 Z"
+            d="M256 82 L303 207 L437 213 L332 297 L368 426 L256 352
+               L144 426 L180 297 L75 213 L209 207 Z"
             fill={GOLD}
-            stroke={DARK}
-            strokeWidth="18"
-            strokeLinejoin="round"
           />
-          <circle cx="256" cy="252" r="30" fill="#FFF6DC" opacity="0.55" />
+          <path
+            d="M256 82 L303 207 L437 213 L332 297 L368 426 L256 352 Z"
+            fill="#E0A800"
+            opacity="0.35"
+          />
         </>,
       );
     default:
