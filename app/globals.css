@@ -231,8 +231,8 @@ input[type="checkbox"] {
 }
 /* gentle life: boat bobs, sun breathes */
 @keyframes lp-boat {
-  0%, 100% { transform: translate(320px, 368px); }
-  50% { transform: translate(320px, 357px); }
+  0%, 100% { transform: translate(320px, 428px); }
+  50% { transform: translate(320px, 418px); }
 }
 @keyframes lp-sun {
   0%, 100% { transform: scale(1); }

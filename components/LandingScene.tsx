@@ -63,17 +63,16 @@ export default function LandingScene() {
           fill="#5BA36B"
         />
 
-        {/* water — in front, hiding the sprout's base */}
+        {/* back wave — behind the boat */}
         <path
           d="M0 500c110 30 190-14 300-14s200 32 340 12v262H0z"
           fill="#F0B90B"
         />
-        <path d="M0 552c130 26 200-14 340-14s200 26 300 8v214H0z" fill="#D9A400" />
 
-        {/* boat — sits on the water */}
+        {/* boat — sits in the water, between the two wave layers */}
         <g
           id="lp-boat"
-          transform="translate(320,368)"
+          transform="translate(320,428)"
           {...obj(t("landing.bubSailWho"), t("landing.bubSailText"))}
         >
           <rect x="-66" y="-8" width="132" height="140" fill="transparent" />
@@ -84,22 +83,25 @@ export default function LandingScene() {
           <path d="M-4 12L-54 88H-4z" fill="#F0B90B" />
         </g>
 
+        {/* front wave — laps over the boat's hull */}
+        <path d="M0 552c130 26 200-14 340-14s200 26 300 8v214H0z" fill="#D9A400" />
+
         {/* anchor */}
         <g
-          transform="translate(470,600)"
+          transform="translate(470,610)"
           {...obj(t("landing.bubAnchorWho"), t("landing.bubAnchorText"))}
         >
-          <rect x="-36" y="-52" width="72" height="116" fill="transparent" />
+          <rect x="-34" y="-58" width="68" height="120" fill="transparent" />
           <circle
             cx="0"
-            cy="-34"
-            r="12"
+            cy="-42"
+            r="11"
             fill="none"
             stroke="#452C1C"
             strokeWidth="8"
           />
-          <rect x="-4" y="-26" width="8" height="62" rx="4" fill="#452C1C" />
-          <rect x="-20" y="-16" width="40" height="8" rx="4" fill="#452C1C" />
+          <rect x="-4" y="-30" width="8" height="86" rx="4" fill="#452C1C" />
+          <rect x="-22" y="-14" width="44" height="8" rx="4" fill="#452C1C" />
           <path
             d="M-30 22c0 20 14 30 30 30s30-10 30-30"
             stroke="#452C1C"
