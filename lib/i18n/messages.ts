@@ -83,6 +83,7 @@ const en: Dict = {
   "ti.participationHint": "Submissions / {size} members",
   "ti.participationNoTeam": "Set your team size to track this",
   "ti.cardSentiment": "Team sentiment",
+  "ti.sentimentTip": "Engagement trend across your finished retros",
   "ti.sentPositive": "Positive",
   "ti.sentNeutral": "Neutral",
   "ti.sentAttention": "Needs attention",
@@ -240,7 +241,8 @@ const en: Dict = {
   "rc.anonComment": "Comment anonymously",
 
   // form link popup
-  "flb.trigger": "Retro Form",
+  "flb.shareForm": "Share form",
+  "flb.shareResult": "Share result",
   "flb.inviteEyebrow": "Invite your team",
   "flb.shareTitle": "Share retro form",
   "flb.shareDesc":
@@ -249,6 +251,12 @@ const en: Dict = {
   "flb.copy": "Copy",
   "flb.copied": "Copied",
   "flb.openNewTab": "Open form in new tab",
+  "flb.shareResultEyebrow": "Share the outcome",
+  "flb.shareResultTitle": "Share results",
+  "flb.shareResultDesc":
+    "Anyone with this link can view the results and join the discussion.",
+  "flb.resultLink": "Results link",
+  "flb.openResultNewTab": "Open results in new tab",
 
   // auth modal
   "am.login": "Log in",
@@ -351,6 +359,7 @@ const zh: Dict = {
   "ti.participationHint": "填答人數 / 預計 {size} 人",
   "ti.participationNoTeam": "設定團隊人數後顯示",
   "ti.cardSentiment": "整體氛圍",
+  "ti.sentimentTip": "根據已結束 retro 的參與趨勢計算",
   "ti.sentPositive": "正向",
   "ti.sentNeutral": "持平",
   "ti.sentAttention": "需要關注",
@@ -493,7 +502,8 @@ const zh: Dict = {
   "rc.use": "使用",
   "rc.anonComment": "匿名留言",
 
-  "flb.trigger": "retro 表單",
+  "flb.shareForm": "分享表單",
+  "flb.shareResult": "分享結果",
   "flb.inviteEyebrow": "邀請你的團隊",
   "flb.shareTitle": "分享 retro 表單",
   "flb.shareDesc": "任何拿到連結的人都能填寫回饋 — 不需要註冊帳號。",
@@ -501,6 +511,11 @@ const zh: Dict = {
   "flb.copy": "複製",
   "flb.copied": "已複製",
   "flb.openNewTab": "在新分頁開啟表單",
+  "flb.shareResultEyebrow": "分享成果",
+  "flb.shareResultTitle": "分享結果頁",
+  "flb.shareResultDesc": "任何拿到連結的人都能查看結果並加入討論。",
+  "flb.resultLink": "結果連結",
+  "flb.openResultNewTab": "在新分頁開啟結果",
 
   "am.login": "登入",
   "am.register": "註冊",

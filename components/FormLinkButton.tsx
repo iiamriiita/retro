@@ -4,15 +4,41 @@ import { useState } from "react";
 import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
 
-export default function FormLinkButton({ sessionId }: { sessionId: string }) {
+export default function FormLinkButton({
+  sessionId,
+  ended = false,
+}: {
+  sessionId: string;
+  ended?: boolean;
+}) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // In progress → share the fill form; ended → share the results page.
+  const path = ended ? `/s/${sessionId}/results` : `/s/${sessionId}`;
   const url =
     typeof window !== "undefined"
-      ? `${window.location.origin}/s/${sessionId}`
-      : `/s/${sessionId}`;
+      ? `${window.location.origin}${path}`
+      : path;
+
+  const tx = ended
+    ? {
+        trigger: t("flb.shareResult"),
+        eyebrow: t("flb.shareResultEyebrow"),
+        title: t("flb.shareResultTitle"),
+        desc: t("flb.shareResultDesc"),
+        linkLabel: t("flb.resultLink"),
+        openNewTab: t("flb.openResultNewTab"),
+      }
+    : {
+        trigger: t("flb.shareForm"),
+        eyebrow: t("flb.inviteEyebrow"),
+        title: t("flb.shareTitle"),
+        desc: t("flb.shareDesc"),
+        linkLabel: t("flb.formLink"),
+        openNewTab: t("flb.openNewTab"),
+      };
 
   async function copy() {
     try {
@@ -39,7 +65,7 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
         className="btn-ghost !py-1.5 text-xs"
         onClick={() => setOpen(true)}
       >
-        {t("flb.trigger")}
+        {tx.trigger}
       </button>
 
       {open && (
@@ -112,18 +138,18 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
                 className="eyebrow relative mt-4"
                 style={{ color: "var(--text-inverse)", opacity: 0.85 }}
               >
-                {t("flb.inviteEyebrow")}
+                {tx.eyebrow}
               </p>
             </div>
 
             {/* Body */}
             <div className="p-6">
               <h3 className="text-xl font-extrabold tracking-tight">
-                {t("flb.shareTitle")}
+                {tx.title}
               </h3>
-              <p className="mt-1.5 text-sm text-muted">{t("flb.shareDesc")}</p>
+              <p className="mt-1.5 text-sm text-muted">{tx.desc}</p>
 
-              <p className="eyebrow mt-5">{t("flb.formLink")}</p>
+              <p className="eyebrow mt-5">{tx.linkLabel}</p>
               <div className="mt-2 flex items-stretch gap-2">
                 <input
                   readOnly
@@ -144,13 +170,13 @@ export default function FormLinkButton({ sessionId }: { sessionId: string }) {
 
               <a
                 className="btn-ghost mt-3 !h-11 w-full"
-                href={`/s/${sessionId}`}
+                href={path}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
               >
                 <Icon name="external-link" size={15} />
-                {t("flb.openNewTab")}
+                {tx.openNewTab}
               </a>
             </div>
           </div>

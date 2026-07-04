@@ -28,18 +28,41 @@ function Delta({ value, unit }: { value: number | null; unit: string }) {
   );
 }
 
+// Eyebrow label with an on-hover tooltip carrying the metric's explanation.
+function CardEyebrow({ label, tip }: { label: string; tip?: string }) {
+  return (
+    <span className="group relative w-fit">
+      <span
+        className={`eyebrow ${tip ? "cursor-help border-b border-dotted border-[color:var(--border-strong)]" : ""}`}
+      >
+        {label}
+      </span>
+      {tip && (
+        <span
+          className="pointer-events-none absolute bottom-full left-0 z-20 mb-1.5 hidden w-max max-w-[220px] rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
+          style={{ background: "#452C1C" }}
+        >
+          {tip}
+        </span>
+      )}
+    </span>
+  );
+}
+
 function StatCard({
   label,
   value,
+  tip,
   children,
 }: {
   label: string;
   value: string;
+  tip?: string;
   children?: React.ReactNode;
 }) {
   return (
     <div className="card flex flex-col">
-      <span className="eyebrow">{label}</span>
+      <CardEyebrow label={label} tip={tip} />
       <span className="mt-2 font-display text-3xl font-extrabold tracking-tight">
         {value}
       </span>
@@ -162,7 +185,10 @@ export default function TeamInsights({
           const s = deriveSentiment(stats, tr);
           return (
             <div className="card flex flex-col">
-              <span className="eyebrow">{tr("ti.cardSentiment")}</span>
+              <CardEyebrow
+                label={tr("ti.cardSentiment")}
+                tip={tr("ti.sentimentTip")}
+              />
               <span className="mt-2 inline-flex items-center gap-2 font-display text-3xl font-extrabold tracking-tight">
                 <span
                   className="inline-block h-3 w-3 rounded-full"
@@ -185,12 +211,12 @@ export default function TeamInsights({
         <StatCard
           label={tr("ti.cardSubmission")}
           value={stats.participationAvg != null ? `${stats.participationAvg}%` : "—"}
-        >
-          <span className="mt-1 text-xs text-subtle">
-            {stats.teamSize
+          tip={
+            stats.teamSize
               ? tr("ti.participationHint", { size: stats.teamSize })
-              : tr("ti.participationNoTeam")}
-          </span>
+              : tr("ti.participationNoTeam")
+          }
+        >
           <Delta value={stats.participationDelta} unit={tr("ti.vsLast")} />
         </StatCard>
 
@@ -198,9 +224,8 @@ export default function TeamInsights({
         <StatCard
           label={tr("ti.cardActivity")}
           value={stats.discussionRate != null ? `${stats.discussionRate}%` : "—"}
-        >
-          <span className="mt-1 text-xs text-subtle">{tr("ti.activityHint")}</span>
-        </StatCard>
+          tip={tr("ti.activityHint")}
+        />
       </div>
 
       {/* Chart + AI pulse */}

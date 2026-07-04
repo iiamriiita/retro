@@ -160,7 +160,10 @@ export default async function DashboardPage() {
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <FormLinkButton sessionId={s.id} />
+                  <FormLinkButton
+                    sessionId={s.id}
+                    ended={state.primary.tone === "closed"}
+                  />
                   <Link
                     className="btn-primary !py-1.5 text-xs"
                     href={`/s/${s.id}/results`}
