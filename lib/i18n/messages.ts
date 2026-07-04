@@ -159,7 +159,7 @@ const en: Dict = {
     "Share this link with your team so they can start filling it in.",
   "cw.copy": "Copy",
   "cw.copied": "Copied",
-  "cw.manageResults": "Manage results",
+  "cw.manageResults": "Manage",
   "cw.backDashboard": "Back to dashboard",
 
   // fill wizard
@@ -452,7 +452,7 @@ const zh: Dict = {
   "cw.createdDesc": "把這個連結分享給成員，他們就能開始填寫。",
   "cw.copy": "複製",
   "cw.copied": "已複製",
-  "cw.manageResults": "管理結果",
+  "cw.manageResults": "管理",
   "cw.backDashboard": "回 Dashboard",
 
   "fw.enterName": "請輸入你的名字。",
