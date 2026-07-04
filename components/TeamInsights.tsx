@@ -96,13 +96,32 @@ function deriveSentiment(stats: TeamStats, tr: Tr) {
     };
   }
 
+  // Label/colour follow the DIRECTION when we have a trend (improving →
+  // Positive, declining → Needs attention, steady → Neutral); with a single
+  // rating and no trend yet, fall back to the score level.
+  let tone: "positive" | "neutral" | "attention";
+  if (hasTrend) {
+    tone =
+      momentum === "up"
+        ? "positive"
+        : momentum === "down"
+          ? "attention"
+          : "neutral";
+  } else {
+    tone = avgRating >= 4 ? "positive" : avgRating >= 3 ? "neutral" : "attention";
+  }
   const label =
-    avgRating >= 4
+    tone === "positive"
       ? tr("ti.sentPositive")
-      : avgRating >= 3
+      : tone === "neutral"
         ? tr("ti.sentNeutral")
         : tr("ti.sentAttention");
-  const color = moodColor(avgRating);
+  const color =
+    tone === "positive"
+      ? "var(--green-500)"
+      : tone === "neutral"
+        ? "var(--accent)"
+        : "var(--red-500)";
 
   // Note describes the trend of the last rated retros: improving / declining
   // for N in a row, or up / down / steady vs the previous one.
