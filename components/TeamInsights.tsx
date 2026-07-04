@@ -96,10 +96,10 @@ export default function TeamInsights({
       {/* Header */}
       <div className="mb-4 flex items-center gap-3">
         <span
-          className="flex h-8 w-8 items-center justify-center rounded-lg"
-          style={{ background: "var(--accent)", color: "var(--text-inverse)" }}
+          className="flex h-8 w-8 items-center justify-center"
+          style={{ color: "var(--accent)" }}
         >
-          <Icon name="line-chart" size={17} />
+          <Icon name="line-chart" size={22} />
         </span>
         <h2 className="text-lg font-extrabold tracking-tight">
           {tr("ti.title")}
