@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useT } from "@/lib/i18n/client";
+import RoleIcon from "@/components/RoleIcon";
 import type { Anonymity, ModerateResult, Question } from "@/lib/types";
 
 async function moderate(
@@ -350,7 +351,7 @@ export default function FillWizard({
       {inQuestion && currentQuestion && currentQuestion.type === "role" && (
         <div className="card">
           <label className="field-label">{currentQuestion.label}</label>
-          <div className="mt-3 space-y-2">
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {(currentQuestion.options ?? []).map((o) => {
               const roleStr = `${o.emoji} ${o.label}`;
               const sel = roleSel[currentQuestion.key] === roleStr;
@@ -359,17 +360,20 @@ export default function FillWizard({
                   key={o.label}
                   type="button"
                   onClick={() => selectRole(currentQuestion.key, roleStr)}
-                  className="w-full rounded-lg p-3 text-left transition-colors"
+                  className="flex flex-col items-center gap-1.5 rounded-lg p-3 text-center transition-colors"
                   style={
                     sel
                       ? { background: "var(--accent-weak)" }
                       : { background: "var(--surface-2)" }
                   }
                 >
-                  <span className="block text-sm font-semibold">
-                    {o.emoji} {o.label}
+                  <RoleIcon emoji={o.emoji} size={40} />
+                  <span className="text-sm font-semibold leading-tight">
+                    {o.label}
                   </span>
-                  <span className="mt-0.5 block text-xs text-muted">{o.desc}</span>
+                  <span className="text-xs leading-snug text-muted">
+                    {o.desc}
+                  </span>
                 </button>
               );
             })}
