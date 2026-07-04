@@ -8,7 +8,7 @@ import { LocaleProvider } from "@/lib/i18n/client";
 import AuthModal from "@/components/AuthModal";
 import LangSwitcher from "@/components/LangSwitcher";
 import UserMenu from "@/components/UserMenu";
-import LogoMark from "@/components/LogoMark";
+import LogoWordmark from "@/components/LogoWordmark";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -43,12 +43,8 @@ export default async function RootLayout({
             style={{ background: "var(--surface)" }}
           >
             <div className="container-wide flex h-[60px] items-center justify-between">
-              <Link
-                href="/"
-                className="flex items-center gap-2.5 font-display text-[17px] font-extrabold tracking-tight"
-              >
-                <LogoMark size={28} />
-                Team&nbsp;Retro
+              <Link href="/" className="flex items-center">
+                <LogoWordmark className="text-[19px]" />
               </Link>
               <nav className="flex items-center gap-4 text-sm">
                 {user ? (
