@@ -62,7 +62,7 @@ const en: Dict = {
   "dash.empty":
     "No retros yet. Click “New retro” in the top-right to start your first one.",
   "dash.allRetros": "All retros",
-  "dash.manage": "Manage / Results",
+  "dash.manage": "Manage results",
   "dash.named": "Named",
   "dash.anonymous": "Anonymous",
   "dash.due": "Due {date}",
@@ -147,7 +147,7 @@ const en: Dict = {
     "Share this link with your team so they can start filling it in.",
   "cw.copy": "Copy",
   "cw.copied": "Copied",
-  "cw.manageResults": "Manage / Results",
+  "cw.manageResults": "Manage results",
   "cw.backDashboard": "Back to dashboard",
 
   // fill wizard
@@ -246,7 +246,7 @@ const en: Dict = {
 
   // form link popup
   "flb.shareForm": "Share form",
-  "flb.shareResult": "Share result",
+  "flb.shareResult": "Share results",
   "flb.inviteEyebrow": "Invite your team",
   "flb.shareTitle": "Share retro form",
   "flb.shareDesc":
@@ -344,7 +344,7 @@ const zh: Dict = {
   "dash.new": "發起新 retro",
   "dash.empty": "還沒有任何 retro。點右上角「發起新 retro」開始第一場。",
   "dash.allRetros": "所有 retro",
-  "dash.manage": "管理 / 結果",
+  "dash.manage": "管理結果",
   "dash.named": "具名",
   "dash.anonymous": "匿名",
   "dash.due": "截止 {date}",
@@ -421,7 +421,7 @@ const zh: Dict = {
   "cw.createdDesc": "把這個連結分享給成員，他們就能開始填寫。",
   "cw.copy": "複製",
   "cw.copied": "已複製",
-  "cw.manageResults": "管理 / 結果",
+  "cw.manageResults": "管理結果",
   "cw.backDashboard": "回 Dashboard",
 
   "fw.enterName": "請輸入你的名字。",
