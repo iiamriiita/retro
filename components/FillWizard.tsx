@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useT } from "@/lib/i18n/client";
 import RoleIcon from "@/components/RoleIcon";
+import Icon from "@/components/Icon";
 import type { Anonymity, ModerateResult, Question } from "@/lib/types";
 
 async function moderate(
@@ -483,6 +484,7 @@ export default function FillWizard({
             onClick={back}
             disabled={submitting}
           >
+            <Icon name="arrow-left" size={15} />
             {t("fw.prev")}
           </button>
         )}
@@ -503,6 +505,7 @@ export default function FillWizard({
             disabled={checking}
           >
             {checking ? t("fw.nextChecking") : t("fw.next")}
+            <Icon name="arrow-right" size={15} />
           </button>
         )}
       </div>

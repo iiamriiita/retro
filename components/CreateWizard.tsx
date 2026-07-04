@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useT } from "@/lib/i18n/client";
 import TemplateIcon from "@/components/TemplateIcon";
+import Icon from "@/components/Icon";
 import type { Anonymity, Template } from "@/lib/types";
 
 function defaultDeadline(): string {
@@ -278,12 +279,14 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
               onClick={back}
               disabled={submitting}
             >
+              <Icon name="arrow-left" size={15} />
               {tr("cw.prev")}
             </button>
           )}
           {step < STEPS.length - 1 ? (
             <button type="button" className="btn-primary" onClick={next}>
               {tr("cw.next")}
+              <Icon name="arrow-right" size={15} />
             </button>
           ) : (
             <button
