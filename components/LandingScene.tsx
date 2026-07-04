@@ -56,21 +56,19 @@ export default function LandingScene() {
           <circle id="lp-sun" cx="510" cy="150" r="66" fill="#F0B90B" />
         </g>
 
-        {/* water */}
-        <path
-          d="M0 500c110 30 190-14 300-14s200 32 340 12v262H0z"
-          fill="#F0B90B"
-          opacity=".9"
-        />
-        <path d="M0 552c130 26 200-14 340-14s200 26 300 8v214H0z" fill="#D9A400" />
-
-        {/* small island + sprout */}
-        <path d="M84 508c18-12 50-12 68 0z" fill="#7E5232" />
-        <rect x="115" y="470" width="6" height="40" fill="#7E5232" />
+        {/* sprout — drawn first so the waves cover its base */}
+        <rect x="115" y="462" width="6" height="64" fill="#7E5232" />
         <path
           d="M118 470c-12-2-20-10-20-10 10-2 20 2 20 2 0-10 8-18 8-18 4 10 0 20 0 20 10-4 20-2 20-2-6 8-18 10-18 10z"
           fill="#5BA36B"
         />
+
+        {/* water — in front, hiding the sprout's base */}
+        <path
+          d="M0 500c110 30 190-14 300-14s200 32 340 12v262H0z"
+          fill="#F0B90B"
+        />
+        <path d="M0 552c130 26 200-14 340-14s200 26 300 8v214H0z" fill="#D9A400" />
 
         {/* boat — sits on the water */}
         <g
