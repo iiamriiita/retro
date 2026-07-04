@@ -156,7 +156,29 @@ export default function TeamInsights({
     }
   }
 
-  const maxBar = Math.max(1, ...stats.timeline.map((t) => t.responses));
+  const sentiment = deriveSentiment(stats, tr);
+  const maxResp = Math.max(1, ...stats.timeline.map((t) => t.responses));
+
+  // Bar height: participation (submissions / team size) when a team size is
+  // set; otherwise responses relative to the busiest retro.
+  function barPct(pt: (typeof stats.timeline)[number]): number {
+    if (stats.teamSize && stats.teamSize > 0)
+      return Math.min(100, Math.round((pt.submitted / stats.teamSize) * 100));
+    return Math.round((pt.responses / maxResp) * 100);
+  }
+  function barEmpty(pt: (typeof stats.timeline)[number]): boolean {
+    return stats.teamSize ? pt.submitted === 0 : pt.responses === 0;
+  }
+  function barTip(pt: (typeof stats.timeline)[number]): string {
+    return stats.teamSize
+      ? tr("ti.barTipParticipation", {
+          date: pt.dateLabel,
+          n: pt.submitted,
+          size: stats.teamSize,
+          pct: barPct(pt),
+        })
+      : tr("ti.barTipResponses", { date: pt.dateLabel, n: pt.responses });
+  }
 
   return (
     <section className="mb-8">
@@ -182,31 +204,26 @@ export default function TeamInsights({
       {/* Real stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {/* Team sentiment — computed engagement momentum (no AI) */}
-        {(() => {
-          const s = deriveSentiment(stats, tr);
-          return (
-            <div className="card flex flex-col">
-              <CardEyebrow
-                label={tr("ti.cardSentiment")}
-                tip={tr("ti.sentimentTip")}
-              />
-              <span className="mt-2 inline-flex items-center gap-2 font-display text-3xl font-extrabold tracking-tight">
-                <span
-                  className="inline-block h-3 w-3 rounded-full"
-                  style={{ background: s.color }}
-                />
-                {s.label}
-              </span>
-              <span
-                className="mt-3 inline-flex items-center gap-1 text-xs font-semibold"
-                style={{ color: s.noteColor }}
-              >
-                {s.icon && <Icon name={s.icon} size={14} />}
-                {s.note}
-              </span>
-            </div>
-          );
-        })()}
+        <div className="card flex flex-col">
+          <CardEyebrow
+            label={tr("ti.cardSentiment")}
+            tip={tr("ti.sentimentTip")}
+          />
+          <span className="mt-2 inline-flex items-center gap-2 font-display text-3xl font-extrabold tracking-tight">
+            <span
+              className="inline-block h-3 w-3 rounded-full"
+              style={{ background: sentiment.color }}
+            />
+            {sentiment.label}
+          </span>
+          <span
+            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold"
+            style={{ color: sentiment.noteColor }}
+          >
+            {sentiment.icon && <Icon name={sentiment.icon} size={14} />}
+            {sentiment.note}
+          </span>
+        </div>
 
         {/* Submission (form) rate */}
         <StatCard
@@ -234,7 +251,20 @@ export default function TeamInsights({
         {/* Responses over time */}
         <div className="card">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-bold">{tr("ti.chartTitle")}</h3>
+            <span className="flex items-center gap-1.5">
+              <h3 className="text-sm font-bold">{tr("ti.chartTitle")}</h3>
+              <span className="group relative inline-flex">
+                <span className="cursor-help text-[color:var(--text-subtle)] transition-colors hover:text-[color:var(--text-muted)]">
+                  <Icon name="info" size={13} />
+                </span>
+                <span
+                  className="pointer-events-none absolute bottom-full left-0 z-20 mb-1.5 hidden w-max max-w-[240px] rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
+                  style={{ background: "#452C1C" }}
+                >
+                  {tr("ti.chartTip")}
+                </span>
+              </span>
+            </span>
             <span className="eyebrow">
               {tr("ti.lastN", { n: stats.timeline.length })}
             </span>
@@ -245,25 +275,27 @@ export default function TeamInsights({
             <div className="flex h-40 items-stretch gap-2">
               {stats.timeline.map((t, i) => {
                 const last = i === stats.timeline.length - 1;
+                const empty = barEmpty(t);
                 return (
                   <div
                     key={t.id}
                     className="flex h-full flex-1 flex-col items-center gap-2"
+                    title={barTip(t)}
                   >
                     <div className="flex w-full flex-1 items-end">
                       <div
-                        className="w-full rounded-md"
+                        className="w-full rounded-md transition-all"
                         style={{
-                          height: `${Math.max(6, (t.responses / maxBar) * 100)}%`,
-                          background: last
-                            ? "var(--accent)"
-                            : "var(--brown-200, #E4D0BA)",
+                          height: `${Math.max(6, barPct(t))}%`,
+                          background: empty
+                            ? "var(--surface-3)"
+                            : sentiment.color,
+                          opacity: empty || last ? 1 : 0.55,
                         }}
-                        title={tr("rc.responses", { n: t.responses })}
                       />
                     </div>
                     <span
-                      className={`text-[11px] ${last ? "font-semibold text-[color:var(--gold-700)]" : "text-subtle"}`}
+                      className={`text-[11px] ${last ? "font-semibold text-ink" : "text-subtle"}`}
                     >
                       {t.dateLabel}
                     </span>

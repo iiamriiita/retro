@@ -19,6 +19,7 @@ export interface TimelinePoint {
   id: string;
   dateLabel: string;
   responses: number;
+  submitted: number; // people who submitted (for participation height)
 }
 
 export interface TeamStats {
@@ -96,6 +97,7 @@ export function computeTeamStats(
     id: r.id,
     dateLabel: fmtDate(r.created_at),
     responses: responsesBySession.get(r.id) ?? 0,
+    submitted: submittedBySession.get(r.id) ?? 0,
   }));
 
   // Participation = submissions / expected team size, per closed retro, averaged.
