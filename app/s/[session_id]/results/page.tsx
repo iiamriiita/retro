@@ -101,6 +101,19 @@ export default async function ResultsPage({
         10
       : null;
 
+  // Optional per-person "why I gave this score" reasons.
+  const ratingQ = template?.questions.find((q) => q.type === "rating");
+  const scaleEmoji = (v: number) =>
+    ratingQ?.scale?.find((s) => s.value === v)?.emoji ?? "";
+  const moodReasons = moodRows
+    .map((a) => {
+      const [scoreStr, ...rest] = a.content.split("｜");
+      const reason = rest.join("｜").trim();
+      const score = parseInt(scoreStr, 10);
+      return reason && Number.isFinite(score) ? { score, reason } : null;
+    })
+    .filter((x): x is { score: number; reason: string } => x !== null);
+
   const answers: PublicAnswer[] = (rawAnswers ?? [])
     .filter((a) => a.question_key !== MOOD_KEY)
     .map((a) => ({
@@ -164,6 +177,21 @@ export default async function ResultsPage({
           >
             {t("res.avgMood", { avg: avgMood })}
           </span>
+        )}
+        {moodReasons.length > 0 && (
+          <div className="mt-4">
+            <p className="eyebrow">{t("res.moodWhy")}</p>
+            <ul className="mt-2 space-y-1.5">
+              {moodReasons.map((r, i) => (
+                <li key={i} className="text-sm text-muted">
+                  <span className="font-semibold text-ink">
+                    {scaleEmoji(r.score)} {r.score}/5
+                  </span>{" "}
+                  — {r.reason}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
 

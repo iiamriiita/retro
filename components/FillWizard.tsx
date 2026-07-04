@@ -87,12 +87,23 @@ export default function FillWizard({
       return;
     }
     if (inQuestion && currentQuestion) {
-      // Rating question: require a choice, no moderation.
+      // Rating question: require a score; moderate the optional "why".
       if (currentQuestion.type === "rating") {
         if (!(values[currentQuestion.key] ?? "").trim()) {
           setError(t("fw.ratingRequired"));
           return;
         }
+        const why = (values[currentQuestion.key + "__why"] ?? "").trim();
+        if (why) {
+          setChecking(true);
+          const res = await moderate(why, locale);
+          setChecking(false);
+          if (res.verdict === "revise") {
+            setSuggestion(res.suggestion);
+            return;
+          }
+        }
+        setSuggestion("");
         setStep((s) => s + 1);
         return;
       }
@@ -147,14 +158,17 @@ export default function FillWizard({
     }
     setSubmitting(true);
     try {
-      // Moderate free text (text questions + any role "why"), not the rating.
-      const toModerate = questions.filter(
-        (q) => q.type !== "rating" && (values[q.key] ?? "").trim(),
-      );
+      // Free text to moderate per question: rating → its "why"; else the value
+      // (text answer or role reason).
+      const freeText = (q: Question) =>
+        q.type === "rating"
+          ? (values[q.key + "__why"] ?? "").trim()
+          : (values[q.key] ?? "").trim();
+      const toModerate = questions.filter((q) => freeText(q));
       const results = await Promise.all(
         toModerate.map(async (q) => ({
           key: q.key,
-          result: await moderate((values[q.key] ?? "").trim(), locale),
+          result: await moderate(freeText(q), locale),
         })),
       );
       const bad = results.find((r) => r.result.verdict === "revise");
@@ -179,6 +193,14 @@ export default function FillWizard({
               return {
                 question_key: q.key,
                 content: why ? `${roleSel[q.key]}｜${why}` : roleSel[q.key],
+              };
+            }
+            if (q.type === "rating") {
+              const why = (values[q.key + "__why"] ?? "").trim();
+              const score = (values[q.key] ?? "").trim();
+              return {
+                question_key: q.key,
+                content: why ? `${score}｜${why}` : score,
               };
             }
             return { question_key: q.key, content: (values[q.key] ?? "").trim() };
@@ -310,15 +332,27 @@ export default function FillWizard({
                     <span>{t("fw.ratingHigh")}</span>
                   </div>
                 )}
-                {q.lowNudge && chosen && Number(chosen) <= 2 && (
-                  <div className="mt-2 rounded-lg bg-amber-50 p-2 text-xs text-amber-800">
-                    {q.lowNudge}
-                  </div>
-                )}
+                <textarea
+                  rows={3}
+                  className={`textarea mt-3 ${
+                    suggestion ? "border-amber-400 focus:border-amber-400 focus:ring-amber-400" : ""
+                  }`}
+                  placeholder={t("fw.ratingWhy")}
+                  value={values[q.key + "__why"] ?? ""}
+                  onChange={(e) => setValue(q.key + "__why", e.target.value)}
+                />
+                <div className="mt-2 min-h-[1.25rem] text-xs">
+                  {checking && <span className="text-muted">{t("fw.checking")}</span>}
+                  {suggestion && (
+                    <div className="rounded-lg bg-amber-50 p-2 text-amber-800">
+                      {suggestion}
+                    </div>
+                  )}
+                </div>
               </>
             );
           })()}
-          <p className="mt-2 text-xs text-muted">
+          <p className="mt-1 text-xs text-muted">
             {t("fw.qProgressRating", { i: qIndex + 1, n: questions.length })}
           </p>
         </div>
