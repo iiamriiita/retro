@@ -27,6 +27,7 @@ type IconName =
   | "log-out"
   | "settings"
   | "info"
+  | "trash"
   | "check";
 
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -137,6 +138,14 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <circle cx="12" cy="12" r="10" />
       <path d="M12 16v-4" />
       <path d="M12 8h.01" />
+    </>
+  ),
+  trash: (
+    <>
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="10" x2="10" y1="11" y2="17" />
+      <line x1="14" x2="14" y1="11" y2="17" />
     </>
   ),
   "log-out": (

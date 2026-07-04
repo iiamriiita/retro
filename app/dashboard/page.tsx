@@ -8,6 +8,7 @@ import { computeTeamStats, type RetroRow, type AiInsights } from "@/lib/insights
 import { MOOD_KEY } from "@/lib/templates";
 import { getT } from "@/lib/i18n/server";
 import FormLinkButton from "@/components/FormLinkButton";
+import DeleteRetroButton from "@/components/DeleteRetroButton";
 import TeamInsights from "@/components/TeamInsights";
 import Icon from "@/components/Icon";
 
@@ -208,6 +209,7 @@ export default async function DashboardPage() {
                   >
                     {t("dash.manage")}
                   </Link>
+                  <DeleteRetroButton sessionId={s.id} />
                 </div>
               </li>
             );
