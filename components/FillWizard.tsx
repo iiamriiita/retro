@@ -475,8 +475,8 @@ export default function FillWizard({
         </p>
       )}
 
-      <div className="flex justify-between">
-        {step > 0 ? (
+      <div className="flex justify-end gap-2">
+        {step > 0 && (
           <button
             type="button"
             className="btn-ghost"
@@ -485,8 +485,6 @@ export default function FillWizard({
           >
             {t("fw.prev")}
           </button>
-        ) : (
-          <span />
         )}
         {inReview ? (
           <button
