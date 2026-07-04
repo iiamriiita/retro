@@ -21,8 +21,6 @@ export default async function LandingPage() {
     <div className="-my-10 grid min-h-[calc(100vh-60px)] grid-cols-1 md:grid-cols-[1.05fr_1fr]">
       {/* Left — copy + CTAs */}
       <div className="flex flex-col justify-center gap-6 px-6 py-14 sm:px-10 md:px-16">
-        <span className="lp-eyebrow">{t("landing.eyebrow")}</span>
-
         <h1 className="lp-headline">
           {t("landing.headlineLead")}
           <span style={{ color: "var(--accent)" }}>
