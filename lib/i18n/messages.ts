@@ -209,7 +209,7 @@ const en: Dict = {
   "rc.anonComment": "Comment anonymously",
 
   // form link popup
-  "flb.trigger": "Retro form",
+  "flb.trigger": "Retro Form",
   "flb.inviteEyebrow": "Invite your team",
   "flb.shareTitle": "Share retro form",
   "flb.shareDesc":
