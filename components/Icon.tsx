@@ -22,6 +22,7 @@ type IconName =
   | "trending-down"
   | "alert-triangle"
   | "line-chart"
+  | "list"
   | "check";
 
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -114,6 +115,16 @@ const PATHS: Record<IconName, React.ReactNode> = {
     <>
       <path d="M3 3v16a2 2 0 0 0 2 2h16" />
       <path d="m19 9-5 5-4-4-3 3" />
+    </>
+  ),
+  list: (
+    <>
+      <path d="M8 6h13" />
+      <path d="M8 12h13" />
+      <path d="M8 18h13" />
+      <path d="M3 6h.01" />
+      <path d="M3 12h.01" />
+      <path d="M3 18h.01" />
     </>
   ),
   x: (
