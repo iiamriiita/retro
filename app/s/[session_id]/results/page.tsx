@@ -114,12 +114,27 @@ export default async function ResultsPage({
     })
     .filter((x): x is { score: number; reason: string } => x !== null);
 
+  // Role answers were historically stored as "<emoji> <label>"; drop a leading
+  // emoji so results read as plain text (matches the rest of the UI).
+  const roleKeys = new Set(
+    (template?.questions ?? [])
+      .filter((q) => q.type === "role")
+      .map((q) => q.key),
+  );
+  const stripLeadingEmoji = (s: string) =>
+    s.replace(
+      /^\p{Extended_Pictographic}(‍\p{Extended_Pictographic})*️?\s*/u,
+      "",
+    );
+
   const answers: PublicAnswer[] = (rawAnswers ?? [])
     .filter((a) => a.question_key !== MOOD_KEY)
     .map((a) => ({
       id: a.id,
       question_key: a.question_key,
-      content: a.content,
+      content: roleKeys.has(a.question_key)
+        ? stripLeadingEmoji(a.content)
+        : a.content,
       author_name: anonymous ? null : (nameById.get(a.participant_id) ?? null),
     }));
 

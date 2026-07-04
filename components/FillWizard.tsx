@@ -392,7 +392,7 @@ export default function FillWizard({
           <label className="field-label">{currentQuestion.label}</label>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {(currentQuestion.options ?? []).map((o) => {
-              const roleStr = `${o.emoji} ${o.label}`;
+              const roleStr = o.label;
               const sel = roleSel[currentQuestion.key] === roleStr;
               return (
                 <button
