@@ -64,15 +64,14 @@ export default async function LandingPage() {
           )}
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-x-6 gap-y-2.5">
           {FEATURES.map((f) => (
             <span
               key={f.key}
-              className="inline-flex h-[38px] items-center gap-2 rounded-full px-4 text-sm font-semibold"
-              style={{ background: "var(--surface-2)", color: "var(--text)" }}
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted"
             >
               <span style={{ color: "var(--gold-700)" }}>
-                <Icon name={f.icon} size={15} />
+                <Icon name={f.icon} size={16} />
               </span>
               {t(f.key)}
             </span>
