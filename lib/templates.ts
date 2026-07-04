@@ -69,8 +69,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
     questions: [
       roleQuestion(
         {
-          en: "Your role (pick one + say why)",
-          zh: "角色選擇（選一個 + 說明為什麼）",
+          en: "On this voyage, which role were you? (and why)",
+          zh: "這趟航行，你比較像哪個角色？順便說說為什麼。",
         },
         [
           {
@@ -233,8 +233,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
     questions: [
       roleQuestion(
         {
-          en: "Your role (pick one + say why)",
-          zh: "角色選擇（選一個 + 說明為什麼）",
+          en: "In our garden, which role were you? (and why)",
+          zh: "在這座花園裡，你是哪個角色？順便說說為什麼。",
         },
         [
           {
@@ -393,8 +393,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
     questions: [
       roleQuestion(
         {
-          en: "Your role (pick one + say why)",
-          zh: "角色選擇（選一個 + 說明為什麼）",
+          en: "On this mission, which role were you? (and why)",
+          zh: "這趟任務，你是哪個角色？順便說說為什麼。",
         },
         [
           {

@@ -152,7 +152,8 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
             return (
               <div
                 key={t.id}
-                className="rounded-xl p-4 transition-colors"
+                onClick={() => setTemplateId(t.id)}
+                className="cursor-pointer rounded-xl p-4 transition-colors"
                 style={{
                   background: isSel
                     ? "var(--accent-weak)"
@@ -160,28 +161,19 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                 }}
               >
                 <div className="flex items-start gap-3">
-                  <input
-                    type="radio"
-                    className="mt-1.5"
-                    checked={isSel}
-                    onChange={() => setTemplateId(t.id)}
-                  />
                   <TemplateIcon id={t.id} size={44} />
                   <div className="flex-1">
-                    <button
-                      type="button"
-                      className="block text-left"
-                      onClick={() => setTemplateId(t.id)}
-                    >
-                      <span className="block text-sm font-medium">{t.name}</span>
-                      <span className="block text-xs text-muted">
-                        {t.description}
-                      </span>
-                    </button>
+                    <span className="block text-sm font-medium">{t.name}</span>
+                    <span className="block text-xs text-muted">
+                      {t.description}
+                    </span>
                     <button
                       type="button"
                       className="mt-2 block text-xs text-[color:var(--gold-700)] hover:underline"
-                      onClick={() => setPreview(open ? null : t.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreview(open ? null : t.id);
+                      }}
                     >
                       {open ? tr("cw.previewHide") : tr("cw.previewShow")}
                     </button>
