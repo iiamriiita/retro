@@ -6,9 +6,9 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n/server";
 import { LocaleProvider } from "@/lib/i18n/client";
 import AuthModal from "@/components/AuthModal";
-import Icon from "@/components/Icon";
 import LangSwitcher from "@/components/LangSwitcher";
 import UserMenu from "@/components/UserMenu";
+import LogoMark from "@/components/LogoMark";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -47,15 +47,7 @@ export default async function RootLayout({
                 href="/"
                 className="flex items-center gap-2.5 font-display text-[17px] font-extrabold tracking-tight"
               >
-                <span
-                  className="flex h-[26px] w-[26px] items-center justify-center rounded-md"
-                  style={{
-                    background: "var(--accent)",
-                    color: "var(--text-inverse)",
-                  }}
-                >
-                  <Icon name="database" size={16} />
-                </span>
+                <LogoMark size={28} />
                 Team&nbsp;Retro
               </Link>
               <nav className="flex items-center gap-4 text-sm">

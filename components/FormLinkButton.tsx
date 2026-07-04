@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Icon from "@/components/Icon";
+import LogoMark from "@/components/LogoMark";
 import { useT } from "@/lib/i18n/client";
 
 export default function FormLinkButton({
@@ -124,15 +125,7 @@ export default function FormLinkButton({
 
               {/* logo mark */}
               <div className="relative rounded-2xl bg-white p-2.5 shadow-md">
-                <span
-                  className="flex h-14 w-14 items-center justify-center rounded-xl"
-                  style={{
-                    background: "var(--accent)",
-                    color: "var(--text-inverse)",
-                  }}
-                >
-                  <Icon name="database" size={30} />
-                </span>
+                <LogoMark size={56} className="rounded-xl" />
               </div>
               <p
                 className="eyebrow relative mt-4"
