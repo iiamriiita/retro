@@ -192,7 +192,8 @@ export default function TeamInsights({
     if (pt.rating != null && stats.teamSize)
       return tr("ti.barTipMood", {
         date: pt.dateLabel,
-        pct: barPct(pt),
+        n: pt.submitted,
+        size: stats.teamSize,
         mood: pt.rating.toFixed(1),
       });
     return stats.teamSize
@@ -200,7 +201,6 @@ export default function TeamInsights({
           date: pt.dateLabel,
           n: pt.submitted,
           size: stats.teamSize,
-          pct: barPct(pt),
         })
       : tr("ti.barTipResponses", { date: pt.dateLabel, n: pt.responses });
   }
