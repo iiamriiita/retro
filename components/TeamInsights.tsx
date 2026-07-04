@@ -113,7 +113,18 @@ export default function TeamInsights({
       </div>
 
       {/* Real stat cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard
+          label={tr("ti.cardParticipation")}
+          value={stats.participationAvg != null ? `${stats.participationAvg}%` : "—"}
+        >
+          <span className="mt-1 text-xs text-subtle">
+            {stats.teamSize
+              ? tr("ti.participationHint", { size: stats.teamSize })
+              : tr("ti.participationNoTeam")}
+          </span>
+          <Delta value={stats.participationDelta} unit={tr("ti.vsLast")} />
+        </StatCard>
         <StatCard label={tr("ti.cardFeedback")} value={String(stats.totalResponses)}>
           <span className="mt-1 text-xs text-subtle">
             {tr("ti.avgPerRetro", { n: stats.avgResponses })}

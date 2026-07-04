@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
+import { createServiceClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n/server";
 import { LocaleProvider } from "@/lib/i18n/client";
 import AuthModal from "@/components/AuthModal";
 import Icon from "@/components/Icon";
 import LangSwitcher from "@/components/LangSwitcher";
+import UserMenu from "@/components/UserMenu";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -20,6 +22,17 @@ export default async function RootLayout({
 }) {
   const user = await getCurrentUser();
   const { locale, t } = await getT();
+
+  let team: { name: string; team_size: number | null } | null = null;
+  if (user) {
+    const supabase = createServiceClient();
+    const { data } = await supabase
+      .from("retro_teams")
+      .select("name, team_size")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+    team = data ?? null;
+  }
 
   return (
     <html lang={locale === "zh" ? "zh-Hant" : "en"}>
@@ -54,11 +67,12 @@ export default async function RootLayout({
                     >
                       {t("nav.dashboard")}
                     </Link>
-                    <form action="/auth/signout" method="post">
-                      <button className="text-muted hover:text-ink">
-                        {t("nav.signOut")}
-                      </button>
-                    </form>
+                    <UserMenu
+                      email={user.email ?? ""}
+                      initialTeamName={team?.name ?? null}
+                      initialTeamSize={team?.team_size ?? null}
+                      hasTeam={!!team}
+                    />
                   </>
                 ) : (
                   <AuthModal

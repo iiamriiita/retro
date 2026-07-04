@@ -30,6 +30,9 @@ export interface TeamStats {
   responsesDelta: number | null; // latest closed retro vs the one before
   commentsDelta: number | null;
   timeline: TimelinePoint[]; // chronological, up to last 8
+  teamSize: number | null;
+  participationAvg: number | null; // 0–100, only when teamSize is set
+  participationDelta: number | null;
 }
 
 function fmtDate(iso: string): string {
@@ -48,6 +51,8 @@ export function computeTeamStats(
   retros: RetroRow[],
   responsesBySession: Map<string, number>,
   commentsBySession: Map<string, number>,
+  submittedBySession: Map<string, number> = new Map(),
+  teamSize: number | null = null,
 ): TeamStats {
   const byDate = [...retros].sort(
     (a, b) =>
@@ -88,6 +93,21 @@ export function computeTeamStats(
     responses: responsesBySession.get(r.id) ?? 0,
   }));
 
+  // Participation = submissions / expected team size, per closed retro, averaged.
+  let participationAvg: number | null = null;
+  let participationDelta: number | null = null;
+  if (teamSize && teamSize > 0 && closed.length > 0) {
+    const pct = (r: RetroRow) =>
+      Math.min(100, Math.round(((submittedBySession.get(r.id) ?? 0) / teamSize) * 100));
+    participationAvg = Math.round(
+      closed.reduce((n, r) => n + pct(r), 0) / closed.length,
+    );
+    if (closed.length >= 2) {
+      participationDelta =
+        pct(closed[closed.length - 1]) - pct(closed[closed.length - 2]);
+    }
+  }
+
   return {
     retroCount: retros.length,
     closedCount,
@@ -99,6 +119,9 @@ export function computeTeamStats(
     responsesDelta,
     commentsDelta,
     timeline,
+    teamSize,
+    participationAvg,
+    participationDelta,
   };
 }
 

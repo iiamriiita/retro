@@ -31,10 +31,16 @@ export default async function DashboardPage() {
   const ids = (sessions ?? []).map((s) => s.id);
   const responsesBySession = new Map<string, number>();
   const commentsBySession = new Map<string, number>();
+  const submittedBySession = new Map<string, number>();
   if (ids.length > 0) {
-    const [{ data: ans }, { data: cms }] = await Promise.all([
+    const [{ data: ans }, { data: cms }, { data: parts }] = await Promise.all([
       supabase.from("retro_answers").select("session_id").in("session_id", ids),
       supabase.from("retro_comments").select("session_id").in("session_id", ids),
+      supabase
+        .from("retro_participants")
+        .select("session_id")
+        .in("session_id", ids)
+        .not("submitted_at", "is", null),
     ]);
     for (const a of ans ?? [])
       responsesBySession.set(
@@ -46,12 +52,25 @@ export default async function DashboardPage() {
         c.session_id,
         (commentsBySession.get(c.session_id) ?? 0) + 1,
       );
+    for (const p of parts ?? [])
+      submittedBySession.set(
+        p.session_id,
+        (submittedBySession.get(p.session_id) ?? 0) + 1,
+      );
   }
+
+  const { data: team } = await supabase
+    .from("retro_teams")
+    .select("team_size")
+    .eq("owner_id", user.id)
+    .maybeSingle();
 
   const stats = computeTeamStats(
     (sessions ?? []) as RetroRow[],
     responsesBySession,
     commentsBySession,
+    submittedBySession,
+    team?.team_size ?? null,
   );
 
   const { data: insightRow } = await supabase
