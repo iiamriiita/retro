@@ -237,7 +237,7 @@ export default function TeamInsights({
         <h2 className="text-lg font-extrabold tracking-tight">
           {tr("ti.title")}
         </h2>
-        <span className="eyebrow">
+        <span className="text-sm text-muted">
           {tr("ti.scope", {
             count: stats.retroCount,
             closed: stats.closedCount,
