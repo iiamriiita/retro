@@ -34,6 +34,10 @@ export interface TeamStats {
   participationAvg: number | null; // 0–100, only when teamSize is set
   participationDelta: number | null;
   discussionRate: number | null; // % of finished retros that had discussion
+  // Engagement momentum across finished retros (computed, no AI).
+  momentum: "up" | "down" | "flat";
+  improvingStreak: number; // consecutive increases at the tail
+  hasTrend: boolean; // ≥2 finished retros to compare
 }
 
 function fmtDate(iso: string): string {
@@ -109,6 +113,25 @@ export function computeTeamStats(
     }
   }
 
+  // Engagement momentum: trend of submissions (fallback: responses) across
+  // finished retros. Drives the computed "Team sentiment" card — no AI.
+  const subSeries = closed.map((r) => submittedBySession.get(r.id) ?? 0);
+  const series = subSeries.some((v) => v > 0)
+    ? subSeries
+    : closed.map((r) => responsesBySession.get(r.id) ?? 0);
+  const hasTrend = closed.length >= 2;
+  let momentum: "up" | "down" | "flat" = "flat";
+  let improvingStreak = 0;
+  if (hasTrend) {
+    const last = series[series.length - 1];
+    const prev = series[series.length - 2];
+    momentum = last > prev ? "up" : last < prev ? "down" : "flat";
+    for (let i = series.length - 1; i > 0; i--) {
+      if (series[i] > series[i - 1]) improvingStreak++;
+      else break;
+    }
+  }
+
   // Discussion activity = share of finished retros that sparked any comment.
   const discussionRate =
     closedCount > 0
@@ -134,6 +157,9 @@ export function computeTeamStats(
     participationAvg,
     participationDelta,
     discussionRate,
+    momentum,
+    improvingStreak,
+    hasTrend,
   };
 }
 

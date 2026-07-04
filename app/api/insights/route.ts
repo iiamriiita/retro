@@ -92,7 +92,10 @@ export async function POST() {
   }
 
   try {
-    const data = await geminiInsights(retros, locale);
+    const insights = await geminiInsights(retros, locale);
+    // Tag the cached payload with the language it was generated in, so the
+    // dashboard can show it only when it matches the viewer's UI language.
+    const data = { ...insights, _locale: locale };
     const generated_at = new Date().toISOString();
     const { error } = await supabase
       .from("retro_team_insights")

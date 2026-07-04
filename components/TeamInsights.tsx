@@ -48,25 +48,47 @@ function StatCard({
   );
 }
 
-function sentimentColor(label: string): string {
-  const s = label.toLowerCase();
-  if (
-    s.includes("positive") ||
-    label.includes("正") ||
-    s.includes("good") ||
-    s.includes("healthy")
-  )
-    return "var(--green-500)";
-  if (
-    s.includes("attention") ||
-    s.includes("risk") ||
-    s.includes("negative") ||
-    label.includes("關注") ||
-    label.includes("需要") ||
-    label.includes("負")
-  )
-    return "var(--red-500)";
-  return "var(--accent)";
+type Tr = (key: string, vars?: Record<string, string | number>) => string;
+
+// Computed engagement "sentiment" from real stats — no AI, always localized.
+function deriveSentiment(stats: TeamStats, tr: Tr) {
+  const { momentum, improvingStreak, hasTrend } = stats;
+
+  let label: string;
+  let color: string;
+  if (!hasTrend || momentum === "flat") {
+    label = tr("ti.sentNeutral");
+    color = "var(--accent)";
+  } else if (momentum === "up") {
+    label = tr("ti.sentPositive");
+    color = "var(--green-500)";
+  } else {
+    label = tr("ti.sentAttention");
+    color = "var(--red-500)";
+  }
+
+  let note: string;
+  let noteColor = "var(--text-subtle)";
+  let icon: "trending-up" | "trending-down" | null = null;
+  if (!hasTrend) {
+    note = tr("ti.sentFirst");
+  } else if (improvingStreak >= 2) {
+    note = tr("ti.sentImproving", { n: improvingStreak + 1 });
+    noteColor = "var(--green-500)";
+    icon = "trending-up";
+  } else if (momentum === "up") {
+    note = tr("ti.sentUp");
+    noteColor = "var(--green-500)";
+    icon = "trending-up";
+  } else if (momentum === "down") {
+    note = tr("ti.sentDown");
+    noteColor = "var(--red-500)";
+    icon = "trending-down";
+  } else {
+    note = tr("ti.sentSteady");
+  }
+
+  return { label, color, note, noteColor, icon };
 }
 
 function themeTone(direction: "up" | "warning" | "down") {
@@ -135,39 +157,29 @@ export default function TeamInsights({
 
       {/* Real stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {/* Team sentiment (from AI insights) */}
-        <div className="card flex flex-col">
-          <span className="eyebrow">{tr("ti.cardSentiment")}</span>
-          {insights ? (
-            <>
+        {/* Team sentiment — computed engagement momentum (no AI) */}
+        {(() => {
+          const s = deriveSentiment(stats, tr);
+          return (
+            <div className="card flex flex-col">
+              <span className="eyebrow">{tr("ti.cardSentiment")}</span>
               <span className="mt-2 inline-flex items-center gap-2 font-display text-3xl font-extrabold tracking-tight">
                 <span
                   className="inline-block h-3 w-3 rounded-full"
-                  style={{ background: sentimentColor(insights.sentiment.label) }}
+                  style={{ background: s.color }}
                 />
-                {insights.sentiment.label}
+                {s.label}
               </span>
-              {insights.sentiment.note && (
-                <span
-                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold"
-                  style={{ color: "var(--green-500)" }}
-                >
-                  <Icon name="trending-up" size={14} />
-                  {insights.sentiment.note}
-                </span>
-              )}
-            </>
-          ) : (
-            <>
-              <span className="mt-2 font-display text-3xl font-extrabold tracking-tight text-subtle">
-                —
+              <span
+                className="mt-3 inline-flex items-center gap-1 text-xs font-semibold"
+                style={{ color: s.noteColor }}
+              >
+                {s.icon && <Icon name={s.icon} size={14} />}
+                {s.note}
               </span>
-              <span className="mt-1 text-xs text-subtle">
-                {tr("ti.sentimentNoAI")}
-              </span>
-            </>
-          )}
-        </div>
+            </div>
+          );
+        })()}
 
         {/* Submission (form) rate */}
         <StatCard

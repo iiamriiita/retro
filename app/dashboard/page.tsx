@@ -79,6 +79,11 @@ export default async function DashboardPage() {
     .eq("owner_id", user.id)
     .maybeSingle();
 
+  // Only surface cached AI insights when they were generated in the language
+  // the dashboard is currently showing; otherwise prompt to regenerate.
+  const insightData = insightRow?.data as (AiInsights & { _locale?: string }) | undefined;
+  const insightsMatchLocale = insightData?._locale === locale;
+
   return (
     <div className="container-wide">
       <div className="mb-6 flex items-center justify-between">
@@ -102,8 +107,8 @@ export default async function DashboardPage() {
         <>
           <TeamInsights
             stats={stats}
-            initialInsights={(insightRow?.data as AiInsights | undefined) ?? null}
-            initialGeneratedAt={insightRow?.generated_at ?? null}
+            initialInsights={insightsMatchLocale ? (insightData as AiInsights) : null}
+            initialGeneratedAt={insightsMatchLocale ? insightRow?.generated_at ?? null : null}
           />
           <div className="mb-4 flex items-center gap-3">
             <span
