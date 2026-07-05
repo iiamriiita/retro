@@ -118,8 +118,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "wind",
         label: {
-          en: "💨 Wind: What's pushing us forward? Which practices make us go faster?",
-          zh: "💨 風（Wind）：什麼事情在推著我們前進？哪些做法讓我們跑得更快？",
+          en: "Wind: What's pushing us forward? Which practices make us go faster?",
+          zh: "風（Wind）：什麼事情在推著我們前進？哪些做法讓我們跑得更快？",
         },
         placeholder: {
           en: "e.g. Daily 15-min syncs keep everyone aligned and moving.",
@@ -129,8 +129,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "anchor",
         label: {
-          en: "⚓ Anchor: What's slowing us down? What makes you feel held back?",
-          zh: "⚓ 錨（Anchor）：什麼在拖慢我們？哪些事讓你覺得綁手綁腳？",
+          en: "Anchor: What's slowing us down? What makes you feel held back?",
+          zh: "錨（Anchor）：什麼在拖慢我們？哪些事讓你覺得綁手綁腳？",
         },
         placeholder: {
           en: "e.g. Waiting days for reviews blocks the next piece of work.",
@@ -140,8 +140,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "rocks",
         label: {
-          en: "🪨 Rocks: What risks or worries lie ahead that we should steer around early?",
-          zh: "🪨 暗礁（Rocks）：前方有什麼風險或隱憂，是我們該提早閃避的？",
+          en: "Rocks: What risks or worries lie ahead that we should steer around early?",
+          zh: "暗礁（Rocks）：前方有什麼風險或隱憂，是我們該提早閃避的？",
         },
         placeholder: {
           en: "e.g. Only one person understands the deploy — a bus-factor risk.",
@@ -151,8 +151,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "island",
         label: {
-          en: "🏝️ Island: What are we really trying to reach? What does your ideal destination look like?",
-          zh: "🏝️ 島嶼（Island）：我們真正想抵達的目標是什麼？你心中理想的終點長怎樣？",
+          en: "Island: What are we really trying to reach? What does your ideal destination look like?",
+          zh: "島嶼（Island）：我們真正想抵達的目標是什麼？你心中理想的終點長怎樣？",
         },
         placeholder: {
           en: "e.g. Ship weekly with confidence and no fire-drills.",
@@ -161,8 +161,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       },
       moodQuestion(
         {
-          en: "⚖️ Voyage satisfaction: how many points for our boat this trip?",
-          zh: "⚖️ 航行滿意度：這趟航行，你給我們這艘船打幾分？",
+          en: "Voyage satisfaction: how many points for our boat this trip?",
+          zh: "航行滿意度：這趟航行，你給我們這艘船打幾分？",
         },
         [
           {
