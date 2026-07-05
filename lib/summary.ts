@@ -211,33 +211,49 @@ export async function geminiSummary(
   const responseSchema = { type: "OBJECT", properties: props };
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: intro }] },
-      contents: [{ role: "user", parts: [{ text: ask }] }],
-      generationConfig: {
-        temperature: 0.5,
-        maxOutputTokens: 2600,
-        responseMimeType: "application/json",
-        responseSchema,
-      },
-    }),
-    signal: AbortSignal.timeout(30_000),
+  const payload = JSON.stringify({
+    systemInstruction: { parts: [{ text: intro }] },
+    contents: [{ role: "user", parts: [{ text: ask }] }],
+    generationConfig: {
+      temperature: 0.5,
+      maxOutputTokens: 2600,
+      responseMimeType: "application/json",
+      responseSchema,
+    },
   });
 
-  if (!res.ok) {
-    if (res.status === 429)
+  // The model can be briefly overloaded (503) — retry a couple of times.
+  let res: Response | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (res.status !== 503 && res.status !== 500) break;
+    if (attempt < 2)
+      await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
+  }
+
+  if (!res || !res.ok) {
+    const status = res?.status ?? 0;
+    if (status === 429)
       throw new Error(
         locale === "en"
           ? "The AI is over its usage quota right now. Please try again in a little while."
           : "AI 目前已超過用量額度，請稍後再試（Gemini 免費額度有限）。",
       );
-    const detail = await res.text().catch(() => "");
+    if (status === 503 || status === 500)
+      throw new Error(
+        locale === "en"
+          ? "The AI is very busy right now. Please try again in a moment."
+          : "AI 目前流量很大、暫時忙碌，請稍等一下再試一次。",
+      );
+    const detail = res ? await res.text().catch(() => "") : "";
     throw new Error(
       (locale === "en" ? "AI service error" : "AI 服務錯誤") +
-        `（${res.status}）：${detail.slice(0, 300)}`,
+        `（${status}）：${detail.slice(0, 300)}`,
     );
   }
 
