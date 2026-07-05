@@ -116,6 +116,46 @@ export default function QuestionIcon({
           <rect x="8" y="19.2" width="8" height="2.4" rx="1.2" />
         </g>,
       );
+    case "blooming": // flower with a gold centre
+      return svg(
+        <g>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ellipse
+              key={i}
+              cx="12"
+              cy="5.4"
+              rx="3.1"
+              ry="4.4"
+              fill={BROWN}
+              transform={`rotate(${i * 45} 12 12)`}
+            />
+          ))}
+          <circle cx="12" cy="12" r="3.9" fill="#ECC30B" />
+        </g>,
+      );
+    case "needs_water": // water drop
+      return svg(
+        <path
+          d="M12 2.6c3.5 4.5 6.4 8.9 6.4 12.3a6.4 6.4 0 1 1-12.8 0C5.6 11.5 8.5 7.1 12 2.6Z"
+          fill={BROWN}
+        />,
+      );
+    case "weeds": // two-leaf sprout
+      return svg(
+        <g fill={BROWN}>
+          <path d="M12 4.4c1.3 2.6 1.6 5.3.5 8.1h-1c-1.1-2.8-.8-5.5.5-8.1Z" />
+          <path d="M11 12.6c-.8-2.4-2.6-3.9-5.6-4.4.4 3 2.2 4.6 5.4 5.1z" />
+          <path d="M13 12.6c.8-2.4 2.6-3.9 5.6-4.4-.4 3-2.2 4.6-5.4 5.1z" />
+          <path d="M11.6 12.4h.8c.3 3.1.2 6.2-.4 9.2-.6-3-.7-6.1-.4-9.2Z" />
+        </g>,
+      );
+    case "seeds": // seed with a gold sprouting tip
+      return svg(
+        <g>
+          <ellipse cx="12" cy="13" rx="7.2" ry="8" fill={BROWN} />
+          <path d="M12 5.4c1.7 1.6 2.6 3.6 2.6 6H9.4c0-2.4.9-4.4 2.6-6Z" fill="#C99413" />
+        </g>,
+      );
     default:
       return null;
   }

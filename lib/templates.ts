@@ -282,8 +282,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "blooming",
         label: {
-          en: "🌸 Blooming: What grew well this time and is worth celebrating?",
-          zh: "🌸 開花的（Blooming）：這段時間有什麼長得很好、值得慶祝的？",
+          en: "Blooming: What grew well this time and is worth celebrating?",
+          zh: "開花的（Blooming）：這段時間有什麼長得很好、值得慶祝的？",
         },
         placeholder: {
           en: "e.g. Our onboarding docs finally paid off — new folks ramped fast.",
@@ -293,8 +293,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "needs_water",
         label: {
-          en: "💧 Needs water: What's still fragile and needs more attention to thrive?",
-          zh: "💧 需要澆水的（Needs Water）：什麼還很脆弱、需要更多關注才能長好？",
+          en: "Needs water: What's still fragile and needs more attention to thrive?",
+          zh: "需要澆水的（Needs Water）：什麼還很脆弱、需要更多關注才能長好？",
         },
         placeholder: {
           en: "e.g. Test coverage is thin in the payments module.",
@@ -304,8 +304,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "weeds",
         label: {
-          en: "🌿 Weeds: What habit or process is draining nutrients and should be removed?",
-          zh: "🌿 該除的雜草（Weeds）：有什麼在消耗養分、該被移除的習慣或流程？",
+          en: "Weeds: What habit or process is draining nutrients and should be removed?",
+          zh: "該除的雜草（Weeds）：有什麼在消耗養分、該被移除的習慣或流程？",
         },
         placeholder: {
           en: "e.g. Status meetings that could just be a message.",
@@ -315,8 +315,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "seeds",
         label: {
-          en: "🌰 Seeds: What new thing would you like to start growing next season?",
-          zh: "🌰 想播的種子（Seeds）：下一季你想開始培養什麼新的東西？",
+          en: "Seeds: What new thing would you like to start growing next season?",
+          zh: "想播的種子（Seeds）：下一季你想開始培養什麼新的東西？",
         },
         placeholder: {
           en: "e.g. A regular pairing slot to spread knowledge.",
@@ -325,8 +325,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       },
       moodQuestion(
         {
-          en: "🌡️ Garden health: how's our garden doing right now?",
-          zh: "🌡️ 花園健康度：我們這座花園現在長得如何？",
+          en: "Garden health: how's our garden doing right now?",
+          zh: "花園健康度：我們這座花園現在長得如何？",
         },
         [
           {
