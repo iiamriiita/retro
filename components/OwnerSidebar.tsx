@@ -24,10 +24,14 @@ export default function OwnerSidebar({
   const { t } = useT();
   const router = useRouter();
   const [busy, setBusy] = useState<"discussion" | "share" | null>(null);
+  const [discOn, setDiscOn] = useState(discussionEnabled);
   const [view, setView] = useState<ShareView>(shareView);
   const [error, setError] = useState<string | null>(null);
   const [stuck, setStuck] = useState(false);
   const [atLeastMsg, setAtLeastMsg] = useState(false);
+
+  useEffect(() => setDiscOn(discussionEnabled), [discussionEnabled]);
+  useEffect(() => setView(shareView), [shareView]);
 
   // Show our own share button only once the header's button scrolls away.
   useEffect(() => {
@@ -42,18 +46,22 @@ export default function OwnerSidebar({
   }, []);
 
   async function toggleDiscussion() {
+    // Optimistic: flip immediately, roll back only on failure.
+    const next = !discOn;
+    setDiscOn(next);
     setBusy("discussion");
     setError(null);
     try {
       const res = await fetch(`/api/sessions/${sessionId}/discussion`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled: !discussionEnabled }),
+        body: JSON.stringify({ enabled: next }),
       });
       if (!res.ok)
         throw new Error((await res.json())?.error ?? t("oc.updateFail"));
       router.refresh();
     } catch (err) {
+      setDiscOn(!next);
       setError(err instanceof Error ? err.message : t("oc.updateFail"));
     } finally {
       setBusy(null);
@@ -62,6 +70,9 @@ export default function OwnerSidebar({
 
   async function setShare(next: ShareView) {
     if (next === view || busy) return;
+    // Optimistic: reflect the choice immediately, roll back on failure.
+    const prev = view;
+    setView(next);
     setBusy("share");
     setError(null);
     try {
@@ -72,9 +83,9 @@ export default function OwnerSidebar({
       });
       if (!res.ok)
         throw new Error((await res.json())?.error ?? t("oc.updateFail"));
-      setView(next);
       router.refresh();
     } catch (err) {
+      setView(prev);
       setError(err instanceof Error ? err.message : t("oc.updateFail"));
     } finally {
       setBusy(null);
@@ -108,7 +119,7 @@ export default function OwnerSidebar({
         <FormLinkButton
           sessionId={sessionId}
           ended
-          discussionEnabled={discussionEnabled}
+          discussionEnabled={discOn}
           triggerClassName="btn-primary w-full"
         />
       </div>
@@ -120,24 +131,22 @@ export default function OwnerSidebar({
           <button
             type="button"
             role="switch"
-            aria-checked={discussionEnabled}
+            aria-checked={discOn}
             onClick={toggleDiscussion}
-            disabled={busy !== null}
-            className="relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-60"
+            disabled={busy === "discussion"}
+            className="relative h-6 w-11 shrink-0 rounded-full transition-colors"
             style={{
-              background: discussionEnabled
-                ? "var(--accent)"
-                : "var(--surface-3)",
+              background: discOn ? "var(--accent)" : "var(--surface-3)",
             }}
           >
             <span
               className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
-                discussionEnabled ? "left-[22px]" : "left-0.5"
+                discOn ? "left-[22px]" : "left-0.5"
               }`}
             />
           </button>
         </div>
-        {discussionEnabled && (
+        {discOn && (
           <p className="mt-2 text-xs text-muted">{t("os.discussionOnHint")}</p>
         )}
       </div>
