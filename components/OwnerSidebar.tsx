@@ -127,7 +127,7 @@ export default function OwnerSidebar({
       {/* Discussion — toggle switch */}
       <div className="card">
         <div className="flex items-center justify-between">
-          <p className="eyebrow">{t("os.discussionTitle")}</p>
+          <p className="text-[15px] font-medium">{t("os.discussionTitle")}</p>
           <button
             type="button"
             role="switch"
@@ -153,7 +153,7 @@ export default function OwnerSidebar({
 
       {/* Shared-view content — multi-select parts */}
       <div className="card">
-        <p className="eyebrow">{t("os.shareTitle")}</p>
+        <p className="text-[15px] font-medium">{t("os.shareTitle")}</p>
         <p className="mt-2 text-xs text-muted">{t("os.shareHint")}</p>
         <div className="mt-3 space-y-2">
           {[
