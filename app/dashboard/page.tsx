@@ -192,11 +192,11 @@ export default async function DashboardPage() {
                     ))}
                   </div>
                   <p className="mt-1 text-xs text-muted">
+                    {t("dash.responses", { n: submittedBySession.get(s.id) ?? 0 })} ·{" "}
                     {s.anonymity === "anonymous"
                       ? t("dash.anonymous")
                       : t("dash.named")}{" "}
-                    · {t("dash.responses", { n: submittedBySession.get(s.id) ?? 0 })}
-                    {" "}· {t("dash.due", { date: new Date(s.deadline).toLocaleString() })}
+                    · {t("dash.due", { date: new Date(s.deadline).toLocaleString() })}
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
