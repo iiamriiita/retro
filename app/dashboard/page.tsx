@@ -113,12 +113,9 @@ export default async function DashboardPage() {
   return (
     <div className="container-wide">
       <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            {t("dash.title")}
-          </h1>
-          <p className="mt-1.5 text-sm text-muted">{user.email}</p>
-        </div>
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          {t("dash.title")}
+        </h1>
         <Link className="btn-primary" href="/dashboard/new">
           <Icon name="plus" size={15} />
           {t("dash.new")}
