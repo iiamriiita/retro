@@ -309,9 +309,6 @@ export default function TeamInsights({
                 </span>
               </span>
             </span>
-            <span className="eyebrow">
-              {tr("ti.lastN", { n: stats.timeline.length })}
-            </span>
           </div>
           {stats.timeline.length === 0 ? (
             <p className="text-sm text-muted">{tr("ti.noData")}</p>
