@@ -194,17 +194,15 @@ export interface RetroForAI {
 
 const INSIGHTS_SYSTEM_ZH = `你是一個團隊 retro（回顧會議）的資深教練。你會收到同一個團隊「多場」retro 的回答（依時間排序，已去識別化）。
 
-請跨場快速看團隊的走向，然後「只」輸出 JSON（繁體中文內容），欄位只有一個：
-- pulse：3–4 行的簡短團隊近況，點出走向、持續的優點、以及還沒解決的痛點。白話、具體，不要空泛的場面話。
+請跨場快速看團隊的走向，然後用「3–4 行、繁體中文」寫一段簡短的團隊近況：點出走向、持續的優點、以及還沒解決的痛點。白話、具體，不要空泛的場面話。
 
-原則：對事不對人、忠實反映內容、不要杜撰沒出現的事。只輸出 JSON，不要多餘文字。`;
+只輸出這段文字本身，不要 JSON、不要標題、不要條列符號、不要 markdown。對事不對人、忠實反映內容、不要杜撰沒出現的事。`;
 
 const INSIGHTS_SYSTEM_EN = `You are a senior coach for a team's retrospectives. You'll receive answers from MULTIPLE retros of the same team (in chronological order, de-identified).
 
-Skim the team's trajectory across retros and output ONLY JSON (content in English), with a single field:
-- pulse: a short 3–4 line read on the team — the trajectory, lasting strengths, and unresolved pain points. Plain and specific, no generic filler.
+Skim the team's trajectory across retros, then write a short 3–4 line read on the team in English: the trajectory, lasting strengths, and unresolved pain points. Plain and specific, no generic filler.
 
-Principles: about the work not the people, reflect the content faithfully, don't invent things. Output JSON only, no extra text.`;
+Output only that text — no JSON, no heading, no bullet points, no markdown. About the work not the people; reflect the content faithfully; don't invent things.`;
 
 function buildAiContext(retros: RetroForAI[], locale: Locale): string {
   const nth = (i: number, d: string) =>
@@ -226,14 +224,6 @@ function buildAiContext(retros: RetroForAI[], locale: Locale): string {
   return blocks.join("\n\n");
 }
 
-const RESPONSE_SCHEMA = {
-  type: "object",
-  properties: {
-    pulse: { type: "string" },
-  },
-  required: ["pulse"],
-};
-
 export async function geminiInsights(
   retros: RetroForAI[],
   locale: Locale = "en",
@@ -254,8 +244,8 @@ export async function geminiInsights(
       : `${system}\n\n以下是這個團隊依時間排序的多場 retro 回答：\n\n${context}`;
   const ask =
     locale === "en"
-      ? "Analyze across retros and output JSON."
-      : "請跨場分析並輸出 JSON。";
+      ? "Write the 3–4 line summary now."
+      : "請現在寫出那段 3–4 行的近況。";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
   const payload = JSON.stringify({
     systemInstruction: { parts: [{ text: intro }] },
@@ -263,8 +253,6 @@ export async function geminiInsights(
     generationConfig: {
       temperature: 0.5,
       maxOutputTokens: 700,
-      responseMimeType: "application/json",
-      responseSchema: RESPONSE_SCHEMA,
     },
   });
 
@@ -316,27 +304,17 @@ export async function geminiInsights(
         : "AI 沒有回覆內容，請再試一次。",
     );
 
-  // Clean up: strip any ```json fences and keep the outermost JSON object.
-  let clean = rawText;
-  if (clean.startsWith("```")) {
-    clean = clean
-      .replace(/^```(?:json)?\s*/i, "")
+  // Plain text — just tidy it. Strip any stray code fences or an accidental
+  // { "pulse": "..." } wrapper the model might add, then hand it back as-is.
+  let pulse = rawText;
+  if (pulse.startsWith("```")) {
+    pulse = pulse
+      .replace(/^```(?:json|text)?\s*/i, "")
       .replace(/```\s*$/, "")
       .trim();
   }
-  const first = clean.indexOf("{");
-  const last = clean.lastIndexOf("}");
-  if (first >= 0 && last > first) clean = clean.slice(first, last + 1);
+  const wrapped = pulse.match(/^\{[\s\S]*"pulse"\s*:\s*"([\s\S]*?)"[\s\S]*\}$/);
+  if (wrapped) pulse = wrapped[1].replace(/\\n/g, "\n").replace(/\\"/g, '"');
 
-  let parsed: { pulse?: unknown };
-  try {
-    parsed = JSON.parse(clean);
-  } catch {
-    throw new Error(
-      locale === "en"
-        ? "The AI returned malformed output — please try again."
-        : "AI 回傳格式錯誤，請再試一次。",
-    );
-  }
-  return { pulse: typeof parsed.pulse === "string" ? parsed.pulse.trim() : "" };
+  return { pulse: pulse.trim() };
 }
