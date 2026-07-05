@@ -26,10 +26,16 @@ const TONE_EN: Record<ReportTone, string> = {
     "Tone: light, warm, a little playful. Feel free to lean on the retro template's metaphor (sailing / garden / space mission) in headings and phrasing, while keeping the content concrete and actionable.",
 };
 
+// A source citation on a well/improve bullet: which answer it came from and the
+// respondent's 1-based index (matches "Respondent N" in the responses below).
+export type ReportSource = { id: string; r: number };
+export type ReportBullet = { text: string; src: ReportSource[] };
+export type AnswerRef = { answerId: string; respondent: number };
+
 export type StructuredReport = {
   summary?: string;
-  well?: string[];
-  improve?: string[];
+  well?: ReportBullet[];
+  improve?: ReportBullet[];
   actions?: string[];
 };
 
@@ -47,7 +53,7 @@ export function summarySystem(
     const fields: string[] = [];
     if (wantPoints)
       fields.push(
-        '- points: an array that classifies EVERY answer, one by one. For each answer output an object { "text": a one-short-sentence version of what they said, "kind": "well" if it is positive / went well, or "improve" if it is a problem, frustration, or went badly }. Judge each answer on its OWN meaning, not on which question it sits under — a problem is "improve" even if written under a positive prompt, and a positive is "well" even under a problems prompt. If an answer only names a topic with no clear good/bad, use the bracketed leaning of its question. Skip answers that just say "none" / "n/a" / "nothing".',
+        '- points: an array that classifies EVERY answer, one by one. Each answer in the input is prefixed with an id like [#3]. For each answer output an object { "text": a one-short-sentence version of what they said (do NOT include the [#N] marker in the text), "kind": "well" if it is positive / went well, or "improve" if it is a problem, frustration, or went badly, "sources": the [#N] numbers of the answers this point is based on (usually one; more if you merged several) }. Judge each answer on its OWN meaning, not on which question it sits under — a problem is "improve" even if written under a positive prompt, and a positive is "well" even under a problems prompt. If an answer only names a topic with no clear good/bad, use the bracketed leaning of its question. Skip answers that just say "none" / "n/a" / "nothing".',
       );
     if (wantActions)
       fields.push(
@@ -71,7 +77,7 @@ ${TONE_EN[tone]}`;
   const fields: string[] = [];
   if (wantPoints)
     fields.push(
-      '- points：一個陣列，把「每一條」回答逐條分類。每條回答輸出一個物件 { "text": 用一句短句重述這條回答的內容, "kind": 若是正向、順利就填 "well"，若是問題、困擾、不順就填 "improve" }。請依「這條回答本身的意思」判斷，而不是依它寫在哪一題——問題就算寫在正向題也算 "improve"，正向就算寫在問題題也算 "well"。若某條只點出主題、沒說好壞，就依該題括號標示的傾向判斷。像「沒有」「無」「n/a」這種就跳過不收。',
+      '- points：一個陣列，把「每一條」回答逐條分類。輸入的每條回答前面都有一個像 [#3] 的編號。每條回答輸出一個物件 { "text": 用一句短句重述這條回答的內容（text 裡不要包含 [#N] 編號）, "kind": 若是正向、順利就填 "well"，若是問題、困擾、不順就填 "improve", "sources": 這條依據哪幾個 [#N] 編號（通常一個，若你合併了多條就填多個） }。請依「這條回答本身的意思」判斷，而不是依它寫在哪一題——問題就算寫在正向題也算 "improve"，正向就算寫在問題題也算 "well"。若某條只點出主題、沒說好壞，就依該題括號標示的傾向判斷。像「沒有」「無」「n/a」這種就跳過不收。',
     );
   if (wantActions)
     fields.push(
@@ -115,9 +121,14 @@ const QUESTION_LEANING: Record<string, "positive" | "problem" | "direction"> = {
 
 export function buildContext(
   templateId: string,
-  answers: { question_key: string; content: string }[],
+  answers: {
+    id?: string;
+    question_key: string;
+    content: string;
+    respondent?: number;
+  }[],
   locale: Locale = "en",
-): string {
+): { context: string; refs: Map<number, AnswerRef> } {
   const template = getTemplate(templateId, locale);
   const questions = template?.questions ?? [];
   const en = locale === "en";
@@ -136,21 +147,32 @@ export function buildContext(
         : "（此題偏未來方向）";
   };
 
+  // Number each answer ([#1], [#2]…) so the model can cite its sources, and keep
+  // a map from that number back to the answer id + respondent for the UI tags.
+  const refs = new Map<number, AnswerRef>();
+  let n = 0;
   const blocks: string[] = [];
   for (const q of questions) {
     if (q.type === "rating" || q.type === "role") continue;
-    const items = answers
-      .filter((x) => x.question_key === q.key)
-      .map((a) => a.content.trim())
-      .filter(Boolean);
-    if (!items.length) continue;
+    const lines: string[] = [];
+    for (const a of answers.filter((x) => x.question_key === q.key)) {
+      const c = a.content.trim();
+      if (!c) continue;
+      n += 1;
+      if (a.id) refs.set(n, { answerId: a.id, respondent: a.respondent ?? 0 });
+      lines.push(`- [#${n}] ${c}`);
+    }
+    if (!lines.length) continue;
     blocks.push(
-      `### ${q.label}${leanLabel(QUESTION_LEANING[q.key])}\n` +
-        items.map((c) => `- ${c}`).join("\n"),
+      `### ${q.label}${leanLabel(QUESTION_LEANING[q.key])}\n` + lines.join("\n"),
     );
   }
-  if (!blocks.length) return en ? "(no answers)" : "（沒有任何回答）";
-  return blocks.join("\n\n");
+  const context = blocks.length
+    ? blocks.join("\n\n")
+    : en
+      ? "(no answers)"
+      : "（沒有任何回答）";
+  return { context, refs };
 }
 
 // Guard against the model degenerating into an endless run-on summary: keep the
@@ -175,6 +197,7 @@ export async function geminiSummary(
   tone: ReportTone = "neutral",
   sections: ReportSection[] = ALL_SECTIONS,
   note = "",
+  refs: Map<number, AnswerRef> = new Map(),
 ): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey)
@@ -216,6 +239,7 @@ export async function geminiSummary(
         properties: {
           text: { type: "STRING" },
           kind: { type: "STRING", enum: ["well", "improve"] },
+          sources: { type: "ARRAY", items: { type: "INTEGER" } },
         },
         required: ["text", "kind"],
       },
@@ -328,10 +352,11 @@ export async function geminiSummary(
     out.summary =
       typeof parsed.summary === "string" ? clampSummary(parsed.summary) : "";
   if (wantPoints) {
-    // Split the labelled answers into the green (well) and red (improve) boxes.
+    // Split the labelled answers into the green (well) and red (improve) boxes,
+    // resolving each point's cited [#N] ids back to answer id + respondent.
     const points = Array.isArray(parsed.points) ? parsed.points : [];
-    const well: string[] = [];
-    const improve: string[] = [];
+    const well: ReportBullet[] = [];
+    const improve: ReportBullet[] = [];
     for (const p of points) {
       if (!p || typeof p !== "object") continue;
       const text =
@@ -344,7 +369,20 @@ export async function geminiSummary(
         kind.includes("improve") ||
         kind.includes("bad") ||
         kind.includes("problem");
-      (isImprove ? improve : well).push(text);
+      const rawSources = (p as { sources?: unknown }).sources;
+      const src: ReportSource[] = [];
+      const seen = new Set<string>();
+      if (Array.isArray(rawSources)) {
+        for (const s of rawSources) {
+          const num = typeof s === "number" ? s : parseInt(String(s), 10);
+          const ref = Number.isFinite(num) ? refs.get(num) : undefined;
+          if (ref && !seen.has(ref.answerId)) {
+            seen.add(ref.answerId);
+            src.push({ id: ref.answerId, r: ref.respondent });
+          }
+        }
+      }
+      (isImprove ? improve : well).push({ text, src });
     }
     if (chosen.includes("well")) out.well = well;
     if (chosen.includes("improve")) out.improve = improve;

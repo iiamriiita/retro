@@ -315,3 +315,16 @@ input[type="checkbox"] {
   .rp-fade { animation: none; }
   .rp-dots span { animation: none; }
 }
+
+/* Brief highlight when a report source tag scrolls you to its answer. */
+@keyframes rp-flash {
+  0% { box-shadow: 0 0 0 3px var(--accent-weak); background: var(--accent-weak); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.rp-flash {
+  border-radius: var(--radius-md);
+  animation: rp-flash 1.6s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rp-flash { animation: none; }
+}

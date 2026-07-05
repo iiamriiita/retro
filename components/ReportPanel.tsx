@@ -7,6 +7,38 @@ import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
 
 type Tr = (key: string, vars?: Record<string, string | number>) => string;
+type Src = { id: string; r: number };
+type Bullet = string | { text: string; src?: Src[] };
+
+// Scroll to (and briefly flash) the source answer down in the responses list.
+function jumpToAnswer(id: string) {
+  const el = document.querySelector(`[data-answer-id="${id}"]`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.add("rp-flash");
+  window.setTimeout(() => el.classList.remove("rp-flash"), 1600);
+}
+
+// Small round tags linking a bullet back to the respondent(s) it came from.
+function SourceTags({ src }: { src: Src[] }) {
+  if (!src.length) return null;
+  return (
+    <span className="ml-1.5 inline-flex gap-1 align-middle">
+      {src.map((s) => (
+        <button
+          key={s.id}
+          type="button"
+          onClick={() => jumpToAnswer(s.id)}
+          title={`Respondent ${s.r}`}
+          className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[11px] font-semibold transition-colors"
+          style={{ background: "var(--surface-3)", color: "var(--text-muted)" }}
+        >
+          {s.r}
+        </button>
+      ))}
+    </span>
+  );
+}
 
 // A report bullet list that collapses to a few items when long, with a text
 // button to reveal the rest (keeps a long "improve" column from dominating).
@@ -15,7 +47,7 @@ function ReportList({
   variant,
   t,
 }: {
-  items: string[];
+  items: Bullet[];
   variant: "well" | "improve" | "actions";
   t: Tr;
 }) {
@@ -24,6 +56,10 @@ function ReportList({
   const shown = expanded ? items : items.slice(0, LIMIT);
   const space = variant === "actions" ? "space-y-2" : "space-y-2.5";
   const gap = variant === "well" ? "gap-2.5" : "gap-2";
+  const norm = (it: Bullet): { text: string; src: Src[] } =>
+    typeof it === "string"
+      ? { text: it, src: [] }
+      : { text: it.text, src: it.src ?? [] };
   const bullet = () => {
     if (variant === "well")
       return (
@@ -50,12 +86,18 @@ function ReportList({
   return (
     <>
       <ul className={`mt-3 ${space}`}>
-        {shown.map((it, i) => (
-          <li key={i} className={`flex ${gap} text-sm`}>
-            {bullet()}
-            <span>{it}</span>
-          </li>
-        ))}
+        {shown.map((it, i) => {
+          const { text, src } = norm(it);
+          return (
+            <li key={i} className={`flex ${gap} text-sm`}>
+              {bullet()}
+              <span>
+                {text}
+                <SourceTags src={src} />
+              </span>
+            </li>
+          );
+        })}
       </ul>
       {items.length > LIMIT && (
         <div className="mt-3 flex justify-center">
@@ -153,10 +195,11 @@ export default function ReportPanel({
   }
 
   // New reports are stored as JSON (StructuredReport); old ones are markdown.
+  // well/improve items may be plain strings (older reports) or {text, src}.
   type Structured = {
     summary?: string;
-    well?: string[];
-    improve?: string[];
+    well?: Bullet[];
+    improve?: Bullet[];
     actions?: string[];
   };
   let structured: Structured | null = null;

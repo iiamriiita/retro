@@ -55,8 +55,9 @@ export async function POST(
 
   const { data: answers } = await supabase
     .from("retro_answers")
-    .select("question_key, content")
-    .eq("session_id", session.id);
+    .select("id, question_key, content, participant_id, created_at")
+    .eq("session_id", session.id)
+    .order("created_at", { ascending: true });
   if (!answers || answers.length === 0) {
     return NextResponse.json(
       { error: en ? "This retro has no answers yet." : "這場還沒有任何回答。" },
@@ -77,13 +78,33 @@ export async function POST(
     ? (ALL_SECTIONS.filter((k) => body.sections!.includes(k)) as ReportSection[])
     : ALL_SECTIONS;
 
+  // Respondent index by first appearance (created_at order) — matches the
+  // "Respondent N" numbering in the responses list below the report.
+  const authorIdx = new Map<string, number>();
+  for (const a of answers) {
+    if (!authorIdx.has(a.participant_id))
+      authorIdx.set(a.participant_id, authorIdx.size + 1);
+  }
+  const annotated = answers.map((a) => ({
+    id: a.id,
+    question_key: a.question_key,
+    content: a.content,
+    respondent: authorIdx.get(a.participant_id) ?? 0,
+  }));
+
   try {
+    const { context, refs } = buildContext(
+      session.template_id,
+      annotated,
+      locale,
+    );
     const report = await geminiSummary(
-      buildContext(session.template_id, answers, locale),
+      context,
       locale,
       tone,
       sections.length > 0 ? sections : ALL_SECTIONS,
       typeof body.note === "string" ? body.note.trim() : "",
+      refs,
     );
     // Persist the report, and make sure the shared view now includes it —
     // a freshly generated report should light up automatically.
