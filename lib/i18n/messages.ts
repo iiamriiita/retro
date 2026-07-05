@@ -285,7 +285,6 @@ const en: Dict = {
   "flb.shareTitle": "Share retro form",
   "flb.shareDesc":
     "Anyone with this link can submit feedback — no account needed.",
-  "flb.formLink": "Form link",
   "flb.copy": "Copy",
   "flb.copied": "Copied",
   "flb.openNewTab": "Open form in new tab",
@@ -293,7 +292,6 @@ const en: Dict = {
   "flb.shareResultTitle": "Share results",
   "flb.shareResultDesc":
     "Anyone with this link can view the results and join the discussion.",
-  "flb.resultLink": "Results link",
   "flb.openResultNewTab": "Open results in new tab",
 
   // auth modal
@@ -579,14 +577,12 @@ const zh: Dict = {
   "flb.inviteEyebrow": "邀請你的團隊",
   "flb.shareTitle": "分享 retro 表單",
   "flb.shareDesc": "任何拿到連結的人都能填寫回饋 — 不需要註冊帳號。",
-  "flb.formLink": "表單連結",
   "flb.copy": "複製",
   "flb.copied": "已複製",
   "flb.openNewTab": "在新分頁開啟表單",
   "flb.shareResultEyebrow": "分享成果",
   "flb.shareResultTitle": "分享結果頁",
   "flb.shareResultDesc": "任何拿到連結的人都能查看結果並加入討論。",
-  "flb.resultLink": "結果連結",
   "flb.openResultNewTab": "在新分頁開啟結果",
 
   "am.login": "登入",

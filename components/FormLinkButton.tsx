@@ -29,7 +29,6 @@ export default function FormLinkButton({
         eyebrow: t("flb.shareResultEyebrow"),
         title: t("flb.shareResultTitle"),
         desc: t("flb.shareResultDesc"),
-        linkLabel: t("flb.resultLink"),
         openNewTab: t("flb.openResultNewTab"),
       }
     : {
@@ -37,7 +36,6 @@ export default function FormLinkButton({
         eyebrow: t("flb.inviteEyebrow"),
         title: t("flb.shareTitle"),
         desc: t("flb.shareDesc"),
-        linkLabel: t("flb.formLink"),
         openNewTab: t("flb.openNewTab"),
       };
 
@@ -99,8 +97,7 @@ export default function FormLinkButton({
               </h3>
               <p className="mt-1.5 text-sm text-muted">{tx.desc}</p>
 
-              <p className="eyebrow mt-5">{tx.linkLabel}</p>
-              <div className="mt-2 flex items-stretch gap-2">
+              <div className="mt-5 flex items-stretch gap-2">
                 <input
                   readOnly
                   value={url}
