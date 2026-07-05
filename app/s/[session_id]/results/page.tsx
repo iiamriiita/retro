@@ -206,31 +206,33 @@ export default async function ResultsPage({
             </span>
           )}
         </div>
-        <p className="mt-1 text-sm text-muted">
-          {anonymous ? t("res.modeAnon") : t("res.modeNamed")} ·{" "}
-          {t("res.responsesTotal", { n: respondentCount })}
-        </p>
-        {avgMood != null && (
-          <span
-            className="badge mt-3"
-            style={{
-              background:
-                avgMood >= 4
-                  ? "var(--green-weak)"
-                  : avgMood >= 3
-                    ? "var(--accent-weak)"
-                    : "var(--danger-weak, rgba(213,84,74,.12))",
-              color:
-                avgMood >= 4
-                  ? "var(--green-500)"
-                  : avgMood >= 3
-                    ? "var(--gold-700)"
-                    : "var(--red-500)",
-            }}
-          >
-            {t("res.avgMood", { avg: avgMood })}
-          </span>
-        )}
+        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+          {avgMood != null && (
+            <span
+              className="badge"
+              style={{
+                background:
+                  avgMood >= 4
+                    ? "var(--green-weak)"
+                    : avgMood >= 3
+                      ? "var(--accent-weak)"
+                      : "var(--danger-weak, rgba(213,84,74,.12))",
+                color:
+                  avgMood >= 4
+                    ? "var(--green-500)"
+                    : avgMood >= 3
+                      ? "var(--gold-700)"
+                      : "var(--red-500)",
+              }}
+            >
+              {t("res.avgMood", { avg: avgMood })}
+            </span>
+          )}
+          <p className="text-sm text-muted">
+            {anonymous ? t("res.modeAnon") : t("res.modeNamed")} ·{" "}
+            {t("res.responsesTotal", { n: respondentCount })}
+          </p>
+        </div>
         </div>
         {isOwner && (
           <div id="share-top-anchor" className="hidden shrink-0 md:block">
