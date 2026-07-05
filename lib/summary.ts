@@ -28,9 +28,15 @@ const TONE_EN: Record<ReportTone, string> = {
 
 // A source citation on a well/improve bullet: which answer it came from and the
 // respondent's 1-based index (matches "Respondent N" in the responses below).
-export type ReportSource = { id: string; r: number };
+// `label` is the responder's name initial for named sessions; when absent the UI
+// falls back to the respondent number `r` (anonymous sessions).
+export type ReportSource = { id: string; r: number; label?: string };
 export type ReportBullet = { text: string; src: ReportSource[] };
-export type AnswerRef = { answerId: string; respondent: number };
+export type AnswerRef = {
+  answerId: string;
+  respondent: number;
+  label?: string;
+};
 
 export type StructuredReport = {
   summary?: string;
@@ -126,6 +132,7 @@ export function buildContext(
     question_key: string;
     content: string;
     respondent?: number;
+    label?: string;
   }[],
   locale: Locale = "en",
 ): { context: string; refs: Map<number, AnswerRef> } {
@@ -159,7 +166,12 @@ export function buildContext(
       const c = a.content.trim();
       if (!c) continue;
       n += 1;
-      if (a.id) refs.set(n, { answerId: a.id, respondent: a.respondent ?? 0 });
+      if (a.id)
+        refs.set(n, {
+          answerId: a.id,
+          respondent: a.respondent ?? 0,
+          label: a.label,
+        });
       lines.push(`- [#${n}] ${c}`);
     }
     if (!lines.length) continue;
@@ -378,7 +390,7 @@ export async function geminiSummary(
           const ref = Number.isFinite(num) ? refs.get(num) : undefined;
           if (ref && !seen.has(ref.answerId)) {
             seen.add(ref.answerId);
-            src.push({ id: ref.answerId, r: ref.respondent });
+            src.push({ id: ref.answerId, r: ref.respondent, label: ref.label });
           }
         }
       }

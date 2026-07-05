@@ -31,7 +31,7 @@ export async function POST(
   const supabase = createServiceClient();
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select("id, owner_id, template_id, status, deadline")
+    .select("id, owner_id, template_id, status, deadline, anonymity")
     .eq("id", id)
     .single();
   if (!session) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -85,11 +85,26 @@ export async function POST(
     if (!authorIdx.has(a.participant_id))
       authorIdx.set(a.participant_id, authorIdx.size + 1);
   }
+
+  // For named sessions, tag sources with the responder's name initial.
+  const initialById = new Map<string, string>();
+  if (session.anonymity !== "anonymous") {
+    const { data: participants } = await supabase
+      .from("retro_participants")
+      .select("id, display_name")
+      .eq("session_id", session.id);
+    for (const p of participants ?? []) {
+      const name = (p.display_name ?? "").trim();
+      if (name) initialById.set(p.id, [...name][0]!.toUpperCase());
+    }
+  }
+
   const annotated = answers.map((a) => ({
     id: a.id,
     question_key: a.question_key,
     content: a.content,
     respondent: authorIdx.get(a.participant_id) ?? 0,
+    label: initialById.get(a.participant_id),
   }));
 
   try {

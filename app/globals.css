@@ -316,14 +316,15 @@ input[type="checkbox"] {
   .rp-dots span { animation: none; }
 }
 
-/* Brief highlight when a report source tag scrolls you to its answer. */
+/* Highlight when a report source tag scrolls you to its answer — hold, then fade. */
 @keyframes rp-flash {
   0% { box-shadow: 0 0 0 3px var(--accent-weak); background: var(--accent-weak); }
-  100% { box-shadow: 0 0 0 0 transparent; }
+  70% { box-shadow: 0 0 0 3px var(--accent-weak); background: var(--accent-weak); }
+  100% { box-shadow: 0 0 0 0 transparent; background: transparent; }
 }
 .rp-flash {
   border-radius: var(--radius-md);
-  animation: rp-flash 1.6s ease-out;
+  animation: rp-flash 3.2s ease-out;
 }
 @media (prefers-reduced-motion: reduce) {
   .rp-flash { animation: none; }

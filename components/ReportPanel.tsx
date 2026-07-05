@@ -7,7 +7,7 @@ import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
 
 type Tr = (key: string, vars?: Record<string, string | number>) => string;
-type Src = { id: string; r: number };
+type Src = { id: string; r: number; label?: string };
 type Bullet = string | { text: string; src?: Src[] };
 
 // Scroll to (and briefly flash) the source answer down in the responses list.
@@ -15,8 +15,11 @@ function jumpToAnswer(id: string) {
   const el = document.querySelector(`[data-answer-id="${id}"]`);
   if (!el) return;
   el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.remove("rp-flash");
+  // reflow so re-triggering the animation on the same element restarts it
+  void (el as HTMLElement).offsetWidth;
   el.classList.add("rp-flash");
-  window.setTimeout(() => el.classList.remove("rp-flash"), 1600);
+  window.setTimeout(() => el.classList.remove("rp-flash"), 3200);
 }
 
 // Small round tags linking a bullet back to the respondent(s) it came from.
@@ -29,11 +32,11 @@ function SourceTags({ src }: { src: Src[] }) {
           key={s.id}
           type="button"
           onClick={() => jumpToAnswer(s.id)}
-          title={`Respondent ${s.r}`}
+          title={s.label ? `${s.label} · jump to source` : `Respondent ${s.r}`}
           className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[11px] font-semibold transition-colors"
           style={{ background: "var(--surface-3)", color: "var(--text-muted)" }}
         >
-          {s.r}
+          {s.label || s.r}
         </button>
       ))}
     </span>
