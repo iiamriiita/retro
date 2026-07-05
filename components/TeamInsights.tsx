@@ -213,18 +213,16 @@ export default function TeamInsights({
   function barTip(pt: (typeof stats.timeline)[number]): string {
     if (pt.rating != null && stats.teamSize)
       return tr("ti.barTipMood", {
-        date: pt.dateLabel,
         n: pt.submitted,
         size: stats.teamSize,
         mood: pt.rating.toFixed(1),
       });
     return stats.teamSize
       ? tr("ti.barTipParticipation", {
-          date: pt.dateLabel,
           n: pt.submitted,
           size: stats.teamSize,
         })
-      : tr("ti.barTipResponses", { date: pt.dateLabel, n: pt.responses });
+      : tr("ti.barTipResponses", { n: pt.responses });
   }
 
   return (
