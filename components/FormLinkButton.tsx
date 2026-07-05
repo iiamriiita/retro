@@ -95,34 +95,34 @@ export default function FormLinkButton({
               </h3>
               <p className="mt-1.5 text-sm text-muted">{tx.desc}</p>
 
-              <div className="mt-5 flex items-stretch gap-2">
-                <input
-                  readOnly
-                  value={url}
-                  onFocus={(e) => e.currentTarget.select()}
-                  className="textarea flex-1 font-mono text-xs"
-                  style={{ height: "44px" }}
-                />
+              <input
+                readOnly
+                value={url}
+                onFocus={(e) => e.currentTarget.select()}
+                className="textarea mt-5 w-full font-mono text-xs"
+                style={{ height: "44px" }}
+              />
+
+              <div className="mt-3 flex gap-2">
+                <a
+                  className="btn-ghost !h-11 flex-1"
+                  href={path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                >
+                  <Icon name="external-link" size={15} />
+                  {tx.openNewTab}
+                </a>
                 <button
                   type="button"
-                  className="btn-primary !h-11 shrink-0 !px-5"
+                  className="btn-primary !h-11 flex-1"
                   onClick={copy}
                 >
                   <Icon name={copied ? "check" : "link"} size={15} />
                   {copied ? t("flb.copied") : t("flb.copy")}
                 </button>
               </div>
-
-              <a
-                className="btn-ghost mt-3 !h-11 w-full"
-                href={path}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
-              >
-                <Icon name="external-link" size={15} />
-                {tx.openNewTab}
-              </a>
             </div>
           </div>
         </div>
