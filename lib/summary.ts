@@ -45,10 +45,6 @@ export function summarySystem(
 
   if (locale === "en") {
     const fields: string[] = [];
-    if (wantSummary)
-      fields.push(
-        "- summary: ONE short sentence (25 words max) capturing the overall takeaway. End it with a period. Do NOT ramble or pad with generic business commentary.",
-      );
     if (wantPoints)
       fields.push(
         '- points: an array that classifies EVERY answer, one by one. For each answer output an object { "text": a one-short-sentence version of what they said, "kind": "well" if it is positive / went well, or "improve" if it is a problem, frustration, or went badly }. Judge each answer on its OWN meaning, not on which question it sits under — a problem is "improve" even if written under a positive prompt, and a positive is "well" even under a problems prompt. If an answer only names a topic with no clear good/bad, use the bracketed leaning of its question. Skip answers that just say "none" / "n/a" / "nothing".',
@@ -56,6 +52,10 @@ export function summarySystem(
     if (wantActions)
       fields.push(
         '- actions: YOUR own concrete, specific suggested adjustments that address the "improve" problems (and any direction people mentioned) — propose them yourself even if no one spelled them out.',
+      );
+    if (wantSummary)
+      fields.push(
+        "- summary: ONE short sentence (25 words max) capturing the overall takeaway. End it with a period. Do NOT ramble or pad with generic business commentary.",
       );
     return `You are an AI assistant for a team retrospective. You'll receive all the answers from one retro (de-identified, text only). Return a JSON object with ONLY these fields:
 
@@ -69,10 +69,6 @@ ${TONE_EN[tone]}`;
   }
 
   const fields: string[] = [];
-  if (wantSummary)
-    fields.push(
-      "- summary：用「一句話」（最多約 45 字）總結這場 retro 的整體重點，句末加句號，不要長篇大論或加空泛的場面話。",
-    );
   if (wantPoints)
     fields.push(
       '- points：一個陣列，把「每一條」回答逐條分類。每條回答輸出一個物件 { "text": 用一句短句重述這條回答的內容, "kind": 若是正向、順利就填 "well"，若是問題、困擾、不順就填 "improve" }。請依「這條回答本身的意思」判斷，而不是依它寫在哪一題——問題就算寫在正向題也算 "improve"，正向就算寫在問題題也算 "well"。若某條只點出主題、沒說好壞，就依該題括號標示的傾向判斷。像「沒有」「無」「n/a」這種就跳過不收。',
@@ -80,6 +76,10 @@ ${TONE_EN[tone]}`;
   if (wantActions)
     fields.push(
       '- actions：由你針對上面那些 "improve" 問題（以及大家提到的方向）提出的具體調整建議——就算沒人明講，也請主動給出可行、具體的下一步。',
+    );
+  if (wantSummary)
+    fields.push(
+      "- summary：用「一句話」（最多約 45 字）總結這場 retro 的整體重點，句末加句號，不要長篇大論或加空泛的場面話。",
     );
   return `你是一個團隊 retro（回顧會議）的 AI 助理。你會收到一場 retro 的所有回答（已去識別化，只有文字）。請回傳一個 JSON 物件，只包含這些欄位：
 
@@ -204,8 +204,11 @@ export async function geminiSummary(
   // it to label every answer and we split them into the two boxes ourselves.
   const wantPoints = chosen.includes("well") || chosen.includes("improve");
   const props: Record<string, unknown> = {};
-  if (chosen.includes("themes")) props.summary = { type: "STRING" };
-  if (wantPoints)
+  const order: string[] = [];
+  // Generate the classification FIRST, then actions, then the summary last. The
+  // summary can occasionally run away and eat the token budget; keeping it last
+  // means it can never starve the points that feed the green/red boxes.
+  if (wantPoints) {
     props.points = {
       type: "ARRAY",
       items: {
@@ -217,9 +220,21 @@ export async function geminiSummary(
         required: ["text", "kind"],
       },
     };
-  if (chosen.includes("actions"))
+    order.push("points");
+  }
+  if (chosen.includes("actions")) {
     props.actions = { type: "ARRAY", items: { type: "STRING" } };
-  const responseSchema = { type: "OBJECT", properties: props };
+    order.push("actions");
+  }
+  if (chosen.includes("themes")) {
+    props.summary = { type: "STRING" };
+    order.push("summary");
+  }
+  const responseSchema = {
+    type: "OBJECT",
+    properties: props,
+    propertyOrdering: order,
+  };
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
   const payload = JSON.stringify({
