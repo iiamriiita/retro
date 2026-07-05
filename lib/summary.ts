@@ -170,7 +170,7 @@ export async function geminiSummary(
       contents: [{ role: "user", parts: [{ text: ask }] }],
       generationConfig: {
         temperature: 0.5,
-        maxOutputTokens: 1200,
+        maxOutputTokens: 2600,
         responseMimeType: "application/json",
         responseSchema,
       },
@@ -204,9 +204,20 @@ export async function geminiSummary(
         ? "The AI returned no content — please try again."
         : "AI 沒有回覆內容，請再試一次。",
     );
-  // Validate it parses; store the raw JSON string.
+  // Clean up: strip any ```json fences and keep the outermost JSON object.
+  let clean = reply.trim();
+  if (clean.startsWith("```")) {
+    clean = clean
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/```\s*$/, "")
+      .trim();
+  }
+  const first = clean.indexOf("{");
+  const last = clean.lastIndexOf("}");
+  if (first >= 0 && last > first) clean = clean.slice(first, last + 1);
+
   try {
-    JSON.parse(reply);
+    JSON.parse(clean);
   } catch {
     throw new Error(
       locale === "en"
@@ -214,5 +225,5 @@ export async function geminiSummary(
         : "AI 回傳格式有誤，請再試一次。",
     );
   }
-  return reply;
+  return clean;
 }
