@@ -312,24 +312,6 @@ export default function ReportPanel({
                 <span>{t("rp.toneBalanced")}</span>
                 <span>{t("rp.tonePlayful")}</span>
               </div>
-              <p className="mt-2 text-sm font-medium">
-                {t(
-                  toneIdx === 0
-                    ? "rp.toneNeutral"
-                    : toneIdx === 1
-                      ? "rp.toneBalanced"
-                      : "rp.tonePlayful",
-                )}
-                <span className="ml-2 font-normal text-muted">
-                  {t(
-                    toneIdx === 0
-                      ? "rp.toneNeutralDesc"
-                      : toneIdx === 1
-                        ? "rp.toneBalancedDesc"
-                        : "rp.tonePlayfulDesc",
-                  )}
-                </span>
-              </p>
             </div>
 
             {/* Sections */}
