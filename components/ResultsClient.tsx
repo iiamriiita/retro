@@ -406,8 +406,8 @@ export default function ResultsClient({
           const group = answers.filter((a) => a.question_key === q.key);
           return (
             <section key={q.key}>
-              <h2 className="flex items-center gap-2 text-lg font-bold">
-                <QuestionIcon qKey={q.key} size={20} />
+              <h2 className="flex items-center gap-2 text-[15px] font-medium leading-snug">
+                <QuestionIcon qKey={q.key} size={19} />
                 {q.label}
               </h2>
               <p className="mb-3 text-xs text-muted">
