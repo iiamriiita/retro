@@ -16,7 +16,7 @@ export default async function FillPage({
 
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select("id, owner_id, template_id, anonymity, status, deadline")
+    .select("id, name, owner_id, template_id, anonymity, status, deadline")
     .eq("id", session_id)
     .single();
 
@@ -62,7 +62,9 @@ export default async function FillPage({
 
         {/* Locked (read-only) view of the original questionnaire */}
         <div>
-          <h2 className="text-lg font-semibold">{template.name}</h2>
+          <h2 className="text-lg font-semibold">
+            {session.name || template.name}
+          </h2>
           <p className="mt-1 text-sm text-muted">{template.description}</p>
           <div className="mt-4 space-y-3 opacity-70">
             {template.questions
@@ -104,7 +106,7 @@ export default async function FillPage({
         sessionId={session.id}
         templateId={session.template_id}
         anonymity={session.anonymity}
-        templateName={template.name}
+        templateName={session.name || template.name}
         templateDescription={invite}
         questions={template.questions}
       />
