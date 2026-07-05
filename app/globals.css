@@ -274,4 +274,21 @@ input[type="checkbox"] {
 @media (prefers-reduced-motion: reduce) {
   #lp-boat, #lp-sun { animation: none; }
   .lp-bubble { animation: none; }
+  .rp-skel { animation: none; }
+}
+
+/* Shimmering skeleton line while the AI report is generating. */
+@keyframes rp-shimmer {
+  to { background-position: -200% 0; }
+}
+.rp-skel {
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--surface-3) 37%,
+    var(--surface-2) 63%
+  );
+  background-size: 200% 100%;
+  animation: rp-shimmer 1.4s linear infinite;
 }

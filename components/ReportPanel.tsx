@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import Icon from "@/components/Icon";
@@ -35,24 +35,36 @@ export default function ReportPanel({
     );
   }
 
+  const abortRef = useRef<AbortController | null>(null);
+
   async function generate() {
+    setAskTone(false); // the card itself shows the progress
     setBusy(true);
     setError(null);
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     try {
       const res = await fetch(`/api/sessions/${sessionId}/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tone: TONES[toneIdx], sections }),
+        signal: ctrl.signal,
       });
       if (!res.ok)
         throw new Error((await res.json())?.error ?? t("oc.genFail"));
-      setAskTone(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("oc.genFail"));
+      if (!(err instanceof DOMException && err.name === "AbortError")) {
+        setError(err instanceof Error ? err.message : t("oc.genFail"));
+      }
     } finally {
       setBusy(false);
+      abortRef.current = null;
     }
+  }
+
+  function stop() {
+    abortRef.current?.abort();
   }
 
   return (
@@ -64,7 +76,7 @@ export default function ReportPanel({
           </span>
           {t("rv.title")}
         </h2>
-        {isOwner && report && (
+        {isOwner && report && !busy && (
           <button
             type="button"
             className="btn-ghost !h-8 text-xs"
@@ -75,7 +87,29 @@ export default function ReportPanel({
         )}
       </div>
 
-      {report ? (
+      {busy ? (
+        <div className="py-2">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <span className="animate-pulse" style={{ color: "var(--accent)" }}>
+              <Icon name="sparkles" size={18} />
+            </span>
+            {t("oc.generating")}
+          </div>
+          <div className="mt-5 space-y-3">
+            <div className="rp-skel h-4 w-2/5" />
+            <div className="rp-skel h-3 w-full" />
+            <div className="rp-skel h-3 w-[92%]" />
+            <div className="rp-skel h-3 w-[78%]" />
+            <div className="rp-skel mt-6 h-4 w-1/3" />
+            <div className="rp-skel h-3 w-full" />
+            <div className="rp-skel h-3 w-[85%]" />
+          </div>
+          <button type="button" className="btn-ghost mt-6" onClick={stop}>
+            <Icon name="x" size={14} />
+            {t("rp.stop")}
+          </button>
+        </div>
+      ) : report ? (
         <>
           <div className="prose-sm max-w-none font-body [&_h2]:mt-4 [&_h2]:font-body [&_h2]:text-base [&_h2]:font-semibold [&_h2]:tracking-normal [&_h3]:font-body [&_h3]:tracking-normal [&_li]:ml-4 [&_li]:list-disc [&_li]:text-sm [&_p]:text-sm [&_strong]:font-normal [&_ul]:my-2">
             <ReactMarkdown>{report}</ReactMarkdown>
