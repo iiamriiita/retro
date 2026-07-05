@@ -322,8 +322,7 @@ export default function TeamInsights({
                 return (
                   <div
                     key={t.id}
-                    className="flex h-full flex-1 flex-col items-center gap-2"
-                    title={barTip(t)}
+                    className="group relative flex h-full flex-1 flex-col items-center gap-2"
                   >
                     <div className="flex w-full flex-1 items-end">
                       <div
@@ -338,6 +337,12 @@ export default function TeamInsights({
                       className={`text-[11px] ${last ? "font-semibold text-ink" : "text-subtle"}`}
                     >
                       {t.dateLabel}
+                    </span>
+                    <span
+                      className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[240px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
+                      style={{ background: "#452C1C" }}
+                    >
+                      {barTip(t)}
                     </span>
                   </div>
                 );
