@@ -57,10 +57,18 @@ export default function LandingScene() {
         </g>
 
         {/* sprout — drawn first so the waves cover its base */}
-        <rect x="115" y="462" width="6" height="64" fill="#7E5232" />
+        <path d="M115 526 Q115 490 118 460 Q121 490 121 526 Z" fill="#6B4A2E" />
         <path
-          d="M118 470c-12-2-20-10-20-10 10-2 20 2 20 2 0-10 8-18 8-18 4 10 0 20 0 20 10-4 20-2 20-2-6 8-18 10-18 10z"
+          d="M118 466 C114 452 116 442 118 438 C120 442 122 452 118 466 Z"
           fill="#5BA36B"
+        />
+        <path
+          d="M117 472 C104 470 96 461 94 454 C106 454 115 463 117 472 Z"
+          fill="#4E8C5A"
+        />
+        <path
+          d="M119 470 C132 466 141 457 143 450 C131 450 121 460 119 470 Z"
+          fill="#6FA972"
         />
 
         {/* back wave — behind the boat */}
@@ -75,12 +83,21 @@ export default function LandingScene() {
           transform="translate(320,428)"
           {...obj(t("landing.bubSailWho"), t("landing.bubSailText"))}
         >
-          <rect x="-66" y="-8" width="132" height="140" fill="transparent" />
-          <path d="M-64 92h128l-18 30h-92z" fill="#7E5232" />
-          <path d="M-64 92h128l-4 6h-120z" fill="#603E27" />
-          <rect x="-3" y="-4" width="7" height="96" fill="#452C1C" />
-          <path d="M4 4l54 84H4z" fill="#F5ECDE" />
-          <path d="M-4 12L-54 88H-4z" fill="#F0B90B" />
+          <rect x="-80" y="-50" width="168" height="180" fill="transparent" />
+          {/* mast */}
+          <rect x="-3" y="-48" width="6" height="170" fill="#4A2F1C" />
+          {/* pennant flag */}
+          <path d="M4 -46h40l-10 8 10 8H4z" fill="#E5873A" />
+          {/* back sail (cream, paneled) */}
+          <path d="M5 -34L5 84 84 84z" fill="#EFE7D6" />
+          <path d="M5 -34L5 84 30 84z" fill="#E3D7C0" />
+          <path d="M60 84L5 12 5 84z" fill="#F5EEE0" opacity=".6" />
+          {/* front sail (gold, two-tone) */}
+          <path d="M-5 -20L-5 84-70 84z" fill="#ECC30B" />
+          <path d="M-5 -20L-5 84-34 84z" fill="#D9A400" />
+          {/* hull + deck rim */}
+          <path d="M-80 84L86 84 62 122-58 122z" fill="#6E4A2E" />
+          <path d="M-80 84L86 84 81 93-75 93z" fill="#523320" />
         </g>
 
         {/* front wave — laps over the boat's hull */}
