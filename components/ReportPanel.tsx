@@ -67,6 +67,23 @@ export default function ReportPanel({
     abortRef.current?.abort();
   }
 
+  // New reports are stored as JSON (StructuredReport); old ones are markdown.
+  type Structured = {
+    summary?: string;
+    well?: string[];
+    improve?: string[];
+    actions?: string[];
+  };
+  let structured: Structured | null = null;
+  if (report && report.trim().startsWith("{")) {
+    try {
+      const o = JSON.parse(report) as Structured;
+      if (o && typeof o === "object") structured = o;
+    } catch {
+      structured = null;
+    }
+  }
+
   return (
     <section className="card">
       <div className="mb-4 flex items-center justify-between">
@@ -109,6 +126,107 @@ export default function ReportPanel({
             {t("rp.stop")}
           </button>
         </div>
+      ) : structured ? (
+        <>
+          {structured.summary && (
+            <div
+              className="border-b pb-5"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <p className="text-[17px] font-semibold leading-relaxed">
+                <span
+                  className="mr-1 font-display text-2xl leading-none"
+                  style={{ color: "var(--accent)", verticalAlign: "-0.28em" }}
+                >
+                  &ldquo;
+                </span>
+                {structured.summary}
+                <span
+                  className="ml-1 font-display text-2xl leading-none"
+                  style={{ color: "var(--accent)", verticalAlign: "-0.28em" }}
+                >
+                  &rdquo;
+                </span>
+              </p>
+            </div>
+          )}
+
+          {(structured.well?.length || structured.improve?.length) && (
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              {structured.well?.length ? (
+                <div
+                  className="rounded-xl p-4"
+                  style={{ background: "var(--surface-2)" }}
+                >
+                  <h3 className="text-[15px] font-semibold">
+                    {t("rp.sec_well")}
+                  </h3>
+                  <ul className="mt-3 space-y-2.5">
+                    {structured.well.map((it, i) => (
+                      <li key={i} className="flex gap-2.5 text-sm">
+                        <span
+                          className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+                          style={{ background: "var(--green-500)" }}
+                        />
+                        <span>{it}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {structured.improve?.length ? (
+                <div
+                  className="rounded-xl p-4"
+                  style={{ background: "var(--surface-2)" }}
+                >
+                  <h3 className="text-[15px] font-semibold">
+                    {t("rp.sec_improve")}
+                  </h3>
+                  <ul className="mt-3 space-y-2.5">
+                    {structured.improve.map((it, i) => (
+                      <li key={i} className="flex gap-2 text-sm">
+                        <span
+                          className="mt-0.5 shrink-0"
+                          style={{ color: "var(--red-500)" }}
+                        >
+                          <Icon name="alert-triangle" size={14} />
+                        </span>
+                        <span>{it}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          {structured.actions?.length ? (
+            <div className="mt-6">
+              <h3 className="text-[15px] font-semibold">{t("rp.sec_actions")}</h3>
+              <ul className="mt-3 space-y-2">
+                {structured.actions.map((it, i) => (
+                  <li key={i} className="flex gap-2 text-sm">
+                    <span
+                      className="shrink-0 font-semibold"
+                      style={{ color: "var(--gold-700)" }}
+                    >
+                      &rarr;
+                    </span>
+                    <span>{it}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {generatedAt && (
+            <p className="mt-6 text-xs text-subtle">
+              {t("rv.generatedAt", {
+                date: new Date(generatedAt).toLocaleString(),
+              })}
+            </p>
+          )}
+        </>
       ) : report ? (
         <>
           <div className="prose-sm max-w-none font-body [&_h2]:mt-4 [&_h2]:font-body [&_h2]:text-base [&_h2]:font-semibold [&_h2]:tracking-normal [&_h3]:font-body [&_h3]:tracking-normal [&_li]:ml-4 [&_li]:list-disc [&_li]:text-sm [&_p]:text-sm [&_strong]:font-normal [&_ul]:my-2">

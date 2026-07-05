@@ -51,6 +51,28 @@ const TONE_EN: Record<ReportTone, string> = {
     "Tone: light, warm, a little playful. Feel free to lean on the retro template's metaphor (sailing / garden / space mission) in headings and phrasing, while keeping the content concrete and actionable.",
 };
 
+export type StructuredReport = {
+  summary?: string;
+  well?: string[];
+  improve?: string[];
+  actions?: string[];
+};
+
+const FIELD_ZH: Record<ReportSection, string> = {
+  themes: "summary：用「一句話」總結這場 retro 的整體重點。",
+  well: "well：2–4 條短句，團隊做得好、值得延續的地方。",
+  improve: "improve：2–4 條短句，需要調整的問題（對事不對人）。",
+  actions: "actions：2–3 條短句，具體、可行動的調整方向。",
+};
+const FIELD_EN: Record<ReportSection, string> = {
+  themes: "summary: ONE sentence capturing the overall takeaway of this retro.",
+  well: "well: 2–4 short bullet strings — what's going well, worth keeping.",
+  improve:
+    "improve: 2–4 short bullet strings — what to improve (about the work, not people).",
+  actions:
+    "actions: 2–3 short bullet strings — concrete, specific next steps.",
+};
+
 export function summarySystem(
   locale: Locale,
   tone: ReportTone = "neutral",
@@ -58,29 +80,21 @@ export function summarySystem(
 ): string {
   const chosen = sections.length > 0 ? sections : ALL_SECTIONS;
   if (locale === "en") {
-    const parts = chosen
-      .map((k) => `## ${SECTIONS_EN[k].h}\n${SECTIONS_EN[k].d}`)
-      .join("\n\n");
-    return `You are an AI assistant for a team retrospective. You'll receive all the answers from one retro (de-identified, text only).
+    const fields = chosen.map((k) => `- ${FIELD_EN[k]}`).join("\n");
+    return `You are an AI assistant for a team retrospective. You'll receive all the answers from one retro (de-identified, text only). Analyse them and return a JSON object with ONLY these fields:
 
-Write the summary in English as markdown, always with exactly these sections (use level-2 headings ##):
+${fields}
 
-${parts}
-
-Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said.
+Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said. Keep each bullet to one short sentence. Write all text in English.
 
 ${TONE_EN[tone]}`;
   }
-  const parts = chosen
-    .map((k) => `## ${SECTIONS_ZH[k].h}\n${SECTIONS_ZH[k].d}`)
-    .join("\n\n");
-  return `你是一個團隊 retro（回顧會議）的 AI 助理。你會收到一場 retro 的所有回答（已去識別化，只有文字）。
+  const fields = chosen.map((k) => `- ${FIELD_ZH[k]}`).join("\n");
+  return `你是一個團隊 retro（回顧會議）的 AI 助理。你會收到一場 retro 的所有回答（已去識別化，只有文字）。請分析後回傳一個 JSON 物件，只包含這些欄位：
 
-請用繁體中文、以 markdown 輸出，幫團隊做總結，固定只包含這幾個部分（用二級標題 ##）：
+${fields}
 
-${parts}
-
-原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。
+原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。每一條保持一句短句。所有文字用繁體中文。
 
 ${TONE_ZH[tone]}`;
 }
@@ -105,7 +119,7 @@ export function buildContext(
   return lines.join("\n");
 }
 
-// One-shot Gemini summary. Throws on failure so the caller can report it.
+// One-shot Gemini summary → JSON string of a StructuredReport. Throws on failure.
 export async function geminiSummary(
   context: string,
   locale: Locale = "en",
@@ -120,14 +134,26 @@ export async function geminiSummary(
         : "尚未設定 GEMINI_API_KEY，無法產生 AI 報告。",
     );
 
+  const chosen = sections.length > 0 ? sections : ALL_SECTIONS;
   const intro =
     locale === "en"
-      ? `${summarySystem(locale, tone, sections)}\n\nHere are all the answers from this retro (de-identified):\n\n${context}`
-      : `${summarySystem(locale, tone, sections)}\n\n以下是這場 retro 的所有回答（已去識別化）：\n\n${context}`;
+      ? `${summarySystem(locale, tone, chosen)}\n\nHere are all the answers from this retro (de-identified):\n\n${context}`
+      : `${summarySystem(locale, tone, chosen)}\n\n以下是這場 retro 的所有回答（已去識別化）：\n\n${context}`;
   const ask =
     locale === "en"
-      ? "Produce the summary and recommendations from the answers above."
-      : "請根據以上回答產生總結與建議。";
+      ? "Produce the JSON report from the answers above."
+      : "請根據以上回答產生 JSON 報告。";
+
+  // Build a response schema with only the requested fields.
+  const props: Record<string, unknown> = {};
+  if (chosen.includes("themes")) props.summary = { type: "STRING" };
+  if (chosen.includes("well"))
+    props.well = { type: "ARRAY", items: { type: "STRING" } };
+  if (chosen.includes("improve"))
+    props.improve = { type: "ARRAY", items: { type: "STRING" } };
+  if (chosen.includes("actions"))
+    props.actions = { type: "ARRAY", items: { type: "STRING" } };
+  const responseSchema = { type: "OBJECT", properties: props };
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
   const res = await fetch(url, {
@@ -136,7 +162,12 @@ export async function geminiSummary(
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: intro }] },
       contents: [{ role: "user", parts: [{ text: ask }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 1400 },
+      generationConfig: {
+        temperature: 0.5,
+        maxOutputTokens: 1200,
+        responseMimeType: "application/json",
+        responseSchema,
+      },
     }),
     signal: AbortSignal.timeout(30_000),
   });
@@ -167,5 +198,15 @@ export async function geminiSummary(
         ? "The AI returned no content — please try again."
         : "AI 沒有回覆內容，請再試一次。",
     );
+  // Validate it parses; store the raw JSON string.
+  try {
+    JSON.parse(reply);
+  } catch {
+    throw new Error(
+      locale === "en"
+        ? "The AI returned malformed output — please try again."
+        : "AI 回傳格式有誤，請再試一次。",
+    );
+  }
   return reply;
 }
