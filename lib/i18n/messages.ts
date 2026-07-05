@@ -286,11 +286,11 @@ const en: Dict = {
     "Anyone with this link can submit feedback — no account needed.",
   "flb.copy": "Copy",
   "flb.copied": "Copied",
-  "flb.openNewTab": "Open form in new tab",
+  "flb.openNewTab": "Open in new tab",
   "flb.shareResultTitle": "Share results",
   "flb.shareResultDesc":
     "Anyone with this link can view the results and join the discussion.",
-  "flb.openResultNewTab": "Open results in new tab",
+  "flb.openResultNewTab": "Open in new tab",
 
   // auth modal
   "am.login": "Log in",
@@ -576,10 +576,10 @@ const zh: Dict = {
   "flb.shareDesc": "任何拿到連結的人都能填寫回饋 — 不需要註冊帳號。",
   "flb.copy": "複製",
   "flb.copied": "已複製",
-  "flb.openNewTab": "在新分頁開啟表單",
+  "flb.openNewTab": "在新分頁開啟",
   "flb.shareResultTitle": "分享結果頁",
   "flb.shareResultDesc": "任何拿到連結的人都能查看結果並加入討論。",
-  "flb.openResultNewTab": "在新分頁開啟結果",
+  "flb.openResultNewTab": "在新分頁開啟",
 
   "am.login": "登入",
   "am.register": "註冊",
