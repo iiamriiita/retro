@@ -6,6 +6,7 @@ import type { PublicAnswer, PublicComment } from "@/lib/types";
 import ResultsClient from "@/components/ResultsClient";
 import ReportPanel from "@/components/ReportPanel";
 import OwnerSidebar from "@/components/OwnerSidebar";
+import Icon from "@/components/Icon";
 import CloseSessionButton from "@/components/CloseSessionButton";
 import FormLinkButton from "@/components/FormLinkButton";
 import BackButton from "@/components/BackButton";
@@ -187,13 +188,27 @@ export default async function ResultsPage({
       <BackButton fallback="/" />
       <div className="mb-6 flex items-start justify-between gap-6">
         <div className="min-w-0">
-        <h1 className="text-2xl font-extrabold tracking-tight">
-          {t("res.title", { name: session.name || template?.name || "Retro" })}
-        </h1>
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            {t("res.title", { name: session.name || template?.name || "Retro" })}
+          </h1>
+          {session.discussion_enabled && (
+            <span className="group relative inline-flex">
+              <span className="badge badge-accent !px-1.5">
+                <Icon name="message" size={13} />
+              </span>
+              <span
+                className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-white group-hover:block"
+                style={{ background: "var(--text)" }}
+              >
+                {t("status.discussing")}
+              </span>
+            </span>
+          )}
+        </div>
         <p className="mt-1 text-sm text-muted">
           {anonymous ? t("res.modeAnon") : t("res.modeNamed")} ·{" "}
           {t("res.responsesTotal", { n: respondentCount })}
-          {session.discussion_enabled && ` · ${t("res.discussing")}`}
         </p>
         {avgMood != null && (
           <span
