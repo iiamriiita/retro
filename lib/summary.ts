@@ -87,7 +87,12 @@ export function summarySystem(
 
 ${fields}
 
-SORT BY MEANING, NOT BY QUESTION: read what each answer actually says. A positive comment goes in \`well\` even if it was written under a "problems" prompt, and a problem goes in \`improve\` even if it was written under a "what went well" prompt. Look at every answer for both fields — do not leave \`improve\` empty when answers clearly describe things going badly. If an answer only names a topic with no clear good/bad, use the bracketed leaning shown next to its question to decide.
+SORT EVERY ANSWER BY WHAT IT ACTUALLY SAYS — never by which question it sits under:
+- Describes something good, working, or that someone liked → \`well\` (even if written under a "problems" prompt).
+- Describes something bad, slow, broken, frustrating, or that someone disliked → \`improve\` (even if written under a "what went well" prompt).
+- Only names a topic with no clear good/bad → use the bracketed leaning next to its question.
+Worked example — answers "efficiency is poor", "team communication is bad", "people joke around too much" are ALL problems and MUST go in \`improve\`; "user testing went great", "we shipped fast" are positives and go in \`well\`.
+Make TWO passes over the answers: one collecting every positive into \`well\`, one collecting every problem into \`improve\`. Almost every retro has problems — only return an empty \`improve\` array if there is genuinely nothing negative anywhere. If your one-sentence summary mentions any challenge, that challenge MUST also appear as an \`improve\` bullet.
 
 Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said. Keep each bullet to one short sentence. If a field genuinely has nothing to report, return an empty array — do NOT write apologies, disclaimers, or meta-commentary. Write all text in English.
 
@@ -98,7 +103,12 @@ ${TONE_EN[tone]}`;
 
 ${fields}
 
-請依「內容的好壞」分類，而不是依它寫在哪一題：正向的內容就算寫在「問題」那題，也要放進 well；負向的內容就算寫在「順利」那題，也要放進 improve。兩個欄位都要把所有回答看過一遍——當回答明顯在講不順的事情時，improve 不可以留空。若某條回答只點出主題、沒說好壞，就依該題旁邊括號標示的傾向來判斷。
+每一條回答都要依「內容本身的好壞」分類，絕不是依它寫在哪一題：
+- 講到好的、順利的、有人喜歡的 → 放進 well（就算寫在「問題」那題）。
+- 講到壞的、慢的、卡住的、令人困擾的、有人不滿的 → 放進 improve（就算寫在「順利」那題）。
+- 只點出主題、沒說好壞 → 依該題旁邊括號標示的傾向判斷。
+範例——「效率差」「團隊溝通不良」「大家太愛開玩笑」全都是問題，一定要放進 improve；「用戶測試很好」「交付很快」是正向，放進 well。
+請把所有回答掃過兩遍：一遍把所有正向的收進 well，一遍把所有問題收進 improve。幾乎每場 retro 都有可以改善的地方——除非真的完全沒有任何負向內容，否則 improve 不可以是空陣列。只要你的一句話總結有提到任何挑戰，那個挑戰就一定要出現在 improve 的其中一條。
 
 原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。每一條保持一句短句。若某欄位確實沒有內容，回傳空陣列即可，不要寫道歉、免責或說明性的句子。所有文字用繁體中文。
 
@@ -213,7 +223,7 @@ export async function geminiSummary(
     systemInstruction: { parts: [{ text: intro }] },
     contents: [{ role: "user", parts: [{ text: ask }] }],
     generationConfig: {
-      temperature: 0.5,
+      temperature: 0.35,
       maxOutputTokens: 2600,
       responseMimeType: "application/json",
       responseSchema,
