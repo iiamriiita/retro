@@ -261,7 +261,7 @@ export default async function ResultsPage({
                 <div className="flex items-start justify-between gap-4">
                   <h2 className="flex items-center gap-2 text-lg font-bold">
                     <span style={{ color: "var(--accent)" }}>
-                      <Icon name="message" size={19} />
+                      <Icon name="thought" size={20} />
                     </span>
                     {t("res.moodTitle")}
                   </h2>

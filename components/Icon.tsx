@@ -29,7 +29,8 @@ type IconName =
   | "info"
   | "trash"
   | "check"
-  | "smile";
+  | "smile"
+  | "thought";
 
 const PATHS: Record<IconName, React.ReactNode> = {
   database: (
@@ -101,6 +102,13 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <path d="M8 14s1.5 2 4 2 4-2 4-2" />
       <line x1="9" x2="9.01" y1="9" y2="9" />
       <line x1="15" x2="15.01" y1="9" y2="9" />
+    </>
+  ),
+  thought: (
+    <>
+      <path d="M7 15.5 C4.8 15.5 3 13.9 3 11.9 C3 10.4 3.9 9.1 5.2 8.5 C5.2 6.2 7 4.4 9.3 4.4 C10.7 4.4 12 5.1 12.8 6.2 C13.5 5.6 14.4 5.3 15.4 5.3 C17.5 5.3 19.2 7 19.2 9.1 C19.2 9.2 19.2 9.4 19.2 9.5 C20.5 10 21.4 11.2 21.4 12.7 C21.4 14.3 20.1 15.5 18.5 15.5 Z" />
+      <circle cx="6.5" cy="18.6" r="1.3" />
+      <circle cx="4" cy="21" r="0.7" />
     </>
   ),
   message: (
