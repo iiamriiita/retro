@@ -296,7 +296,7 @@ export default function TeamInsights({
         <div className="card">
           <div className="mb-4 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <h3 className="text-sm font-bold">{tr("ti.chartTitle")}</h3>
+              <span className="eyebrow">{tr("ti.chartTitle")}</span>
               <span className="group relative inline-flex">
                 <span className="cursor-help text-[color:var(--text-subtle)] transition-colors hover:text-[color:var(--text-muted)]">
                   <Icon name="info" size={13} />
@@ -348,28 +348,19 @@ export default function TeamInsights({
           className="card"
           style={{ background: "var(--accent-weak)" }}
         >
-          <div className="mb-3 flex items-center gap-2">
-            <span
-              className="flex h-8 w-8 items-center justify-center rounded-lg"
-              style={{
-                background: "var(--accent)",
-                color: "var(--text-inverse)",
-              }}
-            >
-              <Icon name="sparkles" size={16} />
-            </span>
-            <h3 className="text-sm font-bold">{tr("ti.pulse")}</h3>
-            {insights && (
+          {insights && (
+            <div className="mb-3 flex items-center justify-between">
+              <span className="eyebrow">{tr("ti.pulse")}</span>
               <button
                 onClick={generate}
                 disabled={busy}
-                className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--gold-700)] hover:underline disabled:opacity-50"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--gold-700)] hover:underline disabled:opacity-50"
               >
                 <Icon name="sparkles" size={13} />
                 {busy ? tr("oc.processing") : tr("ti.regen")}
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {!insights ? (
             <div className="py-4 text-center">
