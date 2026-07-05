@@ -150,7 +150,7 @@ export default function ReportPanel({
               className="border-b pb-5"
               style={{ borderColor: "var(--border)" }}
             >
-              <p className="text-[17px] font-semibold leading-relaxed">
+              <p className="font-body text-[17px] font-medium leading-relaxed">
                 <span
                   className="mr-1 font-display text-2xl leading-none"
                   style={{ color: "var(--accent)", verticalAlign: "-0.28em" }}
