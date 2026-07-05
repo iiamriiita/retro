@@ -6,6 +6,72 @@ import ReactMarkdown from "react-markdown";
 import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
 
+type Tr = (key: string, vars?: Record<string, string | number>) => string;
+
+// A report bullet list that collapses to a few items when long, with a text
+// button to reveal the rest (keeps a long "improve" column from dominating).
+function ReportList({
+  items,
+  variant,
+  t,
+}: {
+  items: string[];
+  variant: "well" | "improve" | "actions";
+  t: Tr;
+}) {
+  const LIMIT = 4;
+  const [expanded, setExpanded] = useState(false);
+  const shown = expanded ? items : items.slice(0, LIMIT);
+  const space = variant === "actions" ? "space-y-2" : "space-y-2.5";
+  const gap = variant === "well" ? "gap-2.5" : "gap-2";
+  const bullet = () => {
+    if (variant === "well")
+      return (
+        <span
+          className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+          style={{ background: "var(--green-500)" }}
+        />
+      );
+    if (variant === "improve")
+      return (
+        <span className="mt-0.5 shrink-0" style={{ color: "var(--red-500)" }}>
+          <Icon name="alert-triangle" size={14} />
+        </span>
+      );
+    return (
+      <span
+        className="shrink-0 font-semibold"
+        style={{ color: "var(--gold-700)" }}
+      >
+        &rarr;
+      </span>
+    );
+  };
+  return (
+    <>
+      <ul className={`mt-3 ${space}`}>
+        {shown.map((it, i) => (
+          <li key={i} className={`flex ${gap} text-sm`}>
+            {bullet()}
+            <span>{it}</span>
+          </li>
+        ))}
+      </ul>
+      {items.length > LIMIT && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-3 text-xs font-semibold text-[color:var(--gold-700)] hover:underline"
+        >
+          {expanded
+            ? t("rp.seeLess")
+            : t("rp.seeMore", { n: items.length - LIMIT })}
+        </button>
+      )}
+    </>
+  );
+}
+
 // Left-column AI report: rendered report, or an empty state guiding the owner
 // to generate one. Generating first asks for the tone in a small dialog.
 export default function ReportPanel({
@@ -177,17 +243,7 @@ export default function ReportPanel({
                 >
                   <p className="text-[15px] font-medium">{t("rp.sec_well")}</p>
                   {structured.well.length ? (
-                    <ul className="mt-3 space-y-2.5">
-                      {structured.well.map((it, i) => (
-                        <li key={i} className="flex gap-2.5 text-sm">
-                          <span
-                            className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
-                            style={{ background: "var(--green-500)" }}
-                          />
-                          <span>{it}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <ReportList items={structured.well} variant="well" t={t} />
                   ) : (
                     <p className="mt-3 text-sm text-subtle">
                       {t("rp.sectionEmpty")}
@@ -202,19 +258,11 @@ export default function ReportPanel({
                 >
                   <p className="text-[15px] font-medium">{t("rp.sec_improve")}</p>
                   {structured.improve.length ? (
-                    <ul className="mt-3 space-y-2.5">
-                      {structured.improve.map((it, i) => (
-                        <li key={i} className="flex gap-2 text-sm">
-                          <span
-                            className="mt-0.5 shrink-0"
-                            style={{ color: "var(--red-500)" }}
-                          >
-                            <Icon name="alert-triangle" size={14} />
-                          </span>
-                          <span>{it}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <ReportList
+                      items={structured.improve}
+                      variant="improve"
+                      t={t}
+                    />
                   ) : (
                     <p className="mt-3 text-sm text-subtle">
                       {t("rp.sectionEmpty")}
@@ -229,19 +277,7 @@ export default function ReportPanel({
             <div className="mt-6">
               <p className="text-[15px] font-medium">{t("rp.sec_actions")}</p>
               {structured.actions.length ? (
-                <ul className="mt-3 space-y-2">
-                  {structured.actions.map((it, i) => (
-                    <li key={i} className="flex gap-2 text-sm">
-                      <span
-                        className="shrink-0 font-semibold"
-                        style={{ color: "var(--gold-700)" }}
-                      >
-                        &rarr;
-                      </span>
-                      <span>{it}</span>
-                    </li>
-                  ))}
-                </ul>
+                <ReportList items={structured.actions} variant="actions" t={t} />
               ) : (
                 <p className="mt-3 text-sm text-subtle">
                   {t("rp.sectionEmpty")}

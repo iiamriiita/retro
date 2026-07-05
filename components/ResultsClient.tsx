@@ -66,7 +66,7 @@ export default function ResultsClient({
   initialComments,
   rosterNames,
   moodByAuthor = {},
-  moodReasons = [],
+  moodEntries = [],
 }: {
   sessionId: string;
   anonymous: boolean;
@@ -75,8 +75,14 @@ export default function ResultsClient({
   answers: PublicAnswer[];
   initialComments: PublicComment[];
   rosterNames: string[];
-  moodByAuthor?: Record<string, { score: number; emoji: string }>;
-  moodReasons?: { score: number; reason: string; emoji: string }[];
+  moodByAuthor?: Record<string, { score: number; emoji: string; reason: string }>;
+  moodEntries?: {
+    key: string;
+    author_name: string | null;
+    score: number;
+    emoji: string;
+    reason: string;
+  }[];
 }) {
   const { t } = useT();
   const [comments, setComments] = useState<PublicComment[]>(initialComments);
@@ -467,28 +473,11 @@ export default function ResultsClient({
         </div>
       </div>
 
-      {moodReasons.length > 0 && (
-        <div
-          className="mb-5 rounded-xl p-4"
-          style={{ background: "var(--surface-2)" }}
-        >
-          <p className="eyebrow">{t("res.moodWhy")}</p>
-          <ul className="mt-2 space-y-1.5">
-            {moodReasons.map((r, i) => (
-              <li key={i} className="text-sm text-muted">
-                <span className="font-semibold text-ink">
-                  {r.emoji} {r.score}/5
-                </span>{" "}
-                — {r.reason}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <div onMouseUp={onMouseUp} className="space-y-8">
         {groupBy === "question"
-          ? questions.map((q) => {
+          ? (
+            <>
+              {questions.map((q) => {
               const group = answers.filter((a) => a.question_key === q.key);
               return (
                 <section key={q.key}>
@@ -529,7 +518,41 @@ export default function ResultsClient({
                   )}
                 </section>
               );
-            })
+              })}
+              {moodEntries.length > 0 && (
+                <section>
+                  <h2 className="flex items-center gap-2 font-body text-[15px] font-medium leading-snug tracking-normal">
+                    <Icon name="smile" size={19} />
+                    {t("res.moodWhy")}
+                  </h2>
+                  <p className="mb-3 text-xs text-muted">
+                    {t("rc.responses", { n: moodEntries.length })}
+                  </p>
+                  <ul className="space-y-3">
+                    {moodEntries.map((e) => (
+                      <li
+                        key={e.key}
+                        className="rounded-xl p-4"
+                        style={{ background: "var(--surface-2)" }}
+                      >
+                        <p className="text-[15px] leading-relaxed text-ink">
+                          <span className="font-semibold">
+                            {e.emoji} {e.score}/5
+                          </span>{" "}
+                          — {e.reason}
+                        </p>
+                        {!anonymous && e.author_name && (
+                          <p className="mt-2 text-xs text-subtle">
+                            — {e.author_name}
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </>
+          )
           : Array.from(new Set(answers.map((a) => a.author_key)))
               .sort((a, b) => Number(a) - Number(b))
               .map((pk) => {
@@ -538,37 +561,11 @@ export default function ResultsClient({
                   group[0]?.author_name ?? t("res.respondentN", { n: pk });
                 const qByKey = new Map(questions.map((q) => [q.key, q]));
                 const mood = moodByAuthor[pk];
-                const moodBg =
-                  mood == null
-                    ? undefined
-                    : mood.score >= 4
-                      ? "var(--green-weak)"
-                      : mood.score >= 3
-                        ? "var(--accent-weak)"
-                        : "var(--danger-weak, rgba(213,84,74,.12))";
-                const moodFg =
-                  mood == null
-                    ? undefined
-                    : mood.score >= 4
-                      ? "var(--green-500)"
-                      : mood.score >= 3
-                        ? "var(--gold-700)"
-                        : "var(--red-500)";
                 return (
                   <section key={pk}>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-body text-[15px] font-medium leading-snug tracking-normal">
-                        {label}
-                      </h2>
-                      {mood && (
-                        <span
-                          className="badge"
-                          style={{ background: moodBg, color: moodFg }}
-                        >
-                          {mood.emoji} {mood.score}/5
-                        </span>
-                      )}
-                    </div>
+                    <h2 className="font-body text-[15px] font-medium leading-snug tracking-normal">
+                      {label}
+                    </h2>
                     <p className="mb-3 mt-0.5 text-xs text-muted">
                       {t("rc.responses", { n: group.length })}
                     </p>
@@ -594,6 +591,23 @@ export default function ResultsClient({
                           </p>
                         </li>
                       ))}
+                      {mood && (
+                        <li
+                          className="rounded-xl p-4"
+                          style={{ background: "var(--surface-2)" }}
+                        >
+                          <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+                            <Icon name="smile" size={14} />
+                            {t("res.moodWhy")}
+                          </p>
+                          <p className="text-[15px] leading-relaxed text-ink">
+                            <span className="font-semibold">
+                              {mood.emoji} {mood.score}/5
+                            </span>
+                            {mood.reason ? <> — {mood.reason}</> : null}
+                          </p>
+                        </li>
+                      )}
                     </ul>
                   </section>
                 );

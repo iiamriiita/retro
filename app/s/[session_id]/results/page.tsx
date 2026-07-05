@@ -102,18 +102,10 @@ export default async function ResultsPage({
         10
       : null;
 
-  // Optional per-person "why I gave this score" reasons.
+  // Rating scale → emoji lookup for the mood answers.
   const ratingQ = template?.questions.find((q) => q.type === "rating");
   const scaleEmoji = (v: number) =>
     ratingQ?.scale?.find((s) => s.value === v)?.emoji ?? "";
-  const moodReasons = moodRows
-    .map((a) => {
-      const [scoreStr, ...rest] = a.content.split("｜");
-      const reason = rest.join("｜").trim();
-      const score = parseInt(scoreStr, 10);
-      return reason && Number.isFinite(score) ? { score, reason } : null;
-    })
-    .filter((x): x is { score: number; reason: string } => x !== null);
 
   // Role answers were historically stored as "<emoji> <label>"; drop a leading
   // emoji so results read as plain text (matches the rest of the UI).
@@ -136,14 +128,38 @@ export default async function ResultsPage({
   }
   const respondentCount = authorIdx.size;
 
-  // Per-respondent mood score (keyed by the same author index as answers).
-  const moodByAuthor: Record<string, { score: number; emoji: string }> = {};
+  // Per-respondent mood score + optional "why I scored it" reason, keyed by the
+  // same author index as answers. The mood is surfaced as its own question.
+  const moodByAuthor: Record<
+    string,
+    { score: number; emoji: string; reason: string }
+  > = {};
   for (const m of moodRows) {
-    const score = parseInt(m.content, 10);
+    const [scoreStr, ...rest] = m.content.split("｜");
+    const score = parseInt(scoreStr, 10);
     if (!Number.isFinite(score)) continue;
     const key = String(authorIdx.get(m.participant_id) ?? 0);
-    moodByAuthor[key] = { score, emoji: scaleEmoji(score) };
+    moodByAuthor[key] = { score, emoji: scaleEmoji(score), reason: rest.join("｜").trim() };
   }
+
+  // Author display name keyed by the same index (for the mood question cards).
+  const nameByKey = new Map<string, string | null>();
+  for (const [pid, idx] of authorIdx) {
+    nameByKey.set(String(idx), anonymous ? null : (nameById.get(pid) ?? null));
+  }
+
+  // Mood entries that carry a written reason — shown as the "Why they scored it"
+  // question at the bottom of the responses (question-grouped view).
+  const moodEntries = Object.entries(moodByAuthor)
+    .filter(([, m]) => m.reason)
+    .map(([key, m]) => ({
+      key,
+      author_name: nameByKey.get(key) ?? null,
+      score: m.score,
+      emoji: m.emoji,
+      reason: m.reason,
+    }))
+    .sort((a, b) => Number(a.key) - Number(b.key));
 
   const answers: PublicAnswer[] = (rawAnswers ?? [])
     .filter((a) => a.question_key !== MOOD_KEY)
@@ -303,10 +319,7 @@ export default async function ResultsPage({
                   initialComments={initialComments}
                   rosterNames={[]}
                   moodByAuthor={moodByAuthor}
-                  moodReasons={moodReasons.map((r) => ({
-                    ...r,
-                    emoji: scaleEmoji(r.score),
-                  }))}
+                  moodEntries={moodEntries}
                 />
               </section>
             )}
