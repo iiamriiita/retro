@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Icon from "@/components/Icon";
 import ShareHeroArt from "@/components/ShareHeroArt";
 import { useT } from "@/lib/i18n/client";
@@ -8,13 +9,36 @@ import { useT } from "@/lib/i18n/client";
 export default function FormLinkButton({
   sessionId,
   ended = false,
+  discussionEnabled = null,
 }: {
   sessionId: string;
   ended?: boolean;
+  discussionEnabled?: boolean | null;
 }) {
   const { t } = useT();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [discussion, setDiscussion] = useState(discussionEnabled);
+  const [toggling, setToggling] = useState(false);
+
+  async function toggleDiscussion() {
+    if (discussion === null) return;
+    setToggling(true);
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/discussion`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !discussion }),
+      });
+      if (res.ok) {
+        setDiscussion(!discussion);
+        router.refresh();
+      }
+    } finally {
+      setToggling(false);
+    }
+  }
 
   // In progress → share the fill form; ended → share the results page.
   const path = ended ? `/s/${sessionId}/results` : `/s/${sessionId}`;
@@ -123,6 +147,22 @@ export default function FormLinkButton({
                 <Icon name="external-link" size={15} />
                 {tx.openNewTab}
               </a>
+
+              {ended && discussion !== null && (
+                <button
+                  type="button"
+                  className={`mt-3 !h-11 w-full ${discussion ? "btn-ghost" : "btn-primary"}`}
+                  onClick={toggleDiscussion}
+                  disabled={toggling}
+                >
+                  <Icon name={discussion ? "lock" : "message"} size={15} />
+                  {toggling
+                    ? "…"
+                    : discussion
+                      ? t("oc.closeDiscussion")
+                      : t("oc.openDiscussion")}
+                </button>
+              )}
             </div>
           </div>
         </div>
