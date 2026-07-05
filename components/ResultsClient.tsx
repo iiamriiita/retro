@@ -521,8 +521,7 @@ export default function ResultsClient({
               })}
               {moodEntries.length > 0 && (
                 <section>
-                  <h2 className="flex items-center gap-2 font-body text-[15px] font-medium leading-snug tracking-normal">
-                    <Icon name="smile" size={19} />
+                  <h2 className="font-body text-[15px] font-medium leading-snug tracking-normal">
                     {t("res.moodWhy")}
                   </h2>
                   <p className="mb-3 text-xs text-muted">
@@ -596,8 +595,7 @@ export default function ResultsClient({
                           className="rounded-xl p-4"
                           style={{ background: "var(--surface-2)" }}
                         >
-                          <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
-                            <Icon name="smile" size={14} />
+                          <p className="mb-1.5 text-xs font-medium text-muted">
                             {t("res.moodWhy")}
                           </p>
                           <p className="text-[15px] leading-relaxed text-ink">

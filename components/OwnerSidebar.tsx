@@ -113,14 +113,14 @@ export default function OwnerSidebar({
       {/* Share results — grows in when the header button scrolls away */}
       <div
         className={`overflow-hidden transition-all duration-300 ${
-          stuck ? "max-h-12 opacity-100" : "-mb-4 max-h-0 opacity-0"
+          stuck ? "max-h-14 opacity-100" : "-mb-4 max-h-0 opacity-0"
         }`}
       >
         <FormLinkButton
           sessionId={sessionId}
           ended
           discussionEnabled={discOn}
-          triggerClassName="btn-primary w-full"
+          triggerClassName="btn-primary w-full !h-11"
         />
       </div>
 
