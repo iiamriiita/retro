@@ -250,6 +250,7 @@ const en: Dict = {
   "os.needReport": "Generate the AI report first.",
   "os.discussionOnHint": "Anyone with the link can select text and comment.",
   "res.avgMood": "Team mood {avg} / 5",
+  "res.moodTitle": "Team mood",
   "res.moodWhy": "Why they scored it",
   "res.discussing": "in discussion",
   "res.inProgressTitle": "Session in progress",

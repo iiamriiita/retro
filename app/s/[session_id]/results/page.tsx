@@ -170,6 +170,20 @@ export default async function ResultsPage({
     created_at: c.created_at,
   }));
 
+  // Mood summary: colour band + the scale's scenario label for the rounded score.
+  const moodColor =
+    avgMood == null
+      ? "var(--text)"
+      : avgMood >= 4
+        ? "var(--green-500)"
+        : avgMood >= 3
+          ? "var(--gold-700)"
+          : "var(--red-500)";
+  const moodLevel =
+    avgMood == null
+      ? null
+      : (ratingQ?.scale?.find((sc) => sc.value === Math.round(avgMood)) ?? null);
+
   const shareView: "both" | "report" | "raw" =
     session.share_view ??
     (session.share_show_raw === false ? "report" : "both");
@@ -206,33 +220,10 @@ export default async function ResultsPage({
             </span>
           )}
         </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-2">
-          {avgMood != null && (
-            <span
-              className="badge"
-              style={{
-                background:
-                  avgMood >= 4
-                    ? "var(--green-weak)"
-                    : avgMood >= 3
-                      ? "var(--accent-weak)"
-                      : "var(--danger-weak, rgba(213,84,74,.12))",
-                color:
-                  avgMood >= 4
-                    ? "var(--green-500)"
-                    : avgMood >= 3
-                      ? "var(--gold-700)"
-                      : "var(--red-500)",
-              }}
-            >
-              {t("res.avgMood", { avg: avgMood })}
-            </span>
-          )}
-          <p className="text-sm text-muted">
-            {anonymous ? t("res.modeAnon") : t("res.modeNamed")} ·{" "}
-            {t("res.responsesTotal", { n: respondentCount })}
-          </p>
-        </div>
+        <p className="mt-1.5 text-sm text-muted">
+          {anonymous ? t("res.modeAnon") : t("res.modeNamed")} ·{" "}
+          {t("res.responsesTotal", { n: respondentCount })}
+        </p>
         </div>
         {isOwner && (
           <div id="share-top-anchor" className="hidden shrink-0 md:block">
@@ -254,8 +245,28 @@ export default async function ResultsPage({
               : "grid gap-6"
           }
         >
-          {/* Left — AI report on top, raw responses below */}
-          <div className="min-w-0 space-y-10">
+          {/* Left — mood, AI report, raw responses */}
+          <div className="min-w-0 space-y-6">
+            {avgMood != null && (
+              <section className="card">
+                <p className="text-[15px] font-medium">{t("res.moodTitle")}</p>
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span
+                    className="text-3xl font-extrabold tracking-tight"
+                    style={{ color: moodColor }}
+                  >
+                    {avgMood}
+                  </span>
+                  <span className="text-sm text-subtle">/ 5</span>
+                </div>
+                {moodLevel && (
+                  <p className="mt-2 text-sm text-muted">
+                    {moodLevel.emoji} {moodLevel.label}
+                  </p>
+                )}
+              </section>
+            )}
+
             {showReport && (
               <ReportPanel
                 sessionId={session.id}
