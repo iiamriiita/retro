@@ -35,6 +35,7 @@ export default function AuthModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [existsSwitch, setExistsSwitch] = useState(false);
 
   function reset(toRegister = false) {
     setView(toRegister ? "otp" : "login");
@@ -45,6 +46,7 @@ export default function AuthModal({
     setNewPassword("");
     setError(null);
     setInfo(null);
+    setExistsSwitch(false);
   }
 
   function openModal() {
@@ -79,7 +81,23 @@ export default function AuthModal({
     setLoading(true);
     setError(null);
     setInfo(null);
+    setExistsSwitch(false);
     try {
+      // Sign-up: block emails that already have an account.
+      if (otpMode === "register") {
+        const res = await fetch("/api/auth/exists", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim() }),
+        });
+        const { exists } = (await res.json()) as { exists?: boolean };
+        if (exists) {
+          setError(t("am.alreadyRegistered"));
+          setExistsSwitch(true);
+          setLoading(false);
+          return;
+        }
+      }
       const supabase = createBrowserSupabase();
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
@@ -287,6 +305,15 @@ export default function AuthModal({
                 <button type="submit" className="btn-primary w-full" disabled={loading}>
                   {loading ? t("am.sending") : t("am.sendCode")}
                 </button>
+                {existsSwitch && (
+                  <button
+                    type="button"
+                    className="block w-full text-center text-sm font-semibold text-[color:var(--gold-700)] hover:underline"
+                    onClick={() => reset(false)}
+                  >
+                    {t("am.goLogin")}
+                  </button>
+                )}
               </form>
             )}
 
