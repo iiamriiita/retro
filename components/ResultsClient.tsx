@@ -65,6 +65,7 @@ export default function ResultsClient({
   answers,
   initialComments,
   rosterNames,
+  moodByAuthor = {},
   moodReasons = [],
 }: {
   sessionId: string;
@@ -74,6 +75,7 @@ export default function ResultsClient({
   answers: PublicAnswer[];
   initialComments: PublicComment[];
   rosterNames: string[];
+  moodByAuthor?: Record<string, { score: number; emoji: string }>;
   moodReasons?: { score: number; reason: string; emoji: string }[];
 }) {
   const { t } = useT();
@@ -535,12 +537,39 @@ export default function ResultsClient({
                 const label =
                   group[0]?.author_name ?? t("res.respondentN", { n: pk });
                 const qByKey = new Map(questions.map((q) => [q.key, q]));
+                const mood = moodByAuthor[pk];
+                const moodBg =
+                  mood == null
+                    ? undefined
+                    : mood.score >= 4
+                      ? "var(--green-weak)"
+                      : mood.score >= 3
+                        ? "var(--accent-weak)"
+                        : "var(--danger-weak, rgba(213,84,74,.12))";
+                const moodFg =
+                  mood == null
+                    ? undefined
+                    : mood.score >= 4
+                      ? "var(--green-500)"
+                      : mood.score >= 3
+                        ? "var(--gold-700)"
+                        : "var(--red-500)";
                 return (
                   <section key={pk}>
-                    <h2 className="font-body text-[15px] font-medium leading-snug tracking-normal">
-                      {label}
-                    </h2>
-                    <p className="mb-3 text-xs text-muted">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="font-body text-[15px] font-medium leading-snug tracking-normal">
+                        {label}
+                      </h2>
+                      {mood && (
+                        <span
+                          className="badge"
+                          style={{ background: moodBg, color: moodFg }}
+                        >
+                          {mood.emoji} {mood.score}/5
+                        </span>
+                      )}
+                    </div>
+                    <p className="mb-3 mt-0.5 text-xs text-muted">
                       {t("rc.responses", { n: group.length })}
                     </p>
                     <ul className="space-y-3">

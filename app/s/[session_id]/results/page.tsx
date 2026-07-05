@@ -136,6 +136,15 @@ export default async function ResultsPage({
   }
   const respondentCount = authorIdx.size;
 
+  // Per-respondent mood score (keyed by the same author index as answers).
+  const moodByAuthor: Record<string, { score: number; emoji: string }> = {};
+  for (const m of moodRows) {
+    const score = parseInt(m.content, 10);
+    if (!Number.isFinite(score)) continue;
+    const key = String(authorIdx.get(m.participant_id) ?? 0);
+    moodByAuthor[key] = { score, emoji: scaleEmoji(score) };
+  }
+
   const answers: PublicAnswer[] = (rawAnswers ?? [])
     .filter((a) => a.question_key !== MOOD_KEY)
     .map((a) => ({
@@ -293,6 +302,7 @@ export default async function ResultsPage({
                   answers={answers}
                   initialComments={initialComments}
                   rosterNames={[]}
+                  moodByAuthor={moodByAuthor}
                   moodReasons={moodReasons.map((r) => ({
                     ...r,
                     emoji: scaleEmoji(r.score),
