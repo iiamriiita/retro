@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import Icon from "@/components/Icon";
@@ -28,6 +28,7 @@ export default function ReportPanel({
   const [sections, setSections] = useState<string[]>([...SECTIONS]);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [stepIdx, setStepIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   function toggleSection(k: string) {
@@ -37,6 +38,16 @@ export default function ReportPanel({
   }
 
   const abortRef = useRef<AbortController | null>(null);
+
+  // Cute cycling status while the report generates.
+  const STEPS = ["rp.step1", "rp.step2", "rp.step3", "rp.step4"] as const;
+  useEffect(() => {
+    if (!busy) return;
+    setStepIdx(0);
+    const iv = setInterval(() => setStepIdx((i) => (i + 1) % STEPS.length), 2600);
+    return () => clearInterval(iv);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busy]);
 
   async function generate() {
     setAskTone(false); // the card itself shows the progress
@@ -89,10 +100,13 @@ export default function ReportPanel({
     <section className="card">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-lg font-bold">
-          <span style={{ color: "var(--accent)" }}>
+          <span
+            className={busy ? "animate-pulse" : ""}
+            style={{ color: "var(--accent)" }}
+          >
             <Icon name="sparkles" size={19} />
           </span>
-          {t("rv.title")}
+          {busy ? t("rp.generatingTitle") : t("rv.title")}
         </h2>
         {isOwner && report && !busy && (
           <button
@@ -107,11 +121,13 @@ export default function ReportPanel({
 
       {busy ? (
         <div className="py-2">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <span className="animate-pulse" style={{ color: "var(--accent)" }}>
-              <Icon name="sparkles" size={18} />
+          <div key={stepIdx} className="rp-fade flex items-center gap-2 text-sm font-medium">
+            <span>{t(STEPS[stepIdx])}</span>
+            <span className="rp-dots" aria-hidden>
+              <span />
+              <span />
+              <span />
             </span>
-            {t("oc.generating")}
           </div>
           <div className="mt-5 space-y-3">
             <div className="rp-skel h-4 w-2/5" />
@@ -157,7 +173,7 @@ export default function ReportPanel({
               {structured.well !== undefined && (
                 <div
                   className="rounded-xl p-4"
-                  style={{ background: "var(--surface-2)" }}
+                  style={{ background: "var(--green-weak)" }}
                 >
                   <p className="text-[15px] font-medium">{t("rp.sec_well")}</p>
                   {structured.well.length ? (
@@ -182,7 +198,7 @@ export default function ReportPanel({
               {structured.improve !== undefined && (
                 <div
                   className="rounded-xl p-4"
-                  style={{ background: "var(--surface-2)" }}
+                  style={{ background: "var(--danger-weak, rgba(213,84,74,.10))" }}
                 >
                   <p className="text-[15px] font-medium">{t("rp.sec_improve")}</p>
                   {structured.improve.length ? (
