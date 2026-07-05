@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import Icon from "@/components/Icon";
+import QuestionIcon from "@/components/QuestionIcon";
 import { useT } from "@/lib/i18n/client";
 import type { PublicAnswer, PublicComment, Question } from "@/lib/types";
 
@@ -405,7 +406,10 @@ export default function ResultsClient({
           const group = answers.filter((a) => a.question_key === q.key);
           return (
             <section key={q.key}>
-              <h2 className="text-lg font-bold">{q.label}</h2>
+              <h2 className="flex items-center gap-2 text-lg font-bold">
+                <QuestionIcon qKey={q.key} size={20} />
+                {q.label}
+              </h2>
               <p className="mb-3 text-xs text-muted">
                 {t("rc.responses", { n: group.length })}
               </p>

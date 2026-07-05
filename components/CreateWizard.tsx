@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useT } from "@/lib/i18n/client";
 import TemplateIcon from "@/components/TemplateIcon";
+import QuestionIcon from "@/components/QuestionIcon";
 import Icon from "@/components/Icon";
 import type { Anonymity, Template } from "@/lib/types";
 
@@ -186,10 +187,13 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                       <ul className="mt-2 space-y-2 rounded-lg bg-white p-3">
                         {t.questions.map((q) => (
                           <li key={q.key} className="text-xs">
-                            <span className="font-medium">{q.label}</span>
+                            <span className="flex items-center gap-1.5 font-medium">
+                              <QuestionIcon qKey={q.key} size={14} />
+                              {q.label}
+                            </span>
                             {q.placeholder && (
                               <span className="mt-0.5 block text-muted">
-                                {tr("cw.example", { text: q.placeholder })}
+                                {q.placeholder}
                               </span>
                             )}
                           </li>
