@@ -23,7 +23,7 @@ export default function TemplateBanner({
     preserveAspectRatio: "xMidYMid slice" as const,
     xmlns: "http://www.w3.org/2000/svg",
     "aria-hidden": true,
-    className: `block w-full ${className}`,
+    className: `block h-full w-full ${className}`,
   };
 
   const CREAM = "#F7F0E1";
@@ -36,7 +36,7 @@ export default function TemplateBanner({
 
   if (id === "sailboat") {
     return (
-      <svg {...common} style={{ height: "auto", aspectRatio: "4 / 1" }}>
+      <svg {...common}>
         <rect width="1200" height="300" fill={CREAM} />
         <circle cx="1005" cy="78" r="52" fill={GOLD} />
         <circle cx="185" cy="72" r="8" fill={GOLD} />
@@ -67,7 +67,7 @@ export default function TemplateBanner({
 
   if (id === "garden") {
     return (
-      <svg {...common} style={{ height: "auto", aspectRatio: "4 / 1" }}>
+      <svg {...common}>
         <rect width="1200" height="300" fill={CREAM} />
         <circle cx="1035" cy="98" r="58" fill={GOLD} />
         <circle cx="186" cy="104" r="8" fill={GOLD} />
@@ -95,7 +95,7 @@ export default function TemplateBanner({
 
   if (id === "space-mission") {
     return (
-      <svg {...common} style={{ height: "auto", aspectRatio: "4 / 1" }}>
+      <svg {...common}>
         <rect width="1200" height="300" fill="#2E2015" />
         {/* planet */}
         <circle cx="108" cy="252" r="96" fill={BROWN} />

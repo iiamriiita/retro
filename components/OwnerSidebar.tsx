@@ -63,7 +63,7 @@ export default function OwnerSidebar({
   }
 
   return (
-    <div className="space-y-4 md:sticky md:top-[76px]">
+    <div className="space-y-4 md:sticky md:top-[76px] md:self-start">
       {/* Discussion */}
       <div className="card">
         <p className="eyebrow">{t("os.discussionTitle")}</p>

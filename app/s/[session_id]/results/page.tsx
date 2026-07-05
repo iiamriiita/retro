@@ -164,11 +164,15 @@ export default async function ResultsPage({
   const showRaw = isOwner || shareShowRaw;
 
   return (
-    <div className="container-wide">
-      <BackButton fallback="/" />
-      <div className="mb-6 mt-1 overflow-hidden rounded-2xl">
+    <>
+      <div
+        className="relative left-1/2 -mt-10 mb-8 w-screen -translate-x-1/2"
+        style={{ height: "clamp(150px, 22vw, 300px)" }}
+      >
         <TemplateBanner id={session.template_id} />
       </div>
+      <div className="container-wide">
+      <BackButton fallback="/" />
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold tracking-tight">
           {t("res.title", { name: session.name || template?.name || "Retro" })}
@@ -219,15 +223,18 @@ export default async function ResultsPage({
             />
 
             {showRaw && (
-              <section>
-                <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+              <section className="card">
+                <h2 className="mb-4 flex items-center gap-2 text-lg font-bold">
                   <span style={{ color: "var(--accent)" }}>
                     <Icon name="list" size={19} />
                   </span>
                   {t("res.raw")}
                 </h2>
                 {moodReasons.length > 0 && (
-                  <div className="card mb-4">
+                  <div
+                    className="mb-5 rounded-xl p-4"
+                    style={{ background: "var(--surface-2)" }}
+                  >
                     <p className="eyebrow">{t("res.moodWhy")}</p>
                     <ul className="mt-2 space-y-1.5">
                       {moodReasons.map((r, i) => (
@@ -266,6 +273,7 @@ export default async function ResultsPage({
       ) : (
         <p className="text-sm text-muted">{t("res.noTemplate")}</p>
       )}
-    </div>
+      </div>
+    </>
   );
 }

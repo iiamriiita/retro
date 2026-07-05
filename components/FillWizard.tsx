@@ -282,7 +282,10 @@ export default function FillWizard({
   return (
     <div className="space-y-5">
       {step === 0 && (
-        <div className="overflow-hidden rounded-2xl">
+        <div
+          className="relative left-1/2 -mt-10 mb-2 w-screen -translate-x-1/2"
+          style={{ height: "clamp(150px, 22vw, 300px)" }}
+        >
           <TemplateBanner id={templateId} />
         </div>
       )}

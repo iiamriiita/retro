@@ -79,7 +79,7 @@ export default async function RootLayout({
               </nav>
             </div>
           </header>
-          <main className="py-10">{children}</main>
+          <main className="overflow-x-clip py-10">{children}</main>
         </LocaleProvider>
       </body>
     </html>

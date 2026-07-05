@@ -47,8 +47,8 @@ export default function ReportPanel({
   }
 
   return (
-    <section>
-      <div className="mb-3 flex items-center justify-between">
+    <section className="card">
+      <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-lg font-bold">
           <span style={{ color: "var(--accent)" }}>
             <Icon name="sparkles" size={19} />
@@ -68,11 +68,11 @@ export default function ReportPanel({
 
       {report ? (
         <>
-          <div className="prose-sm card max-w-none [&_h2]:mt-4 [&_h2]:text-base [&_h2]:font-semibold [&_li]:ml-4 [&_li]:list-disc [&_p]:text-sm [&_ul]:my-2">
+          <div className="prose-sm max-w-none [&_h2]:mt-4 [&_h2]:text-base [&_h2]:font-semibold [&_li]:ml-4 [&_li]:list-disc [&_p]:text-sm [&_ul]:my-2">
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
           {generatedAt && (
-            <p className="mt-2 text-xs text-subtle">
+            <p className="mt-3 text-xs text-subtle">
               {t("rv.generatedAt", {
                 date: new Date(generatedAt).toLocaleString(),
               })}
@@ -80,7 +80,7 @@ export default function ReportPanel({
           )}
         </>
       ) : (
-        <div className="card flex flex-col items-center py-10 text-center">
+        <div className="flex flex-col items-center py-8 text-center">
           <span style={{ color: "var(--accent)" }}>
             <Icon name="sparkles" size={28} />
           </span>

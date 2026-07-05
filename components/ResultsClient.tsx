@@ -418,7 +418,7 @@ export default function ResultsClient({
               ) : (
                 <ul className="space-y-3">
                   {group.map((a) => (
-                    <li key={a.id} className="card">
+                    <li key={a.id} className="rounded-xl p-4" style={{ background: "var(--surface-2)" }}>
                       <p
                         data-answer-id={a.id}
                         className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink"
