@@ -267,6 +267,7 @@ export default async function ResultsPage({
               sessionId={session.id}
               discussionEnabled={session.discussion_enabled}
               shareShowRaw={shareShowRaw}
+              hasReport={!!session.ai_report}
             />
           )}
         </div>

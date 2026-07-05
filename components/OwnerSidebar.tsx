@@ -11,10 +11,12 @@ export default function OwnerSidebar({
   sessionId,
   discussionEnabled,
   shareShowRaw,
+  hasReport,
 }: {
   sessionId: string;
   discussionEnabled: boolean;
   shareShowRaw: boolean;
+  hasReport: boolean;
 }) {
   const { t } = useT();
   const router = useRouter();
@@ -92,27 +94,40 @@ export default function OwnerSidebar({
               { v: true, tt: t("os.shareBoth"), d: t("os.shareBothDesc") },
               { v: false, tt: t("os.shareReportOnly"), d: t("os.shareReportOnlyDesc") },
             ] as const
-          ).map((o) => (
-            <button
-              key={String(o.v)}
-              type="button"
-              onClick={() => setShare(o.v)}
-              disabled={busy !== null}
-              className="relative w-full rounded-lg p-3 text-left transition-colors"
-              style={{
-                background:
-                  showRaw === o.v ? "var(--accent-weak)" : "var(--surface-2)",
-              }}
-            >
-              {showRaw === o.v && (
-                <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
-                  <Icon name="check" size={12} />
-                </span>
-              )}
-              <span className="block text-sm font-medium">{o.tt}</span>
-              <span className="block text-xs text-muted">{o.d}</span>
-            </button>
-          ))}
+          ).map((o) => {
+            const needsReport = o.v === false && !hasReport;
+            return (
+              <div key={String(o.v)} className="group relative">
+                <button
+                  type="button"
+                  onClick={() => setShare(o.v)}
+                  disabled={busy !== null || needsReport}
+                  className="relative w-full rounded-lg p-3 text-left transition-colors disabled:cursor-not-allowed"
+                  style={{
+                    background:
+                      showRaw === o.v ? "var(--accent-weak)" : "var(--surface-2)",
+                    opacity: needsReport ? 0.5 : undefined,
+                  }}
+                >
+                  {showRaw === o.v && (
+                    <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
+                      <Icon name="check" size={12} />
+                    </span>
+                  )}
+                  <span className="block text-sm font-medium">{o.tt}</span>
+                  <span className="block text-xs text-muted">{o.d}</span>
+                </button>
+                {needsReport && (
+                  <span
+                    className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[220px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-white group-hover:block"
+                    style={{ background: "var(--text)" }}
+                  >
+                    {t("os.needReport")}
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
