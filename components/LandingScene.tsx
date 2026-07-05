@@ -100,8 +100,10 @@ export default function LandingScene() {
           <path d="M-80 84L86 84 81 93-75 93z" fill="#523320" />
         </g>
 
-        {/* front wave — laps over the boat's hull */}
-        <path d="M0 552c130 26 200-14 340-14s200 26 300 8v214H0z" fill="#D9A400" />
+        {/* mid wave — laps over the boat's hull */}
+        <path d="M0 548c130 26 200-14 340-14s200 26 300 8v220H0z" fill="#E0A800" />
+        {/* front wave — deepest layer */}
+        <path d="M0 604c120 24 210-16 340-14s210 24 300 6v170H0z" fill="#C68F00" />
 
         {/* anchor */}
         <g
