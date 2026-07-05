@@ -52,7 +52,7 @@ export default function LandingScene() {
         <rect width="640" height="760" fill="#FBF6EE" />
 
         {/* sun */}
-        <g {...obj(t("landing.bubLookoutWho"), t("landing.bubLookoutText"))}>
+        <g {...obj(t("landing.bubSunWho"), t("landing.bubSunText"))}>
           <circle id="lp-sun" cx="510" cy="150" r="66" fill="#F0B90B" />
         </g>
 
