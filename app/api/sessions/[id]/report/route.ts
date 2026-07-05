@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { getLocale } from "@/lib/i18n/server";
-import { buildContext, geminiSummary, type ReportTone } from "@/lib/summary";
+import {
+  ALL_SECTIONS,
+  buildContext,
+  geminiSummary,
+  type ReportSection,
+  type ReportTone,
+} from "@/lib/summary";
 
 export const runtime = "nodejs";
 
@@ -58,14 +64,24 @@ export async function POST(
     );
   }
 
-  const body = (await req.json().catch(() => ({}))) as { tone?: string };
-  const tone: ReportTone = body.tone === "playful" ? "playful" : "neutral";
+  const body = (await req.json().catch(() => ({}))) as {
+    tone?: string;
+    sections?: string[];
+  };
+  const tone: ReportTone =
+    body.tone === "playful" || body.tone === "balanced"
+      ? body.tone
+      : "neutral";
+  const sections: ReportSection[] = Array.isArray(body.sections)
+    ? (ALL_SECTIONS.filter((k) => body.sections!.includes(k)) as ReportSection[])
+    : ALL_SECTIONS;
 
   try {
     const report = await geminiSummary(
       buildContext(session.template_id, answers, locale),
       locale,
       tone,
+      sections.length > 0 ? sections : ALL_SECTIONS,
     );
     const { error } = await supabase
       .from("retro_sessions")

@@ -3,51 +3,50 @@ import type { Locale } from "./i18n/messages";
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
-const SYSTEM_ZH = `你是一個團隊 retro（回顧會議）的 AI 助理。你會收到一場 retro 的所有回答（已去識別化，只有文字）。
+export type ReportTone = "neutral" | "balanced" | "playful";
+export type ReportSection = "themes" | "well" | "improve" | "actions";
+export const ALL_SECTIONS: ReportSection[] = [
+  "themes",
+  "well",
+  "improve",
+  "actions",
+];
 
-請用繁體中文、以 markdown 輸出，幫團隊做總結，固定包含這四個部分（用二級標題 ##）：
-
-## 主題歸納
-歸納大家共同提到的 2–4 個主題。
-
-## 正向亮點
-團隊做得好、值得延續的地方。
-
-## 待改善點
-需要調整的問題，對事不對人。
-
-## 具體調整方向建議
-可行動的 next steps，越具體越好（例如「站會限制在 15 分鐘、超時的議題移到會後」）。
-
-原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。`;
-
-const SYSTEM_EN = `You are an AI assistant for a team retrospective. You'll receive all the answers from one retro (de-identified, text only).
-
-Write the summary in English as markdown, always with these four sections (use level-2 headings ##):
-
-## Themes
-Group the 2–4 themes people commonly raised.
-
-## What's going well
-What the team does well and should keep doing.
-
-## What to improve
-Issues to adjust — about the work, not the people.
-
-## Concrete next steps
-Actionable next steps, as specific as possible (e.g. "cap stand-ups at 15 minutes and move overflow topics to after the meeting").
-
-Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said.`;
-
-export type ReportTone = "neutral" | "playful";
+const SECTIONS_ZH: Record<ReportSection, { h: string; d: string }> = {
+  themes: { h: "主題歸納", d: "歸納大家共同提到的 2–4 個主題。" },
+  well: { h: "正向亮點", d: "團隊做得好、值得延續的地方。" },
+  improve: { h: "待改善點", d: "需要調整的問題，對事不對人。" },
+  actions: {
+    h: "具體調整方向建議",
+    d: "可行動的 next steps，越具體越好（例如「站會限制在 15 分鐘、超時的議題移到會後」）。",
+  },
+};
+const SECTIONS_EN: Record<ReportSection, { h: string; d: string }> = {
+  themes: { h: "Themes", d: "Group the 2–4 themes people commonly raised." },
+  well: {
+    h: "What's going well",
+    d: "What the team does well and should keep doing.",
+  },
+  improve: {
+    h: "What to improve",
+    d: "Issues to adjust — about the work, not the people.",
+  },
+  actions: {
+    h: "Concrete next steps",
+    d: 'Actionable next steps, as specific as possible (e.g. "cap stand-ups at 15 minutes and move overflow topics to after the meeting").',
+  },
+};
 
 const TONE_ZH: Record<ReportTone, string> = {
   neutral: "語氣：中性、專業、精簡。",
+  balanced: "語氣：清楚專業，帶一點溫度與鼓勵，但不油腔滑調。",
   playful:
     "語氣：輕鬆、溫暖、帶點幽默。可以借用這場 retro 模板的比喻（例如航行、花園、太空任務）來包裝標題與描述，但內容仍要具體可行。",
 };
 const TONE_EN: Record<ReportTone, string> = {
   neutral: "Tone: neutral, professional, concise.",
+  balanced:
+    "Tone: clear and professional with a bit of warmth and encouragement — not cheesy.",
   playful:
     "Tone: light, warm, a little playful. Feel free to lean on the retro template's metaphor (sailing / garden / space mission) in headings and phrasing, while keeping the content concrete and actionable.",
 };
@@ -55,12 +54,33 @@ const TONE_EN: Record<ReportTone, string> = {
 export function summarySystem(
   locale: Locale,
   tone: ReportTone = "neutral",
+  sections: ReportSection[] = ALL_SECTIONS,
 ): string {
-  return locale === "en"
-    ? `${SYSTEM_EN}
+  const chosen = sections.length > 0 ? sections : ALL_SECTIONS;
+  if (locale === "en") {
+    const parts = chosen
+      .map((k) => `## ${SECTIONS_EN[k].h}\n${SECTIONS_EN[k].d}`)
+      .join("\n\n");
+    return `You are an AI assistant for a team retrospective. You'll receive all the answers from one retro (de-identified, text only).
 
-${TONE_EN[tone]}`
-    : `${SYSTEM_ZH}
+Write the summary in English as markdown, always with exactly these sections (use level-2 headings ##):
+
+${parts}
+
+Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said.
+
+${TONE_EN[tone]}`;
+  }
+  const parts = chosen
+    .map((k) => `## ${SECTIONS_ZH[k].h}\n${SECTIONS_ZH[k].d}`)
+    .join("\n\n");
+  return `你是一個團隊 retro（回顧會議）的 AI 助理。你會收到一場 retro 的所有回答（已去識別化，只有文字）。
+
+請用繁體中文、以 markdown 輸出，幫團隊做總結，固定只包含這幾個部分（用二級標題 ##）：
+
+${parts}
+
+原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。
 
 ${TONE_ZH[tone]}`;
 }
@@ -90,6 +110,7 @@ export async function geminiSummary(
   context: string,
   locale: Locale = "en",
   tone: ReportTone = "neutral",
+  sections: ReportSection[] = ALL_SECTIONS,
 ): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey)
@@ -101,8 +122,8 @@ export async function geminiSummary(
 
   const intro =
     locale === "en"
-      ? `${summarySystem(locale, tone)}\n\nHere are all the answers from this retro (de-identified):\n\n${context}`
-      : `${summarySystem(locale, tone)}\n\n以下是這場 retro 的所有回答（已去識別化）：\n\n${context}`;
+      ? `${summarySystem(locale, tone, sections)}\n\nHere are all the answers from this retro (de-identified):\n\n${context}`
+      : `${summarySystem(locale, tone, sections)}\n\n以下是這場 retro 的所有回答（已去識別化）：\n\n${context}`;
   const ask =
     locale === "en"
       ? "Produce the summary and recommendations from the answers above."

@@ -22,9 +22,18 @@ export default function ReportPanel({
   const { t } = useT();
   const router = useRouter();
   const [askTone, setAskTone] = useState(false);
-  const [tone, setTone] = useState<"neutral" | "playful">("neutral");
+  const TONES = ["neutral", "balanced", "playful"] as const;
+  const [toneIdx, setToneIdx] = useState(0);
+  const SECTIONS = ["themes", "well", "improve", "actions"] as const;
+  const [sections, setSections] = useState<string[]>([...SECTIONS]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function toggleSection(k: string) {
+    setSections((prev) =>
+      prev.includes(k) ? prev.filter((x) => x !== k) : [...prev, k],
+    );
+  }
 
   async function generate() {
     setBusy(true);
@@ -33,7 +42,7 @@ export default function ReportPanel({
       const res = await fetch(`/api/sessions/${sessionId}/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tone }),
+        body: JSON.stringify({ tone: TONES[toneIdx], sections }),
       });
       if (!res.ok)
         throw new Error((await res.json())?.error ?? t("oc.genFail"));
@@ -115,37 +124,78 @@ export default function ReportPanel({
             className="absolute inset-0 bg-black/40"
             onClick={() => !busy && setAskTone(false)}
           />
-          <div className="card relative z-10 w-full max-w-sm">
-            <h2 className="text-base font-bold">{t("rp.toneTitle")}</h2>
-            <div className="mt-4 space-y-2">
-              {(
-                [
-                  { v: "neutral", tt: t("rp.toneNeutral"), d: t("rp.toneNeutralDesc") },
-                  { v: "playful", tt: t("rp.tonePlayful"), d: t("rp.tonePlayfulDesc") },
-                ] as const
-              ).map((o) => (
-                <button
-                  key={o.v}
-                  type="button"
-                  onClick={() => setTone(o.v)}
-                  className="relative w-full rounded-lg p-3 text-left transition-colors"
-                  style={{
-                    background:
-                      tone === o.v ? "var(--accent-weak)" : "var(--surface-2)",
-                  }}
-                >
-                  {tone === o.v && (
-                    <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
-                      <Icon name="check" size={12} />
-                    </span>
+          <div className="card relative z-10 w-full max-w-lg">
+            <h2 className="text-base font-bold">{t("rp.settingsTitle")}</h2>
+
+            {/* Tone — drag slider */}
+            <p className="eyebrow mt-5">{t("rp.toneTitle")}</p>
+            <div className="mt-3 px-1">
+              <input
+                type="range"
+                min={0}
+                max={2}
+                step={1}
+                value={toneIdx}
+                onChange={(e) => setToneIdx(Number(e.target.value))}
+                className="w-full"
+                style={{ accentColor: "var(--accent)" }}
+              />
+              <div className="mt-1 flex justify-between text-xs text-subtle">
+                <span>{t("rp.toneNeutral")}</span>
+                <span>{t("rp.toneBalanced")}</span>
+                <span>{t("rp.tonePlayful")}</span>
+              </div>
+              <p className="mt-2 text-sm font-medium">
+                {t(
+                  toneIdx === 0
+                    ? "rp.toneNeutral"
+                    : toneIdx === 1
+                      ? "rp.toneBalanced"
+                      : "rp.tonePlayful",
+                )}
+                <span className="ml-2 font-normal text-muted">
+                  {t(
+                    toneIdx === 0
+                      ? "rp.toneNeutralDesc"
+                      : toneIdx === 1
+                        ? "rp.toneBalancedDesc"
+                        : "rp.tonePlayfulDesc",
                   )}
-                  <span className="block text-sm font-medium">{o.tt}</span>
-                  <span className="block text-xs text-muted">{o.d}</span>
-                </button>
-              ))}
+                </span>
+              </p>
             </div>
+
+            {/* Sections */}
+            <p className="eyebrow mt-6">{t("rp.sectionsTitle")}</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {SECTIONS.map((k) => {
+                const on = sections.includes(k);
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => toggleSection(k)}
+                    className="relative rounded-lg p-3 text-left transition-colors"
+                    style={{
+                      background: on ? "var(--accent-weak)" : "var(--surface-2)",
+                      opacity: on ? undefined : 0.75,
+                    }}
+                  >
+                    {on && (
+                      <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
+                        <Icon name="check" size={12} />
+                      </span>
+                    )}
+                    <span className="block pr-6 text-sm font-medium">
+                      {t(`rp.sec_${k}`)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
             {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-            <div className="mt-5 flex justify-end gap-2">
+            <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
                 className="btn-ghost"
@@ -158,7 +208,7 @@ export default function ReportPanel({
                 type="button"
                 className="btn-primary"
                 onClick={generate}
-                disabled={busy}
+                disabled={busy || sections.length === 0}
               >
                 <Icon name="sparkles" size={15} />
                 {busy ? t("oc.generating") : t("oc.genReport")}
