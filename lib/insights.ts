@@ -252,7 +252,11 @@ export async function geminiInsights(
     contents: [{ role: "user", parts: [{ text: ask }] }],
     generationConfig: {
       temperature: 0.5,
-      maxOutputTokens: 700,
+      // gemini-2.5-flash "thinks" by default and those tokens count against the
+      // output budget, which was truncating the brief mid-sentence. This task
+      // is simple, so disable thinking and give the text room to finish.
+      thinkingConfig: { thinkingBudget: 0 },
+      maxOutputTokens: 800,
     },
   });
 
