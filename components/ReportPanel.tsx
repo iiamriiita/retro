@@ -182,8 +182,11 @@ export default function ReportPanel({
                     }}
                   >
                     {on && (
-                      <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
-                        <Icon name="check" size={12} />
+                      <span
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        <Icon name="check" size={18} strokeWidth={3} />
                       </span>
                     )}
                     <span className="block pr-6 text-sm font-medium">
