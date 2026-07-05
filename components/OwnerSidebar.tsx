@@ -81,7 +81,8 @@ export default function OwnerSidebar({
   }
 
   // Checkbox model over the share_view enum: which parts are visible.
-  const partReport = view === "both" || view === "report";
+  // The report part only lights up once a report actually exists.
+  const partReport = hasReport && (view === "both" || view === "report");
   const partResp = view === "both" || view === "raw";
   function togglePart(part: "report" | "raw") {
     const r = part === "report" ? !partReport : partReport;
