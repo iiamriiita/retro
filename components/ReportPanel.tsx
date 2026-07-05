@@ -273,10 +273,7 @@ export default function ReportPanel({
         </>
       ) : (
         <div className="flex flex-col items-center py-8 text-center">
-          <span style={{ color: "var(--accent)" }}>
-            <Icon name="sparkles" size={28} />
-          </span>
-          <p className="mt-3 text-sm font-semibold">{t("rp.emptyTitle")}</p>
+          <p className="text-sm font-semibold">{t("rp.emptyTitle")}</p>
           <p className="mt-1 max-w-sm text-sm text-muted">
             {isOwner ? t("rp.emptyDesc") : t("rp.waitOwner")}
           </p>

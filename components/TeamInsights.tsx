@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
 import type { AiInsights, TeamStats } from "@/lib/insights";
@@ -168,6 +168,17 @@ export default function TeamInsights({
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Cute cycling status while insights generate (mirrors the report panel).
+  const STEPS = ["ti.step1", "ti.step2", "ti.step3", "ti.step4"] as const;
+  const [stepIdx, setStepIdx] = useState(0);
+  useEffect(() => {
+    if (!busy) return;
+    setStepIdx(0);
+    const iv = setInterval(() => setStepIdx((i) => (i + 1) % STEPS.length), 2600);
+    return () => clearInterval(iv);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busy]);
 
   async function generate() {
     setBusy(true);
@@ -340,32 +351,50 @@ export default function TeamInsights({
           className="card flex flex-col"
           style={{ background: "var(--accent-weak)" }}
         >
-          {insights && (
+          {(insights || busy) && (
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-[15px] font-medium">{tr("ti.pulse")}</span>
-              <button
-                onClick={generate}
-                disabled={busy}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--gold-700)] hover:underline disabled:opacity-50"
-              >
-                <Icon name="sparkles" size={13} />
-                {busy ? tr("oc.processing") : tr("ti.regen")}
-              </button>
+              <span className="text-[15px] font-medium">
+                {busy ? tr("ti.generating") : tr("ti.pulse")}
+              </span>
+              {insights && !busy && (
+                <button
+                  onClick={generate}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--gold-700)] hover:underline"
+                >
+                  <Icon name="sparkles" size={13} />
+                  {tr("ti.regen")}
+                </button>
+              )}
             </div>
           )}
 
-          {!insights ? (
+          {busy ? (
+            <div className="py-1">
+              <div
+                key={stepIdx}
+                className="rp-fade flex items-center gap-2 text-sm font-medium"
+              >
+                <span>{tr(STEPS[stepIdx])}</span>
+                <span className="rp-dots" aria-hidden>
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              </div>
+              <div className="mt-4 space-y-3">
+                <div className="rp-skel h-3 w-full" />
+                <div className="rp-skel h-3 w-[92%]" />
+                <div className="rp-skel h-3 w-[78%]" />
+              </div>
+            </div>
+          ) : !insights ? (
             <div className="flex flex-1 flex-col items-center justify-center py-4 text-center">
               <p className="mx-auto max-w-xs text-sm text-muted">
                 {tr("ti.emptyDesc")}
               </p>
-              <button
-                onClick={generate}
-                disabled={busy}
-                className="btn-primary mx-auto mt-4"
-              >
+              <button onClick={generate} className="btn-primary mx-auto mt-4">
                 <Icon name="sparkles" size={15} />
-                {busy ? tr("ti.generating") : tr("ti.generate")}
+                {tr("ti.generate")}
               </button>
               {error && <p className="mt-3 text-xs text-red-600">{error}</p>}
             </div>
