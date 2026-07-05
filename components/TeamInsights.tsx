@@ -32,7 +32,7 @@ function Delta({ value, unit }: { value: number | null; unit: string }) {
 function CardEyebrow({ label, tip }: { label: string; tip?: string }) {
   return (
     <span className="flex items-center gap-1.5">
-      <span className="eyebrow">{label}</span>
+      <span className="text-[15px] font-medium">{label}</span>
       {tip && (
         <span className="group relative inline-flex">
           <span className="cursor-help text-[color:var(--text-subtle)] transition-colors hover:text-[color:var(--text-muted)]">
@@ -288,7 +288,7 @@ export default function TeamInsights({
         <div className="card">
           <div className="mb-4 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <span className="eyebrow">{tr("ti.chartTitle")}</span>
+              <span className="text-[15px] font-medium">{tr("ti.chartTitle")}</span>
               <span className="group relative inline-flex">
                 <span className="cursor-help text-[color:var(--text-subtle)] transition-colors hover:text-[color:var(--text-muted)]">
                   <Icon name="info" size={13} />
@@ -342,7 +342,7 @@ export default function TeamInsights({
         >
           {insights && (
             <div className="mb-3 flex items-center justify-between">
-              <span className="eyebrow">{tr("ti.pulse")}</span>
+              <span className="text-[15px] font-medium">{tr("ti.pulse")}</span>
               <button
                 onClick={generate}
                 disabled={busy}
