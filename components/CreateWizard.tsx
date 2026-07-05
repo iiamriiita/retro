@@ -118,11 +118,12 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
           </button>
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
+          <a className="btn-ghost" href="/dashboard">
+            <Icon name="arrow-left" size={15} />
+            {tr("cw.backDashboard")}
+          </a>
           <a className="btn-ghost" href={`/s/${createdId}/results`}>
             {tr("cw.manageResults")}
-          </a>
-          <a className="btn-ghost" href="/dashboard">
-            {tr("cw.backDashboard")}
           </a>
         </div>
       </div>
