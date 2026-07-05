@@ -77,7 +77,7 @@ export default function ReportPanel({
 
       {report ? (
         <>
-          <div className="prose-sm max-w-none font-body [&_h2]:mt-4 [&_h2]:font-body [&_h2]:text-base [&_h2]:font-semibold [&_h2]:tracking-normal [&_h3]:font-body [&_h3]:tracking-normal [&_li]:ml-4 [&_li]:list-disc [&_p]:text-sm [&_ul]:my-2">
+          <div className="prose-sm max-w-none font-body [&_h2]:mt-4 [&_h2]:font-body [&_h2]:text-base [&_h2]:font-semibold [&_h2]:tracking-normal [&_h3]:font-body [&_h3]:tracking-normal [&_li]:ml-4 [&_li]:list-disc [&_li]:text-sm [&_p]:text-sm [&_strong]:font-normal [&_ul]:my-2">
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
           {generatedAt && (
