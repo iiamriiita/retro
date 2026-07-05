@@ -152,73 +152,87 @@ export default function ReportPanel({
             </div>
           )}
 
-          {(structured.well?.length || structured.improve?.length) && (
+          {(structured.well !== undefined || structured.improve !== undefined) && (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              {structured.well?.length ? (
+              {structured.well !== undefined && (
                 <div
                   className="rounded-xl p-4"
                   style={{ background: "var(--surface-2)" }}
                 >
-                  <h3 className="text-[15px] font-semibold">
-                    {t("rp.sec_well")}
-                  </h3>
-                  <ul className="mt-3 space-y-2.5">
-                    {structured.well.map((it, i) => (
-                      <li key={i} className="flex gap-2.5 text-sm">
-                        <span
-                          className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
-                          style={{ background: "var(--green-500)" }}
-                        />
-                        <span>{it}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-[15px] font-medium">{t("rp.sec_well")}</p>
+                  {structured.well.length ? (
+                    <ul className="mt-3 space-y-2.5">
+                      {structured.well.map((it, i) => (
+                        <li key={i} className="flex gap-2.5 text-sm">
+                          <span
+                            className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+                            style={{ background: "var(--green-500)" }}
+                          />
+                          <span>{it}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-3 text-sm text-subtle">
+                      {t("rp.sectionEmpty")}
+                    </p>
+                  )}
                 </div>
-              ) : null}
-              {structured.improve?.length ? (
+              )}
+              {structured.improve !== undefined && (
                 <div
                   className="rounded-xl p-4"
                   style={{ background: "var(--surface-2)" }}
                 >
-                  <h3 className="text-[15px] font-semibold">
-                    {t("rp.sec_improve")}
-                  </h3>
-                  <ul className="mt-3 space-y-2.5">
-                    {structured.improve.map((it, i) => (
-                      <li key={i} className="flex gap-2 text-sm">
-                        <span
-                          className="mt-0.5 shrink-0"
-                          style={{ color: "var(--red-500)" }}
-                        >
-                          <Icon name="alert-triangle" size={14} />
-                        </span>
-                        <span>{it}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-[15px] font-medium">{t("rp.sec_improve")}</p>
+                  {structured.improve.length ? (
+                    <ul className="mt-3 space-y-2.5">
+                      {structured.improve.map((it, i) => (
+                        <li key={i} className="flex gap-2 text-sm">
+                          <span
+                            className="mt-0.5 shrink-0"
+                            style={{ color: "var(--red-500)" }}
+                          >
+                            <Icon name="alert-triangle" size={14} />
+                          </span>
+                          <span>{it}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-3 text-sm text-subtle">
+                      {t("rp.sectionEmpty")}
+                    </p>
+                  )}
                 </div>
-              ) : null}
+              )}
             </div>
           )}
 
-          {structured.actions?.length ? (
+          {structured.actions !== undefined && (
             <div className="mt-6">
-              <h3 className="text-[15px] font-semibold">{t("rp.sec_actions")}</h3>
-              <ul className="mt-3 space-y-2">
-                {structured.actions.map((it, i) => (
-                  <li key={i} className="flex gap-2 text-sm">
-                    <span
-                      className="shrink-0 font-semibold"
-                      style={{ color: "var(--gold-700)" }}
-                    >
-                      &rarr;
-                    </span>
-                    <span>{it}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-[15px] font-medium">{t("rp.sec_actions")}</p>
+              {structured.actions.length ? (
+                <ul className="mt-3 space-y-2">
+                  {structured.actions.map((it, i) => (
+                    <li key={i} className="flex gap-2 text-sm">
+                      <span
+                        className="shrink-0 font-semibold"
+                        style={{ color: "var(--gold-700)" }}
+                      >
+                        &rarr;
+                      </span>
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-sm text-subtle">
+                  {t("rp.sectionEmpty")}
+                </p>
+              )}
             </div>
-          ) : null}
+          )}
 
           {generatedAt && (
             <p className="mt-6 text-xs text-subtle">

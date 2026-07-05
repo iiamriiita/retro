@@ -85,7 +85,7 @@ export function summarySystem(
 
 ${fields}
 
-Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said. Keep each bullet to one short sentence. Write all text in English.
+Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said. Keep each bullet to one short sentence. If a field genuinely has nothing to report, return an empty array — do NOT write apologies, disclaimers, or meta-commentary. Write all text in English.
 
 ${TONE_EN[tone]}`;
   }
@@ -94,7 +94,7 @@ ${TONE_EN[tone]}`;
 
 ${fields}
 
-原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。每一條保持一句短句。所有文字用繁體中文。
+原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。每一條保持一句短句。若某欄位確實沒有內容，回傳空陣列即可，不要寫道歉、免責或說明性的句子。所有文字用繁體中文。
 
 ${TONE_ZH[tone]}`;
 }
@@ -216,8 +216,14 @@ export async function geminiSummary(
   const last = clean.lastIndexOf("}");
   if (first >= 0 && last > first) clean = clean.slice(first, last + 1);
 
+  let parsed: {
+    summary?: unknown;
+    well?: unknown;
+    improve?: unknown;
+    actions?: unknown;
+  };
   try {
-    JSON.parse(clean);
+    parsed = JSON.parse(clean);
   } catch {
     throw new Error(
       locale === "en"
@@ -225,5 +231,20 @@ export async function geminiSummary(
         : "AI 回傳格式有誤，請再試一次。",
     );
   }
-  return clean;
+  // Keep exactly the requested fields, defaulting missing ones so every chosen
+  // section renders (empty → empty state) rather than silently disappearing.
+  const out: StructuredReport = {};
+  if (chosen.includes("themes"))
+    out.summary = typeof parsed.summary === "string" ? parsed.summary : "";
+  if (chosen.includes("well"))
+    out.well = Array.isArray(parsed.well) ? (parsed.well as string[]) : [];
+  if (chosen.includes("improve"))
+    out.improve = Array.isArray(parsed.improve)
+      ? (parsed.improve as string[])
+      : [];
+  if (chosen.includes("actions"))
+    out.actions = Array.isArray(parsed.actions)
+      ? (parsed.actions as string[])
+      : [];
+  return JSON.stringify(out);
 }
