@@ -27,6 +27,7 @@ export default function OwnerSidebar({
   const [view, setView] = useState<ShareView>(shareView);
   const [error, setError] = useState<string | null>(null);
   const [stuck, setStuck] = useState(false);
+  const [atLeastMsg, setAtLeastMsg] = useState(false);
 
   // Show our own share button only once the header's button scrolls away.
   useEffect(() => {
@@ -87,7 +88,12 @@ export default function OwnerSidebar({
   function togglePart(part: "report" | "raw") {
     const r = part === "report" ? !partReport : partReport;
     const a = part === "raw" ? !partResp : partResp;
-    if (!r && !a) return; // viewers must see something
+    if (!r && !a) {
+      // Viewers must see something — explain instead of silently ignoring.
+      setAtLeastMsg(true);
+      setTimeout(() => setAtLeastMsg(false), 2200);
+      return;
+    }
     void setShare(r && a ? "both" : r ? "report" : "raw");
   }
 
@@ -189,6 +195,11 @@ export default function OwnerSidebar({
             </div>
           ))}
         </div>
+        {atLeastMsg && (
+          <p className="mt-2 text-xs" style={{ color: "var(--red-500)" }}>
+            {t("os.atLeastOne")}
+          </p>
+        )}
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
