@@ -47,7 +47,7 @@ export function summarySystem(
     const fields: string[] = [];
     if (wantSummary)
       fields.push(
-        "- summary: ONE sentence capturing the overall takeaway of this retro.",
+        "- summary: ONE short sentence (25 words max) capturing the overall takeaway. End it with a period. Do NOT ramble or pad with generic business commentary.",
       );
     if (wantPoints)
       fields.push(
@@ -69,7 +69,10 @@ ${TONE_EN[tone]}`;
   }
 
   const fields: string[] = [];
-  if (wantSummary) fields.push("- summary：用「一句話」總結這場 retro 的整體重點。");
+  if (wantSummary)
+    fields.push(
+      "- summary：用「一句話」（最多約 45 字）總結這場 retro 的整體重點，句末加句號，不要長篇大論或加空泛的場面話。",
+    );
   if (wantPoints)
     fields.push(
       '- points：一個陣列，把「每一條」回答逐條分類。每條回答輸出一個物件 { "text": 用一句短句重述這條回答的內容, "kind": 若是正向、順利就填 "well"，若是問題、困擾、不順就填 "improve" }。請依「這條回答本身的意思」判斷，而不是依它寫在哪一題——問題就算寫在正向題也算 "improve"，正向就算寫在問題題也算 "well"。若某條只點出主題、沒說好壞，就依該題括號標示的傾向判斷。像「沒有」「無」「n/a」這種就跳過不收。',
@@ -150,6 +153,21 @@ export function buildContext(
   return blocks.join("\n\n");
 }
 
+// Guard against the model degenerating into an endless run-on summary: keep the
+// first sentence, and hard-cap the length so a runaway can never reach the UI.
+function clampSummary(raw: string): string {
+  let out = raw.trim();
+  const stop = out.search(/[.!?。！？]/);
+  if (stop >= 0 && stop <= 280) return out.slice(0, stop + 1).trim();
+  if (out.length > 280) {
+    out = out.slice(0, 280);
+    const lastSpace = out.lastIndexOf(" ");
+    if (lastSpace > 200) out = out.slice(0, lastSpace);
+    out = out.replace(/[\s,;:，、；：]+$/, "") + "…";
+  }
+  return out.trim();
+}
+
 // One-shot Gemini summary → JSON string of a StructuredReport. Throws on failure.
 export async function geminiSummary(
   context: string,
@@ -208,7 +226,7 @@ export async function geminiSummary(
     systemInstruction: { parts: [{ text: intro }] },
     contents: [{ role: "user", parts: [{ text: ask }] }],
     generationConfig: {
-      temperature: 0.35,
+      temperature: 0.55,
       maxOutputTokens: 2600,
       responseMimeType: "application/json",
       responseSchema,
@@ -292,7 +310,8 @@ export async function geminiSummary(
   // section renders (empty → empty state) rather than silently disappearing.
   const out: StructuredReport = {};
   if (chosen.includes("themes"))
-    out.summary = typeof parsed.summary === "string" ? parsed.summary : "";
+    out.summary =
+      typeof parsed.summary === "string" ? clampSummary(parsed.summary) : "";
   if (wantPoints) {
     // Split the labelled answers into the green (well) and red (improve) boxes.
     const points = Array.isArray(parsed.points) ? parsed.points : [];
