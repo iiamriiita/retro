@@ -61,11 +61,16 @@ function ReportList({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="mt-3 text-xs font-semibold text-[color:var(--gold-700)] hover:underline"
+          className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--text)]"
         >
           {expanded
             ? t("rp.seeLess")
             : t("rp.seeMore", { n: items.length - LIMIT })}
+          <Icon
+            name="chevron-down"
+            size={14}
+            className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+          />
         </button>
       )}
     </>
