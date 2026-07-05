@@ -233,7 +233,7 @@ export default function AuthModal({
             {view === "login" && (
               <form onSubmit={login} className="space-y-3">
                 <div>
-                  <h3 className="text-xl font-extrabold tracking-tight">
+                  <h3 className="text-lg font-extrabold tracking-tight">
                     {t("am.loginTitle")}
                   </h3>
                   <p className="mt-1.5 text-sm text-muted">
@@ -284,7 +284,7 @@ export default function AuthModal({
             {view === "otp" && step === "email" && (
               <form onSubmit={sendCode} className="space-y-3">
                 <div>
-                  <h3 className="text-xl font-extrabold tracking-tight">
+                  <h3 className="text-lg font-extrabold tracking-tight">
                     {otpMode === "register"
                       ? t("am.registerTitle")
                       : t("am.resetTitle")}
@@ -321,7 +321,7 @@ export default function AuthModal({
             {view === "otp" && step === "code" && (
               <form onSubmit={verify} className="space-y-3">
                 <div>
-                  <h3 className="text-xl font-extrabold tracking-tight">
+                  <h3 className="text-lg font-extrabold tracking-tight">
                     {t("am.enterCode")}
                   </h3>
                   <p className="mt-1.5 text-sm text-muted">
@@ -361,7 +361,7 @@ export default function AuthModal({
             {view === "otp" && step === "password" && (
               <form onSubmit={savePassword} className="space-y-3">
                 <div>
-                  <h3 className="text-xl font-extrabold tracking-tight">
+                  <h3 className="text-lg font-extrabold tracking-tight">
                     {t("am.setPassword")}
                   </h3>
                   <p className="mt-1.5 text-sm text-muted">
