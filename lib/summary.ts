@@ -60,17 +60,19 @@ export type StructuredReport = {
 
 const FIELD_ZH: Record<ReportSection, string> = {
   themes: "summary：用「一句話」總結這場 retro 的整體重點。",
-  well: "well：2–4 條短句，團隊做得好、值得延續的地方。",
-  improve: "improve：2–4 條短句，需要調整的問題（對事不對人）。",
-  actions: "actions：2–3 條短句，具體、可行動的調整方向。",
+  well: "well：歸納「順利的部分」區塊的內容。若該區沒有真正正向的內容，回傳空陣列 []。",
+  improve:
+    "improve：歸納「問題與警訊」區塊的內容（每條是簡短、具體的一點）。",
+  actions:
+    "actions：具體、可執行的下一步——就算沒人明講，也可以從「問題與警訊」和「方向」區塊合理推導出來。",
 };
 const FIELD_EN: Record<ReportSection, string> = {
   themes: "summary: ONE sentence capturing the overall takeaway of this retro.",
-  well: "well: 2–4 short bullet strings — what's going well, worth keeping.",
+  well: "well: bullets summarising the WENT WELL section. If that section has no genuinely positive content, return an empty array [].",
   improve:
-    "improve: 2–4 short bullet strings — what to improve (about the work, not people).",
+    "improve: bullets summarising the PROBLEMS & WARNINGS section (each a short, specific point).",
   actions:
-    "actions: 2–3 short bullet strings — concrete, specific next steps.",
+    "actions: concrete, specific next steps — derive them from the PROBLEMS and DIRECTION sections even if no one spelled them out.",
 };
 
 export function summarySystem(
@@ -99,6 +101,26 @@ ${fields}
 ${TONE_ZH[tone]}`;
 }
 
+// Which report section each template question feeds. Lets us group answers
+// deterministically (by question intent) instead of relying on the AI to guess.
+const SECTION_OF: Record<string, "well" | "improve" | "actions"> = {
+  // sailboat
+  wind: "well",
+  anchor: "improve",
+  rocks: "improve",
+  island: "actions",
+  // garden
+  blooming: "well",
+  needs_water: "improve",
+  weeds: "improve",
+  seeds: "actions",
+  // space mission
+  liftoff: "well",
+  gravity: "improve",
+  alerts: "improve",
+  next_coordinates: "actions",
+};
+
 export function buildContext(
   templateId: string,
   answers: { question_key: string; content: string }[],
@@ -106,17 +128,44 @@ export function buildContext(
 ): string {
   const template = getTemplate(templateId, locale);
   const questions = template?.questions ?? [];
-  const lines: string[] = [];
+  const buckets: Record<"well" | "improve" | "actions", string[]> = {
+    well: [],
+    improve: [],
+    actions: [],
+  };
   for (const q of questions) {
-    if (q.type === "rating") continue;
-    const group = answers.filter((a) => a.question_key === q.key);
-    lines.push(`### ${q.label}`);
-    if (group.length === 0)
-      lines.push(locale === "en" ? "(no answer)" : "（沒有回答）");
-    else for (const a of group) lines.push(`- ${a.content}`);
-    lines.push("");
+    if (q.type === "rating" || q.type === "role") continue;
+    const bucket = SECTION_OF[q.key];
+    if (!bucket) continue;
+    for (const a of answers.filter((x) => x.question_key === q.key)) {
+      const c = a.content.trim();
+      if (c) buckets[bucket].push(`- ${c}  (${q.label})`);
+    }
   }
-  return lines.join("\n");
+  const en = locale === "en";
+  const none = en ? "(no answers)" : "（沒有回答）";
+  const section = (title: string, arr: string[]) =>
+    `### ${title}\n${arr.length ? arr.join("\n") : none}\n`;
+  return [
+    section(
+      en
+        ? "WENT WELL — things the team is happy about"
+        : "順利的部分——團隊覺得好的地方",
+      buckets.well,
+    ),
+    section(
+      en
+        ? "PROBLEMS & WARNINGS — what slowed us down or to watch"
+        : "問題與警訊——拖累進度或要注意的",
+      buckets.improve,
+    ),
+    section(
+      en
+        ? "DIRECTION — where the team wants to head next"
+        : "方向——團隊接下來想往哪走",
+      buckets.actions,
+    ),
+  ].join("\n");
 }
 
 // One-shot Gemini summary → JSON string of a StructuredReport. Throws on failure.
