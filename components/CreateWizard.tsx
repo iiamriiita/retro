@@ -107,7 +107,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
           />
           <button
             type="button"
-            className="btn-ghost"
+            className="btn-primary"
             onClick={async () => {
               await navigator.clipboard.writeText(shareUrl);
               setCopied(true);
@@ -118,7 +118,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
           </button>
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
-          <a className="btn-primary" href={`/s/${createdId}/results`}>
+          <a className="btn-ghost" href={`/s/${createdId}/results`}>
             {tr("cw.manageResults")}
           </a>
           <a className="btn-ghost" href="/dashboard">
