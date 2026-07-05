@@ -321,6 +321,7 @@ const en: Dict = {
   "flb.shareResultTitle": "Share results",
   "flb.shareResultDesc":
     "Anyone with this link can view the results and join the discussion.",
+  "flb.shareResultDescNoDisc": "Anyone with this link can view the results.",
   "flb.openResultNewTab": "Open in new tab",
 
   // auth modal
@@ -640,6 +641,7 @@ const zh: Dict = {
   "flb.openNewTab": "在新分頁開啟",
   "flb.shareResultTitle": "分享結果頁",
   "flb.shareResultDesc": "任何拿到連結的人都能查看結果並加入討論。",
+  "flb.shareResultDescNoDisc": "任何拿到連結的人都能查看結果。",
   "flb.openResultNewTab": "在新分頁開啟",
 
   "am.login": "登入",

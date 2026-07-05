@@ -101,6 +101,7 @@ export default function OwnerSidebar({
         <FormLinkButton
           sessionId={sessionId}
           ended
+          discussionEnabled={discussionEnabled}
           triggerClassName="btn-primary w-full"
         />
       </div>

@@ -222,6 +222,7 @@ export default async function ResultsPage({
             <FormLinkButton
               sessionId={session.id}
               ended
+              discussionEnabled={session.discussion_enabled}
               triggerClassName="btn-primary"
             />
           </div>

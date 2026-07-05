@@ -8,10 +8,12 @@ import { useT } from "@/lib/i18n/client";
 export default function FormLinkButton({
   sessionId,
   ended = false,
+  discussionEnabled = false,
   triggerClassName = "btn-ghost !py-1.5 text-xs",
 }: {
   sessionId: string;
   ended?: boolean;
+  discussionEnabled?: boolean;
   triggerClassName?: string;
 }) {
   const { t } = useT();
@@ -29,7 +31,9 @@ export default function FormLinkButton({
     ? {
         trigger: t("flb.shareResult"),
         title: t("flb.shareResultTitle"),
-        desc: t("flb.shareResultDesc"),
+        desc: discussionEnabled
+          ? t("flb.shareResultDesc")
+          : t("flb.shareResultDescNoDisc"),
         openNewTab: t("flb.openResultNewTab"),
       }
     : {
