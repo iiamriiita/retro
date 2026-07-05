@@ -303,7 +303,7 @@ export default function FillWizard({
 
       {inIdentity && (
         <div className="card space-y-2">
-          <label className="mb-1 block text-[17px] font-semibold leading-snug">{t("fw.yourName")}</label>
+          <label className="mb-1 block text-[15px] font-medium leading-snug">{t("fw.yourName")}</label>
           <input
             autoFocus
             className="textarea"
@@ -323,7 +323,7 @@ export default function FillWizard({
 
       {inQuestion && currentQuestion && currentQuestion.type === "rating" && (
         <div className="card">
-          <label className="mb-1 block text-[17px] font-semibold leading-snug">{currentQuestion.label}</label>
+          <label className="mb-1 block text-[15px] font-medium leading-snug">{currentQuestion.label}</label>
           {(() => {
             const q = currentQuestion;
             const scale =
@@ -397,7 +397,7 @@ export default function FillWizard({
 
       {inQuestion && currentQuestion && currentQuestion.type === "role" && (
         <div className="card">
-          <label className="mb-1 block text-[17px] font-semibold leading-snug">{currentQuestion.label}</label>
+          <label className="mb-1 block text-[15px] font-medium leading-snug">{currentQuestion.label}</label>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {(currentQuestion.options ?? []).map((o) => {
               const roleStr = o.label;
@@ -464,7 +464,7 @@ export default function FillWizard({
         currentQuestion.type !== "rating" &&
         currentQuestion.type !== "role" && (
           <div className="card">
-            <label className="mb-1 block text-[17px] font-semibold leading-snug">{currentQuestion.label}</label>
+            <label className="mb-1 block text-[15px] font-medium leading-snug">{currentQuestion.label}</label>
             <textarea
               autoFocus
               rows={4}
