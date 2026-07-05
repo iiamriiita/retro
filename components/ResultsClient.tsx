@@ -391,7 +391,10 @@ export default function ResultsClient({
     <div className="w-full">
       {/* Identity line */}
       {discussionEnabled && (
-        <div className="mb-4 flex items-center gap-2 text-xs text-muted">
+        <div
+          className="-mx-[1.375rem] -mt-[1.25rem] mb-5 flex items-center gap-2 rounded-t-[9px] px-[1.375rem] py-3 text-xs text-muted"
+          style={{ background: "var(--accent-weak)" }}
+        >
           <Icon name="message" size={13} />
           <span>{t("rc.hint")}</span>
           {identity && (
