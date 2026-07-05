@@ -79,6 +79,7 @@ export default function ResultsClient({
   const { t } = useT();
   const [comments, setComments] = useState<PublicComment[]>(initialComments);
   const [groupBy, setGroupBy] = useState<"question" | "person">("question");
+  const [groupMenuOpen, setGroupMenuOpen] = useState(false);
   const [floating, setFloating] = useState<FloatingBtn | null>(null);
 
   // Popovers (only one open at a time).
@@ -411,15 +412,53 @@ export default function ResultsClient({
           </span>
           {t("res.raw")}
         </h2>
-        <select
-          value={groupBy}
-          onChange={(e) => setGroupBy(e.target.value as "question" | "person")}
-          className="cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium outline-none"
-          style={{ background: "var(--surface-2)", color: "var(--text)" }}
-        >
-          <option value="question">{t("res.groupQuestion")}</option>
-          <option value="person">{t("res.groupPerson")}</option>
-        </select>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setGroupMenuOpen((o) => !o)}
+            onBlur={() => setTimeout(() => setGroupMenuOpen(false), 120)}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+            style={{ background: "var(--surface-2)", color: "var(--text)" }}
+          >
+            {t(groupBy === "question" ? "res.groupQuestion" : "res.groupPerson")}
+            <Icon
+              name="chevron-down"
+              size={14}
+              className={`transition-transform ${groupMenuOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+          {groupMenuOpen && (
+            <div
+              className="absolute right-0 top-full z-30 mt-1 w-max overflow-hidden rounded-lg bg-white p-1"
+              style={{ boxShadow: "var(--shadow-md)" }}
+            >
+              {(
+                [
+                  { v: "question", label: t("res.groupQuestion") },
+                  { v: "person", label: t("res.groupPerson") },
+                ] as const
+              ).map((o) => (
+                <button
+                  key={o.v}
+                  type="button"
+                  onClick={() => {
+                    setGroupBy(o.v);
+                    setGroupMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-sm transition-colors hover:bg-[color:var(--surface-2)]"
+                >
+                  <span
+                    className="w-4"
+                    style={{ color: "var(--accent)" }}
+                  >
+                    {groupBy === o.v && <Icon name="check" size={15} strokeWidth={3} />}
+                  </span>
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {moodReasons.length > 0 && (
