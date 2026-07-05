@@ -65,6 +65,7 @@ export default function ResultsClient({
   answers,
   initialComments,
   rosterNames,
+  moodReasons = [],
 }: {
   sessionId: string;
   anonymous: boolean;
@@ -73,9 +74,11 @@ export default function ResultsClient({
   answers: PublicAnswer[];
   initialComments: PublicComment[];
   rosterNames: string[];
+  moodReasons?: { score: number; reason: string; emoji: string }[];
 }) {
   const { t } = useT();
   const [comments, setComments] = useState<PublicComment[]>(initialComments);
+  const [groupBy, setGroupBy] = useState<"question" | "person">("question");
   const [floating, setFloating] = useState<FloatingBtn | null>(null);
 
   // Popovers (only one open at a time).
@@ -401,45 +404,128 @@ export default function ResultsClient({
         </div>
       )}
 
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-lg font-bold">
+          <span style={{ color: "var(--accent)" }}>
+            <Icon name="list" size={19} />
+          </span>
+          {t("res.raw")}
+        </h2>
+        <select
+          value={groupBy}
+          onChange={(e) => setGroupBy(e.target.value as "question" | "person")}
+          className="cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium outline-none"
+          style={{ background: "var(--surface-2)", color: "var(--text)" }}
+        >
+          <option value="question">{t("res.groupQuestion")}</option>
+          <option value="person">{t("res.groupPerson")}</option>
+        </select>
+      </div>
+
+      {moodReasons.length > 0 && (
+        <div
+          className="mb-5 rounded-xl p-4"
+          style={{ background: "var(--surface-2)" }}
+        >
+          <p className="eyebrow">{t("res.moodWhy")}</p>
+          <ul className="mt-2 space-y-1.5">
+            {moodReasons.map((r, i) => (
+              <li key={i} className="text-sm text-muted">
+                <span className="font-semibold text-ink">
+                  {r.emoji} {r.score}/5
+                </span>{" "}
+                — {r.reason}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div onMouseUp={onMouseUp} className="space-y-8">
-        {questions.map((q) => {
-          const group = answers.filter((a) => a.question_key === q.key);
-          return (
-            <section key={q.key}>
-              <h2 className="flex items-center gap-2 font-body text-[15px] font-medium leading-snug tracking-normal">
-                <QuestionIcon qKey={q.key} size={19} />
-                {q.label}
-              </h2>
-              <p className="mb-3 text-xs text-muted">
-                {t("rc.responses", { n: group.length })}
-              </p>
-              {group.length === 0 ? (
-                <p className="text-sm text-muted">{t("rc.noAnswers")}</p>
-              ) : (
-                <ul className="space-y-3">
-                  {group.map((a) => (
-                    <li key={a.id} className="rounded-xl p-4" style={{ background: "var(--surface-2)" }}>
-                      <p
-                        data-answer-id={a.id}
-                        className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink"
-                      >
-                        {renderAnnotated(
-                          a.content,
-                          anchorsByAnswer.get(a.id) ?? [],
-                        )}
-                      </p>
-                      {!anonymous && a.author_name && (
-                        <p className="mt-2 text-xs text-subtle">
-                          — {a.author_name}
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          );
-        })}
+        {groupBy === "question"
+          ? questions.map((q) => {
+              const group = answers.filter((a) => a.question_key === q.key);
+              return (
+                <section key={q.key}>
+                  <h2 className="flex items-center gap-2 font-body text-[15px] font-medium leading-snug tracking-normal">
+                    <QuestionIcon qKey={q.key} size={19} />
+                    {q.label}
+                  </h2>
+                  <p className="mb-3 text-xs text-muted">
+                    {t("rc.responses", { n: group.length })}
+                  </p>
+                  {group.length === 0 ? (
+                    <p className="text-sm text-muted">{t("rc.noAnswers")}</p>
+                  ) : (
+                    <ul className="space-y-3">
+                      {group.map((a) => (
+                        <li
+                          key={a.id}
+                          className="rounded-xl p-4"
+                          style={{ background: "var(--surface-2)" }}
+                        >
+                          <p
+                            data-answer-id={a.id}
+                            className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink"
+                          >
+                            {renderAnnotated(
+                              a.content,
+                              anchorsByAnswer.get(a.id) ?? [],
+                            )}
+                          </p>
+                          {!anonymous && a.author_name && (
+                            <p className="mt-2 text-xs text-subtle">
+                              — {a.author_name}
+                            </p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              );
+            })
+          : Array.from(new Set(answers.map((a) => a.author_key)))
+              .sort((a, b) => Number(a) - Number(b))
+              .map((pk) => {
+                const group = answers.filter((a) => a.author_key === pk);
+                const label =
+                  group[0]?.author_name ?? t("res.respondentN", { n: pk });
+                const qByKey = new Map(questions.map((q) => [q.key, q]));
+                return (
+                  <section key={pk}>
+                    <h2 className="font-body text-[15px] font-medium leading-snug tracking-normal">
+                      {label}
+                    </h2>
+                    <p className="mb-3 text-xs text-muted">
+                      {t("rc.responses", { n: group.length })}
+                    </p>
+                    <ul className="space-y-3">
+                      {group.map((a) => (
+                        <li
+                          key={a.id}
+                          className="rounded-xl p-4"
+                          style={{ background: "var(--surface-2)" }}
+                        >
+                          <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+                            <QuestionIcon qKey={a.question_key} size={14} />
+                            {qByKey.get(a.question_key)?.label ?? a.question_key}
+                          </p>
+                          <p
+                            data-answer-id={a.id}
+                            className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink"
+                          >
+                            {renderAnnotated(
+                              a.content,
+                              anchorsByAnswer.get(a.id) ?? [],
+                            )}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                );
+              })}
       </div>
 
       {/* Floating "comment" button on selection */}

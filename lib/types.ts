@@ -69,6 +69,8 @@ export interface PublicAnswer {
   question_key: string;
   content: string;
   author_name: string | null;
+  /** Stable per-respondent index ("1", "2", …) for grouping by person. */
+  author_key: string;
 }
 
 // A discussion comment. Top-level comments anchor to a quote (quote/offsets set,

@@ -6,7 +6,6 @@ import type { PublicAnswer, PublicComment } from "@/lib/types";
 import ResultsClient from "@/components/ResultsClient";
 import ReportPanel from "@/components/ReportPanel";
 import OwnerSidebar from "@/components/OwnerSidebar";
-import Icon from "@/components/Icon";
 import CloseSessionButton from "@/components/CloseSessionButton";
 import FormLinkButton from "@/components/FormLinkButton";
 import BackButton from "@/components/BackButton";
@@ -128,6 +127,14 @@ export default async function ResultsPage({
       "",
     );
 
+  // Stable per-respondent index in order of first appearance.
+  const authorIdx = new Map<string, number>();
+  for (const a of rawAnswers ?? []) {
+    if (!authorIdx.has(a.participant_id))
+      authorIdx.set(a.participant_id, authorIdx.size + 1);
+  }
+  const respondentCount = authorIdx.size;
+
   const answers: PublicAnswer[] = (rawAnswers ?? [])
     .filter((a) => a.question_key !== MOOD_KEY)
     .map((a) => ({
@@ -137,6 +144,7 @@ export default async function ResultsPage({
         ? stripLeadingEmoji(a.content)
         : a.content,
       author_name: anonymous ? null : (nameById.get(a.participant_id) ?? null),
+      author_key: String(authorIdx.get(a.participant_id) ?? 0),
     }));
 
   // Comment threads. Author names come from the commenter's discussion identity,
@@ -181,7 +189,7 @@ export default async function ResultsPage({
         </h1>
         <p className="mt-1 text-sm text-muted">
           {anonymous ? t("res.modeAnon") : t("res.modeNamed")} ·{" "}
-          {t("res.responsesTotal", { n: answers.length })}
+          {t("res.responsesTotal", { n: respondentCount })}
           {session.discussion_enabled && ` · ${t("res.discussing")}`}
         </p>
         {avgMood != null && (
@@ -236,30 +244,6 @@ export default async function ResultsPage({
 
             {showRaw && (
               <section className="card">
-                <h2 className="mb-4 flex items-center gap-2 text-lg font-bold">
-                  <span style={{ color: "var(--accent)" }}>
-                    <Icon name="list" size={19} />
-                  </span>
-                  {t("res.raw")}
-                </h2>
-                {moodReasons.length > 0 && (
-                  <div
-                    className="mb-5 rounded-xl p-4"
-                    style={{ background: "var(--surface-2)" }}
-                  >
-                    <p className="eyebrow">{t("res.moodWhy")}</p>
-                    <ul className="mt-2 space-y-1.5">
-                      {moodReasons.map((r, i) => (
-                        <li key={i} className="text-sm text-muted">
-                          <span className="font-semibold text-ink">
-                            {scaleEmoji(r.score)} {r.score}/5
-                          </span>{" "}
-                          — {r.reason}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
                 <ResultsClient
                   sessionId={session.id}
                   anonymous={anonymous}
@@ -268,6 +252,10 @@ export default async function ResultsPage({
                   answers={answers}
                   initialComments={initialComments}
                   rosterNames={[]}
+                  moodReasons={moodReasons.map((r) => ({
+                    ...r,
+                    emoji: scaleEmoji(r.score),
+                  }))}
                 />
               </section>
             )}
