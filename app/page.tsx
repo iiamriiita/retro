@@ -33,7 +33,7 @@ export default async function LandingPage() {
           {t("landing.subtitle")}
         </p>
 
-        <div className="mt-7 flex flex-wrap gap-3">
+        <div className="mt-10 flex flex-wrap gap-3">
           {user ? (
             <>
               <Link className="btn-primary !h-12 !px-6 !text-base" href="/dashboard">
