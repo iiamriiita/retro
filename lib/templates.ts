@@ -442,8 +442,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "liftoff",
         label: {
-          en: "🚀 Liftoff: Where did this mission take off smoothly? What went great?",
-          zh: "🚀 成功發射（Liftoff）：這趟任務哪裡順利起飛？什麼進行得很棒？",
+          en: "Liftoff: Where did this mission take off smoothly? What went great?",
+          zh: "成功發射（Liftoff）：這趟任務哪裡順利起飛？什麼進行得很棒？",
         },
         placeholder: {
           en: "e.g. The launch went out on time with zero rollbacks.",
@@ -453,8 +453,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "gravity",
         label: {
-          en: "🌍 Gravity: What force kept pulling us down and slowing progress?",
-          zh: "🌍 重力阻礙（Gravity）：什麼力量一直把我們往下拉、拖慢進度？",
+          en: "Gravity: What force kept pulling us down and slowing progress?",
+          zh: "重力阻礙（Gravity）：什麼力量一直把我們往下拉、拖慢進度？",
         },
         placeholder: {
           en: "e.g. Constant context-switching between too many projects.",
@@ -464,8 +464,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "alerts",
         label: {
-          en: "⚠️ Alerts: What warning signs came up that we should watch next time?",
-          zh: "⚠️ 系統警報（Alerts）：任務中出現過哪些警訊，是下次要注意的？",
+          en: "Alerts: What warning signs came up that we should watch next time?",
+          zh: "系統警報（Alerts）：任務中出現過哪些警訊，是下次要注意的？",
         },
         placeholder: {
           en: "e.g. We noticed flaky tests but kept ignoring them.",
@@ -475,8 +475,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       {
         key: "next_coordinates",
         label: {
-          en: "🛸 Next coordinates: Which direction should we adjust for the next mission?",
-          zh: "🛸 下一趟座標（Next Coordinates）：下一趟任務你希望我們往哪個方向調整？",
+          en: "Next coordinates: Which direction should we adjust for the next mission?",
+          zh: "下一趟座標（Next Coordinates）：下一趟任務你希望我們往哪個方向調整？",
         },
         placeholder: {
           en: "e.g. Fewer parallel projects, more focus per sprint.",
@@ -485,8 +485,8 @@ const TEMPLATES_I18N: I18nTemplate[] = [
       },
       moodQuestion(
         {
-          en: "📊 Mission dashboard: what's your reading on the overall mission status?",
-          zh: "📊 任務儀表板：這趟任務的整體狀態，你的讀數是？",
+          en: "Mission dashboard: what's your reading on the overall mission status?",
+          zh: "任務儀表板：這趟任務的整體狀態，你的讀數是？",
         },
         [
           {
