@@ -347,10 +347,7 @@ export default function TeamInsights({
         </div>
 
         {/* AI pulse */}
-        <div
-          className="card flex flex-col"
-          style={{ background: "#FDF6E3" }}
-        >
+        <div className="card flex flex-col">
           {(insights || busy) && (
             <div className="mb-3 flex items-center justify-between">
               <span className="text-[15px] font-medium">
