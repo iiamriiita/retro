@@ -197,7 +197,7 @@ input[type="checkbox"] {
 .eyebrow {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text-subtle);
 }
 
 /* ---------------- Landing hero scene ---------------- */
