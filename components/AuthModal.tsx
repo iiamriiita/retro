@@ -161,35 +161,40 @@ export default function AuthModal({
             className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex items-center justify-between">
-              {/* Tabs */}
-              <div className="flex gap-1 rounded-lg bg-gray-100 p-1 text-sm">
-                <button
-                  type="button"
-                  className={`rounded-md px-3 py-1 ${
-                    view === "login"
-                      ? "bg-white font-medium shadow-sm"
-                      : "text-muted"
-                  }`}
-                  onClick={() => reset(false)}
-                >
-                  {t("am.login")}
-                </button>
-                <button
-                  type="button"
-                  className={`rounded-md px-3 py-1 ${
-                    view === "otp" && otpMode === "register"
-                      ? "bg-white font-medium shadow-sm"
-                      : "text-muted"
-                  }`}
-                  onClick={() => reset(true)}
-                >
-                  {t("am.register")}
-                </button>
+            <div
+              className="mb-5 flex items-end justify-between border-b"
+              style={{ borderColor: "var(--border)" }}
+            >
+              {/* Underline tabs */}
+              <div className="flex gap-6 text-[15px]">
+                {(
+                  [
+                    { key: "login", label: t("am.login"), active: view === "login" },
+                    {
+                      key: "register",
+                      label: t("am.register"),
+                      active: view === "otp" && otpMode === "register",
+                    },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => reset(tab.key === "register")}
+                    className={`-mb-px border-b-2 pb-2.5 font-semibold transition-colors ${
+                      tab.active
+                        ? "text-ink"
+                        : "border-transparent text-subtle hover:text-muted"
+                    }`}
+                    style={tab.active ? { borderColor: "var(--accent)" } : undefined}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
               <button
                 type="button"
-                className="text-muted hover:text-ink"
+                className="pb-2.5 text-muted hover:text-ink"
                 onClick={() => setOpen(false)}
                 aria-label={t("am.close")}
               >
@@ -209,6 +214,14 @@ export default function AuthModal({
             {/* Login */}
             {view === "login" && (
               <form onSubmit={login} className="space-y-3">
+                <div>
+                  <h3 className="text-xl font-extrabold tracking-tight">
+                    {t("am.loginTitle")}
+                  </h3>
+                  <p className="mt-1.5 text-sm text-muted">
+                    {t("am.loginHint")}
+                  </p>
+                </div>
                 <div>
                   <label className="field-label">Email</label>
                   <input
@@ -252,12 +265,14 @@ export default function AuthModal({
             {/* OTP: email step */}
             {view === "otp" && step === "email" && (
               <form onSubmit={sendCode} className="space-y-3">
-                <p className="text-sm font-medium">
-                  {otpMode === "register"
-                    ? t("am.registerTitle")
-                    : t("am.resetTitle")}
-                </p>
-                <p className="text-xs text-muted">{t("am.emailHint")}</p>
+                <div>
+                  <h3 className="text-xl font-extrabold tracking-tight">
+                    {otpMode === "register"
+                      ? t("am.registerTitle")
+                      : t("am.resetTitle")}
+                  </h3>
+                  <p className="mt-1.5 text-sm text-muted">{t("am.emailHint")}</p>
+                </div>
                 <div>
                   <label className="field-label">Email</label>
                   <input
@@ -278,10 +293,14 @@ export default function AuthModal({
             {/* OTP: code step */}
             {view === "otp" && step === "code" && (
               <form onSubmit={verify} className="space-y-3">
-                <p className="text-sm font-medium">{t("am.enterCode")}</p>
-                <p className="text-xs text-muted">
-                  {t("am.sentTo", { email })}
-                </p>
+                <div>
+                  <h3 className="text-xl font-extrabold tracking-tight">
+                    {t("am.enterCode")}
+                  </h3>
+                  <p className="mt-1.5 text-sm text-muted">
+                    {t("am.sentTo", { email })}
+                  </p>
+                </div>
                 <input
                   inputMode="numeric"
                   autoComplete="one-time-code"
@@ -314,8 +333,14 @@ export default function AuthModal({
             {/* OTP: set password step */}
             {view === "otp" && step === "password" && (
               <form onSubmit={savePassword} className="space-y-3">
-                <p className="text-sm font-medium">{t("am.setPassword")}</p>
-                <p className="text-xs text-muted">{t("am.setPasswordHint")}</p>
+                <div>
+                  <h3 className="text-xl font-extrabold tracking-tight">
+                    {t("am.setPassword")}
+                  </h3>
+                  <p className="mt-1.5 text-sm text-muted">
+                    {t("am.setPasswordHint")}
+                  </p>
+                </div>
                 <div>
                   <label className="field-label">{t("am.password")}</label>
                   <input
