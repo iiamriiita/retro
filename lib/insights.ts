@@ -181,10 +181,9 @@ export function computeTeamStats(
    ============================================================ */
 
 export interface AiInsights {
-  sentiment: { label: string; score: number; note: string };
+  // A short 3–4 line read on the team. Everything else on the panel (sentiment,
+  // chart) is computed from ratings, so the AI only writes this one brief.
   pulse: string;
-  themes: { label: string; count: number; direction: "up" | "warning" | "down" }[];
-  timeline: { label: string; score: number }[];
 }
 
 export interface RetroForAI {
@@ -195,25 +194,15 @@ export interface RetroForAI {
 
 const INSIGHTS_SYSTEM_ZH = `你是一個團隊 retro（回顧會議）的資深教練。你會收到同一個團隊「多場」retro 的回答（依時間排序，已去識別化）。
 
-請跨場分析團隊的走向，並「只」輸出 JSON（繁體中文內容），欄位如下：
-- sentiment.label：整體氛圍，用「正面 / 中性 / 需要關注」其中一個。
-- sentiment.score：0–100 的整體健康分數。
-- sentiment.note：一句話趨勢註解，例如「連續 3 場改善中」。
-- pulse：2–4 句話的團隊近況敘述，點出走向、持續的優點、以及尚未解決的痛點。
-- themes：跨場重複出現的主題陣列，每個含 label（主題名，2–6 字）、count（大約出現次數）、direction（up=正在變好、warning=反覆出現的痛點、down=正在惡化）。最多 6 個，依重要性排序。
-- timeline：每一場的氛圍分數，label 用該場日期、score 0–100，順序與輸入相同。
+請跨場快速看團隊的走向，然後「只」輸出 JSON（繁體中文內容），欄位只有一個：
+- pulse：3–4 行的簡短團隊近況，點出走向、持續的優點、以及還沒解決的痛點。白話、具體，不要空泛的場面話。
 
 原則：對事不對人、忠實反映內容、不要杜撰沒出現的事。只輸出 JSON，不要多餘文字。`;
 
 const INSIGHTS_SYSTEM_EN = `You are a senior coach for a team's retrospectives. You'll receive answers from MULTIPLE retros of the same team (in chronological order, de-identified).
 
-Analyze the team's trajectory across retros and output ONLY JSON (content in English), with these fields:
-- sentiment.label: overall mood, one of "Positive / Neutral / Needs attention".
-- sentiment.score: an overall health score, 0–100.
-- sentiment.note: a one-line trend note, e.g. "Improving 3 retros in a row".
-- pulse: 2–4 sentences on where the team is — the trajectory, lasting strengths, and unresolved pain points.
-- themes: recurring themes across retros; each has label (2–4 words), count (approx times it appeared), direction (up = improving, warning = recurring pain point, down = getting worse). Max 6, ordered by importance.
-- timeline: a mood score per retro; label is that retro's date, score 0–100, in the same order as the input.
+Skim the team's trajectory across retros and output ONLY JSON (content in English), with a single field:
+- pulse: a short 3–4 line read on the team — the trajectory, lasting strengths, and unresolved pain points. Plain and specific, no generic filler.
 
 Principles: about the work not the people, reflect the content faithfully, don't invent things. Output JSON only, no extra text.`;
 
@@ -240,41 +229,9 @@ function buildAiContext(retros: RetroForAI[], locale: Locale): string {
 const RESPONSE_SCHEMA = {
   type: "object",
   properties: {
-    sentiment: {
-      type: "object",
-      properties: {
-        label: { type: "string" },
-        score: { type: "number" },
-        note: { type: "string" },
-      },
-      required: ["label", "score", "note"],
-    },
     pulse: { type: "string" },
-    themes: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          label: { type: "string" },
-          count: { type: "number" },
-          direction: { type: "string", enum: ["up", "warning", "down"] },
-        },
-        required: ["label", "count", "direction"],
-      },
-    },
-    timeline: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          label: { type: "string" },
-          score: { type: "number" },
-        },
-        required: ["label", "score"],
-      },
-    },
   },
-  required: ["sentiment", "pulse", "themes", "timeline"],
+  required: ["pulse"],
 };
 
 export async function geminiInsights(
@@ -300,52 +257,80 @@ export async function geminiInsights(
       ? "Analyze across retros and output JSON."
       : "請跨場分析並輸出 JSON。";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: intro }] },
-      contents: [{ role: "user", parts: [{ text: ask }] }],
-      generationConfig: {
-        temperature: 0.4,
-        maxOutputTokens: 1200,
-        responseMimeType: "application/json",
-        responseSchema: RESPONSE_SCHEMA,
-      },
-    }),
-    signal: AbortSignal.timeout(30_000),
+  const payload = JSON.stringify({
+    systemInstruction: { parts: [{ text: intro }] },
+    contents: [{ role: "user", parts: [{ text: ask }] }],
+    generationConfig: {
+      temperature: 0.5,
+      maxOutputTokens: 700,
+      responseMimeType: "application/json",
+      responseSchema: RESPONSE_SCHEMA,
+    },
   });
 
-  if (!res.ok) {
-    if (res.status === 429)
+  // The model can be briefly overloaded (503) — retry a couple of times.
+  let res: Response | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (res.status !== 503 && res.status !== 500) break;
+    if (attempt < 2)
+      await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
+  }
+
+  if (!res || !res.ok) {
+    const status = res?.status ?? 0;
+    if (status === 429)
       throw new Error(
         locale === "en"
           ? "The AI is over its usage quota right now. Please try again in a little while."
           : "AI 目前已超過用量額度，請稍後再試（Gemini 免費額度有限）。",
       );
-    const detail = await res.text().catch(() => "");
+    if (status === 503 || status === 500)
+      throw new Error(
+        locale === "en"
+          ? "The AI is very busy right now. Please try again in a moment."
+          : "AI 目前流量很大、暫時忙碌，請稍等一下再試一次。",
+      );
+    const detail = res ? await res.text().catch(() => "") : "";
     throw new Error(
       (locale === "en" ? "AI service error" : "AI 服務錯誤") +
-        `（${res.status}）：${detail.slice(0, 300)}`,
+        `（${status}）：${detail.slice(0, 300)}`,
     );
   }
 
   const data = await res.json();
-  const raw: string =
+  const rawText: string =
     data?.candidates?.[0]?.content?.parts
       ?.map((p: { text?: string }) => p.text ?? "")
       .join("")
       .trim() ?? "";
-  if (!raw)
+  if (!rawText)
     throw new Error(
       locale === "en"
         ? "The AI returned no content — please try again."
         : "AI 沒有回覆內容，請再試一次。",
     );
 
-  let parsed: AiInsights;
+  // Clean up: strip any ```json fences and keep the outermost JSON object.
+  let clean = rawText;
+  if (clean.startsWith("```")) {
+    clean = clean
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/```\s*$/, "")
+      .trim();
+  }
+  const first = clean.indexOf("{");
+  const last = clean.lastIndexOf("}");
+  if (first >= 0 && last > first) clean = clean.slice(first, last + 1);
+
+  let parsed: { pulse?: unknown };
   try {
-    parsed = JSON.parse(raw) as AiInsights;
+    parsed = JSON.parse(clean);
   } catch {
     throw new Error(
       locale === "en"
@@ -353,5 +338,5 @@ export async function geminiInsights(
         : "AI 回傳格式錯誤，請再試一次。",
     );
   }
-  return parsed;
+  return { pulse: typeof parsed.pulse === "string" ? parsed.pulse.trim() : "" };
 }

@@ -152,14 +152,6 @@ function deriveSentiment(stats: TeamStats, tr: Tr) {
   return { label, color, note, noteColor, icon };
 }
 
-function themeTone(direction: "up" | "warning" | "down") {
-  if (direction === "up")
-    return { color: "var(--green-500)", icon: "trending-up" as const };
-  if (direction === "down")
-    return { color: "var(--red-500)", icon: "trending-down" as const };
-  return { color: "var(--red-500)", icon: "alert-triangle" as const };
-}
-
 export default function TeamInsights({
   stats,
   initialInsights,
@@ -379,30 +371,9 @@ export default function TeamInsights({
             </div>
           ) : (
             <>
-              <p className="text-sm leading-relaxed text-ink">
+              <p className="whitespace-pre-line text-sm leading-relaxed text-ink">
                 {insights.pulse}
               </p>
-
-              {insights.themes.length > 0 && (
-                <>
-                  <p className="eyebrow mt-4">{tr("ti.themes")}</p>
-                  <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2">
-                    {insights.themes.map((t, i) => {
-                      const tone = themeTone(t.direction);
-                      return (
-                        <span
-                          key={i}
-                          className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                          style={{ color: tone.color }}
-                        >
-                          <Icon name={tone.icon} size={14} />
-                          {t.label} ×{t.count}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
 
               {error && <p className="mt-3 text-xs text-red-600">{error}</p>}
               {generatedAt && (
