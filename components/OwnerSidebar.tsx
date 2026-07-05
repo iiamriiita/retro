@@ -80,15 +80,15 @@ export default function OwnerSidebar({
     }
   }
 
-  const shareOptions: { v: ShareView; tt: string; d: string }[] = [
-    { v: "both", tt: t("os.shareBoth"), d: t("os.shareBothDesc") },
-    {
-      v: "report",
-      tt: t("os.shareReportOnly"),
-      d: t("os.shareReportOnlyDesc"),
-    },
-    { v: "raw", tt: t("os.shareRawOnly"), d: t("os.shareRawOnlyDesc") },
-  ];
+  // Checkbox model over the share_view enum: which parts are visible.
+  const partReport = view === "both" || view === "report";
+  const partResp = view === "both" || view === "raw";
+  function togglePart(part: "report" | "raw") {
+    const r = part === "report" ? !partReport : partReport;
+    const a = part === "raw" ? !partResp : partResp;
+    if (!r && !a) return; // viewers must see something
+    void setShare(r && a ? "both" : r ? "report" : "raw");
+  }
 
   return (
     <div className="space-y-4 md:sticky md:top-[76px] md:self-start">
@@ -135,45 +135,58 @@ export default function OwnerSidebar({
         )}
       </div>
 
-      {/* Shared-view content */}
+      {/* Shared-view content — multi-select parts */}
       <div className="card">
         <p className="eyebrow">{t("os.shareTitle")}</p>
         <p className="mt-2 text-xs text-muted">{t("os.shareHint")}</p>
         <div className="mt-3 space-y-2">
-          {shareOptions.map((o) => {
-            const needsReport = o.v === "report" && !hasReport;
-            return (
-              <div key={o.v} className="group relative">
-                <button
-                  type="button"
-                  onClick={() => setShare(o.v)}
-                  disabled={busy !== null || needsReport}
-                  className="relative w-full rounded-lg p-3 text-left transition-colors disabled:cursor-not-allowed"
-                  style={{
-                    background:
-                      view === o.v ? "var(--accent-weak)" : "var(--surface-2)",
-                    opacity: needsReport ? 0.5 : undefined,
-                  }}
-                >
-                  {view === o.v && (
-                    <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
-                      <Icon name="check" size={12} />
-                    </span>
-                  )}
-                  <span className="block pr-6 text-sm font-medium">{o.tt}</span>
-                  <span className="block text-xs text-muted">{o.d}</span>
-                </button>
-                {needsReport && (
+          {[
+            {
+              k: "raw" as const,
+              label: t("os.optResponses"),
+              on: partResp,
+              disabled: false,
+            },
+            {
+              k: "report" as const,
+              label: t("os.optReport"),
+              on: partReport,
+              disabled: !hasReport,
+            },
+          ].map((o) => (
+            <div key={o.k} className="group relative">
+              <button
+                type="button"
+                onClick={() => togglePart(o.k)}
+                disabled={busy !== null || o.disabled}
+                className="relative w-full rounded-lg p-3 text-left transition-colors disabled:cursor-not-allowed"
+                style={{
+                  background: o.on ? "var(--accent-weak)" : "var(--surface-2)",
+                  opacity: o.disabled ? 0.5 : undefined,
+                }}
+              >
+                {o.on && (
                   <span
-                    className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[220px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-white group-hover:block"
-                    style={{ background: "var(--text)" }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2"
+                    style={{ color: "var(--accent)" }}
                   >
-                    {t("os.needReport")}
+                    <Icon name="check" size={18} strokeWidth={3} />
                   </span>
                 )}
-              </div>
-            );
-          })}
+                <span className="block pr-6 text-sm font-medium">
+                  {o.label}
+                </span>
+              </button>
+              {o.disabled && (
+                <span
+                  className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[220px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-white group-hover:block"
+                  style={{ background: "var(--text)" }}
+                >
+                  {t("os.needReport")}
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
