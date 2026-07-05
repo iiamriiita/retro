@@ -60,19 +60,19 @@ export type StructuredReport = {
 
 const FIELD_ZH: Record<ReportSection, string> = {
   themes: "summary：用「一句話」總結這場 retro 的整體重點。",
-  well: "well：歸納「順利的部分」區塊的內容。若該區沒有真正正向的內容，回傳空陣列 []。",
+  well: "well：所有「正向、做得好、順利」的內容——不管它寫在哪一題底下，只要意思是好的就收進來。每條一句短句。若真的沒有正向內容，回傳空陣列 []。",
   improve:
-    "improve：歸納「問題與警訊」區塊的內容（每條是簡短、具體的一點）。",
+    "improve：所有「問題、困擾、不順、做不好」的內容——不管它寫在哪一題底下，只要意思是壞的就收進來。每條一句短句。若真的沒有負向內容，回傳空陣列 []。",
   actions:
-    "actions：具體、可執行的下一步——就算沒人明講，也可以從「問題與警訊」和「方向」區塊合理推導出來。",
+    "actions：由你針對上面那些問題（以及大家提到的方向）提出的具體調整建議——就算沒人明講，也請主動給出可行、具體的下一步。",
 };
 const FIELD_EN: Record<ReportSection, string> = {
   themes: "summary: ONE sentence capturing the overall takeaway of this retro.",
-  well: "well: bullets summarising the WENT WELL section. If that section has no genuinely positive content, return an empty array [].",
+  well: "well: every genuinely POSITIVE / working-well point — no matter which question it was written under. One short sentence each. If there is nothing genuinely positive, return an empty array [].",
   improve:
-    "improve: bullets summarising the PROBLEMS & WARNINGS section (each a short, specific point).",
+    "improve: every PROBLEM / frustration / thing that went badly — no matter which question it was written under. One short sentence each. If there is nothing negative, return an empty array [].",
   actions:
-    "actions: concrete, specific next steps — derive them from the PROBLEMS and DIRECTION sections even if no one spelled them out.",
+    "actions: YOUR own concrete, specific suggested adjustments that address the problems above (and any direction people mentioned) — propose them yourself even if no one spelled them out.",
 };
 
 export function summarySystem(
@@ -87,6 +87,8 @@ export function summarySystem(
 
 ${fields}
 
+SORT BY MEANING, NOT BY QUESTION: read what each answer actually says. A positive comment goes in \`well\` even if it was written under a "problems" prompt, and a problem goes in \`improve\` even if it was written under a "what went well" prompt. Look at every answer for both fields — do not leave \`improve\` empty when answers clearly describe things going badly. If an answer only names a topic with no clear good/bad, use the bracketed leaning shown next to its question to decide.
+
 Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said. Keep each bullet to one short sentence. If a field genuinely has nothing to report, return an empty array — do NOT write apologies, disclaimers, or meta-commentary. Write all text in English.
 
 ${TONE_EN[tone]}`;
@@ -96,29 +98,32 @@ ${TONE_EN[tone]}`;
 
 ${fields}
 
+請依「內容的好壞」分類，而不是依它寫在哪一題：正向的內容就算寫在「問題」那題，也要放進 well；負向的內容就算寫在「順利」那題，也要放進 improve。兩個欄位都要把所有回答看過一遍——當回答明顯在講不順的事情時，improve 不可以留空。若某條回答只點出主題、沒說好壞，就依該題旁邊括號標示的傾向來判斷。
+
 原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。每一條保持一句短句。若某欄位確實沒有內容，回傳空陣列即可，不要寫道歉、免責或說明性的句子。所有文字用繁體中文。
 
 ${TONE_ZH[tone]}`;
 }
 
-// Which report section each template question feeds. Lets us group answers
-// deterministically (by question intent) instead of relying on the AI to guess.
-const SECTION_OF: Record<string, "well" | "improve" | "actions"> = {
+// Default leaning of each template question. This is only a HINT / tiebreaker:
+// the AI sorts each answer by what it actually says, and falls back to this
+// leaning when an answer just names a topic with no clear good/bad.
+const QUESTION_LEANING: Record<string, "positive" | "problem" | "direction"> = {
   // sailboat
-  wind: "well",
-  anchor: "improve",
-  rocks: "improve",
-  island: "actions",
+  wind: "positive",
+  anchor: "problem",
+  rocks: "problem",
+  island: "direction",
   // garden
-  blooming: "well",
-  needs_water: "improve",
-  weeds: "improve",
-  seeds: "actions",
+  blooming: "positive",
+  needs_water: "problem",
+  weeds: "problem",
+  seeds: "direction",
   // space mission
-  liftoff: "well",
-  gravity: "improve",
-  alerts: "improve",
-  next_coordinates: "actions",
+  liftoff: "positive",
+  gravity: "problem",
+  alerts: "problem",
+  next_coordinates: "direction",
 };
 
 export function buildContext(
@@ -128,44 +133,37 @@ export function buildContext(
 ): string {
   const template = getTemplate(templateId, locale);
   const questions = template?.questions ?? [];
-  const buckets: Record<"well" | "improve" | "actions", string[]> = {
-    well: [],
-    improve: [],
-    actions: [],
+  const en = locale === "en";
+  const leanLabel = (l: "positive" | "problem" | "direction" | undefined) => {
+    if (!l) return "";
+    if (en)
+      return l === "positive"
+        ? " [this prompt leans positive]"
+        : l === "problem"
+          ? " [this prompt leans toward problems]"
+          : " [this prompt leans toward future direction]";
+    return l === "positive"
+      ? "（此題偏正向）"
+      : l === "problem"
+        ? "（此題偏問題）"
+        : "（此題偏未來方向）";
   };
+
+  const blocks: string[] = [];
   for (const q of questions) {
     if (q.type === "rating" || q.type === "role") continue;
-    const bucket = SECTION_OF[q.key];
-    if (!bucket) continue;
-    for (const a of answers.filter((x) => x.question_key === q.key)) {
-      const c = a.content.trim();
-      if (c) buckets[bucket].push(`- ${c}  (${q.label})`);
-    }
+    const items = answers
+      .filter((x) => x.question_key === q.key)
+      .map((a) => a.content.trim())
+      .filter(Boolean);
+    if (!items.length) continue;
+    blocks.push(
+      `### ${q.label}${leanLabel(QUESTION_LEANING[q.key])}\n` +
+        items.map((c) => `- ${c}`).join("\n"),
+    );
   }
-  const en = locale === "en";
-  const none = en ? "(no answers)" : "（沒有回答）";
-  const section = (title: string, arr: string[]) =>
-    `### ${title}\n${arr.length ? arr.join("\n") : none}\n`;
-  return [
-    section(
-      en
-        ? "WENT WELL — things the team is happy about"
-        : "順利的部分——團隊覺得好的地方",
-      buckets.well,
-    ),
-    section(
-      en
-        ? "PROBLEMS & WARNINGS — what slowed us down or to watch"
-        : "問題與警訊——拖累進度或要注意的",
-      buckets.improve,
-    ),
-    section(
-      en
-        ? "DIRECTION — where the team wants to head next"
-        : "方向——團隊接下來想往哪走",
-      buckets.actions,
-    ),
-  ].join("\n");
+  if (!blocks.length) return en ? "(no answers)" : "（沒有任何回答）";
+  return blocks.join("\n\n");
 }
 
 // One-shot Gemini summary → JSON string of a StructuredReport. Throws on failure.
