@@ -125,6 +125,7 @@ export async function geminiSummary(
   locale: Locale = "en",
   tone: ReportTone = "neutral",
   sections: ReportSection[] = ALL_SECTIONS,
+  note = "",
 ): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey)
@@ -139,10 +140,15 @@ export async function geminiSummary(
     locale === "en"
       ? `${summarySystem(locale, tone, chosen)}\n\nHere are all the answers from this retro (de-identified):\n\n${context}`
       : `${summarySystem(locale, tone, chosen)}\n\n以下是這場 retro 的所有回答（已去識別化）：\n\n${context}`;
+  const noteLine = note
+    ? locale === "en"
+      ? `\n\nExtra guidance from the organizer (weigh this, but stay faithful to the answers): ${note}`
+      : `\n\n主辦者的額外指引（請參考，但仍要忠實反映回答）：${note}`
+    : "";
   const ask =
-    locale === "en"
+    (locale === "en"
       ? "Produce the JSON report from the answers above."
-      : "請根據以上回答產生 JSON 報告。";
+      : "請根據以上回答產生 JSON 報告。") + noteLine;
 
   // Build a response schema with only the requested fields.
   const props: Record<string, unknown> = {};

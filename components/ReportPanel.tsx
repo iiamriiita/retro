@@ -26,6 +26,7 @@ export default function ReportPanel({
   const [toneIdx, setToneIdx] = useState(0);
   const SECTIONS = ["themes", "well", "improve", "actions"] as const;
   const [sections, setSections] = useState<string[]>([...SECTIONS]);
+  const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +48,7 @@ export default function ReportPanel({
       const res = await fetch(`/api/sessions/${sessionId}/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tone: TONES[toneIdx], sections }),
+        body: JSON.stringify({ tone: TONES[toneIdx], sections, note: note.trim() }),
         signal: ctrl.signal,
       });
       if (!res.ok)
@@ -348,6 +349,16 @@ export default function ReportPanel({
                 );
               })}
             </div>
+
+            {/* Optional note passed to the AI */}
+            <p className="eyebrow mt-6">{t("rp.noteTitle")}</p>
+            <textarea
+              rows={2}
+              className="textarea mt-2"
+              placeholder={t("rp.notePlaceholder")}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
 
             {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
             <div className="mt-6 flex justify-end gap-2">

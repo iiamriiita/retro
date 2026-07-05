@@ -67,6 +67,7 @@ export async function POST(
   const body = (await req.json().catch(() => ({}))) as {
     tone?: string;
     sections?: string[];
+    note?: string;
   };
   const tone: ReportTone =
     body.tone === "playful" || body.tone === "balanced"
@@ -82,6 +83,7 @@ export async function POST(
       locale,
       tone,
       sections.length > 0 ? sections : ALL_SECTIONS,
+      typeof body.note === "string" ? body.note.trim() : "",
     );
     // Persist the report, and make sure the shared view now includes it —
     // a freshly generated report should light up automatically.
