@@ -8,6 +8,7 @@ import ReportPanel from "@/components/ReportPanel";
 import OwnerSidebar from "@/components/OwnerSidebar";
 import Icon from "@/components/Icon";
 import CloseSessionButton from "@/components/CloseSessionButton";
+import FormLinkButton from "@/components/FormLinkButton";
 import BackButton from "@/components/BackButton";
 import TemplateBanner from "@/components/TemplateBanner";
 
@@ -173,17 +174,8 @@ export default async function ResultsPage({
       </div>
       <div className="container-wide">
       <BackButton fallback="/" />
-      {template ? (
-        <div
-          className={
-            isOwner
-              ? "grid gap-6 md:grid-cols-[minmax(0,1fr)_300px]"
-              : "grid gap-6"
-          }
-        >
-          {/* Left — header, AI report, raw responses */}
-          <div className="min-w-0 space-y-10">
-      <div className="mb-6">
+      <div className="mb-6 flex items-start justify-between gap-6">
+        <div className="min-w-0">
         <h1 className="text-2xl font-extrabold tracking-tight">
           {t("res.title", { name: session.name || template?.name || "Retro" })}
         </h1>
@@ -213,7 +205,28 @@ export default async function ResultsPage({
             {t("res.avgMood", { avg: avgMood })}
           </span>
         )}
+        </div>
+        {isOwner && (
+          <div id="share-top-anchor" className="hidden w-[300px] shrink-0 md:block">
+            <FormLinkButton
+              sessionId={session.id}
+              ended
+              triggerClassName="btn-primary w-full"
+            />
+          </div>
+        )}
       </div>
+
+      {template ? (
+        <div
+          className={
+            isOwner
+              ? "grid gap-6 md:grid-cols-[minmax(0,1fr)_300px]"
+              : "grid gap-6"
+          }
+        >
+          {/* Left — AI report on top, raw responses below */}
+          <div className="min-w-0 space-y-10">
             <ReportPanel
               sessionId={session.id}
               report={session.ai_report}

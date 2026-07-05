@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/Icon";
 import FormLinkButton from "@/components/FormLinkButton";
@@ -24,6 +24,19 @@ export default function OwnerSidebar({
   const [busy, setBusy] = useState<"discussion" | "share" | null>(null);
   const [showRaw, setShowRaw] = useState(shareShowRaw);
   const [error, setError] = useState<string | null>(null);
+  const [stuck, setStuck] = useState(false);
+
+  // Show our own share button only once the header's button scrolls away.
+  useEffect(() => {
+    const anchor = document.getElementById("share-top-anchor");
+    if (!anchor) return;
+    const io = new IntersectionObserver(
+      ([e]) => setStuck(!e.isIntersecting),
+      { rootMargin: "-80px 0px 0px 0px" },
+    );
+    io.observe(anchor);
+    return () => io.disconnect();
+  }, []);
 
   async function toggleDiscussion() {
     setBusy("discussion");
@@ -67,12 +80,18 @@ export default function OwnerSidebar({
 
   return (
     <div className="space-y-4 md:sticky md:top-[76px] md:self-start">
-      {/* Share results */}
-      <FormLinkButton
-        sessionId={sessionId}
-        ended
-        triggerClassName="btn-primary w-full"
-      />
+      {/* Share results — grows in when the header button scrolls away */}
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          stuck ? "max-h-12 opacity-100" : "!-mt-0 max-h-0 opacity-0"
+        }`}
+      >
+        <FormLinkButton
+          sessionId={sessionId}
+          ended
+          triggerClassName="btn-primary w-full"
+        />
+      </div>
 
       {/* Discussion */}
       <div className="card">
