@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/Icon";
+import FormLinkButton from "@/components/FormLinkButton";
 import { useT } from "@/lib/i18n/client";
 
 // Owner-only sticky sidebar on the results page: discussion switch on top,
@@ -66,6 +67,13 @@ export default function OwnerSidebar({
 
   return (
     <div className="space-y-4 md:sticky md:top-[76px] md:self-start">
+      {/* Share results */}
+      <FormLinkButton
+        sessionId={sessionId}
+        ended
+        triggerClassName="btn-primary w-full"
+      />
+
       {/* Discussion */}
       <div className="card">
         <p className="eyebrow">{t("os.discussionTitle")}</p>

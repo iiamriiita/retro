@@ -173,6 +173,16 @@ export default async function ResultsPage({
       </div>
       <div className="container-wide">
       <BackButton fallback="/" />
+      {template ? (
+        <div
+          className={
+            isOwner
+              ? "grid gap-6 md:grid-cols-[minmax(0,1fr)_300px]"
+              : "grid gap-6"
+          }
+        >
+          {/* Left — header, AI report, raw responses */}
+          <div className="min-w-0 space-y-10">
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold tracking-tight">
           {t("res.title", { name: session.name || template?.name || "Retro" })}
@@ -204,17 +214,6 @@ export default async function ResultsPage({
           </span>
         )}
       </div>
-
-      {template ? (
-        <div
-          className={
-            isOwner
-              ? "grid gap-6 md:grid-cols-[minmax(0,1fr)_300px]"
-              : "grid gap-6"
-          }
-        >
-          {/* Left — AI report on top, raw responses below */}
-          <div className="min-w-0 space-y-10">
             <ReportPanel
               sessionId={session.id}
               report={session.ai_report}

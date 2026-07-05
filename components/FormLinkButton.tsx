@@ -8,9 +8,11 @@ import { useT } from "@/lib/i18n/client";
 export default function FormLinkButton({
   sessionId,
   ended = false,
+  triggerClassName = "btn-ghost !py-1.5 text-xs",
 }: {
   sessionId: string;
   ended?: boolean;
+  triggerClassName?: string;
 }) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
@@ -51,7 +53,7 @@ export default function FormLinkButton({
     <>
       <button
         type="button"
-        className="btn-ghost !py-1.5 text-xs"
+        className={triggerClassName}
         onClick={() => setOpen(true)}
       >
         {tx.trigger}
