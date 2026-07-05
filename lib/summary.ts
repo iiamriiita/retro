@@ -39,8 +39,30 @@ Actionable next steps, as specific as possible (e.g. "cap stand-ups at 15 minute
 
 Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said.`;
 
-export function summarySystem(locale: Locale): string {
-  return locale === "en" ? SYSTEM_EN : SYSTEM_ZH;
+export type ReportTone = "neutral" | "playful";
+
+const TONE_ZH: Record<ReportTone, string> = {
+  neutral: "語氣：中性、專業、精簡。",
+  playful:
+    "語氣：輕鬆、溫暖、帶點幽默。可以借用這場 retro 模板的比喻（例如航行、花園、太空任務）來包裝標題與描述，但內容仍要具體可行。",
+};
+const TONE_EN: Record<ReportTone, string> = {
+  neutral: "Tone: neutral, professional, concise.",
+  playful:
+    "Tone: light, warm, a little playful. Feel free to lean on the retro template's metaphor (sailing / garden / space mission) in headings and phrasing, while keeping the content concrete and actionable.",
+};
+
+export function summarySystem(
+  locale: Locale,
+  tone: ReportTone = "neutral",
+): string {
+  return locale === "en"
+    ? `${SYSTEM_EN}
+
+${TONE_EN[tone]}`
+    : `${SYSTEM_ZH}
+
+${TONE_ZH[tone]}`;
 }
 
 export function buildContext(
@@ -67,6 +89,7 @@ export function buildContext(
 export async function geminiSummary(
   context: string,
   locale: Locale = "en",
+  tone: ReportTone = "neutral",
 ): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey)
@@ -78,8 +101,8 @@ export async function geminiSummary(
 
   const intro =
     locale === "en"
-      ? `${summarySystem(locale)}\n\nHere are all the answers from this retro (de-identified):\n\n${context}`
-      : `${summarySystem(locale)}\n\n以下是這場 retro 的所有回答（已去識別化）：\n\n${context}`;
+      ? `${summarySystem(locale, tone)}\n\nHere are all the answers from this retro (de-identified):\n\n${context}`
+      : `${summarySystem(locale, tone)}\n\n以下是這場 retro 的所有回答（已去識別化）：\n\n${context}`;
   const ask =
     locale === "en"
       ? "Produce the summary and recommendations from the answers above."

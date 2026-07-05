@@ -4,8 +4,9 @@ import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { getT } from "@/lib/i18n/server";
 import type { PublicAnswer, PublicComment } from "@/lib/types";
 import ResultsClient from "@/components/ResultsClient";
-import ReportView from "@/components/ReportView";
-import OwnerControls from "@/components/OwnerControls";
+import ReportPanel from "@/components/ReportPanel";
+import OwnerSidebar from "@/components/OwnerSidebar";
+import Icon from "@/components/Icon";
 import CloseSessionButton from "@/components/CloseSessionButton";
 import BackButton from "@/components/BackButton";
 import TemplateBanner from "@/components/TemplateBanner";
@@ -23,9 +24,7 @@ export default async function ResultsPage({
 
   const { data: session } = await supabase
     .from("retro_sessions")
-    .select(
-      "id, name, owner_id, template_id, anonymity, status, deadline, discussion_enabled, ai_report, ai_report_at",
-    )
+    .select("*")
     .eq("id", session_id)
     .single();
 
@@ -161,8 +160,11 @@ export default async function ResultsPage({
     created_at: c.created_at,
   }));
 
+  const shareShowRaw: boolean = session.share_show_raw ?? true;
+  const showRaw = isOwner || shareShowRaw;
+
   return (
-    <div className="container-narrow">
+    <div className="container-wide">
       <BackButton fallback="/" />
       <div className="mb-6 mt-1 overflow-hidden rounded-2xl">
         <TemplateBanner id={session.template_id} />
@@ -197,47 +199,70 @@ export default async function ResultsPage({
             {t("res.avgMood", { avg: avgMood })}
           </span>
         )}
-        {moodReasons.length > 0 && (
-          <div className="mt-4">
-            <p className="eyebrow">{t("res.moodWhy")}</p>
-            <ul className="mt-2 space-y-1.5">
-              {moodReasons.map((r, i) => (
-                <li key={i} className="text-sm text-muted">
-                  <span className="font-semibold text-ink">
-                    {scaleEmoji(r.score)} {r.score}/5
-                  </span>{" "}
-                  — {r.reason}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
 
-      {isOwner && (
-        <OwnerControls
-          sessionId={session.id}
-          discussionEnabled={session.discussion_enabled}
-          hasReport={!!session.ai_report}
-        />
-      )}
-
       {template ? (
-        <>
-          <ResultsClient
-            sessionId={session.id}
-            anonymous={anonymous}
-            discussionEnabled={session.discussion_enabled}
-            questions={template.questions.filter((q) => q.type !== "rating")}
-            answers={answers}
-            initialComments={initialComments}
-            rosterNames={[]}
-          />
-          <ReportView
-            report={session.ai_report}
-            generatedAt={session.ai_report_at}
-          />
-        </>
+        <div
+          className={
+            isOwner
+              ? "grid gap-6 md:grid-cols-[minmax(0,1fr)_300px]"
+              : "grid gap-6"
+          }
+        >
+          {/* Left — AI report on top, raw responses below */}
+          <div className="min-w-0 space-y-10">
+            <ReportPanel
+              sessionId={session.id}
+              report={session.ai_report}
+              generatedAt={session.ai_report_at}
+              isOwner={isOwner}
+            />
+
+            {showRaw && (
+              <section>
+                <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+                  <span style={{ color: "var(--accent)" }}>
+                    <Icon name="list" size={19} />
+                  </span>
+                  {t("res.raw")}
+                </h2>
+                {moodReasons.length > 0 && (
+                  <div className="card mb-4">
+                    <p className="eyebrow">{t("res.moodWhy")}</p>
+                    <ul className="mt-2 space-y-1.5">
+                      {moodReasons.map((r, i) => (
+                        <li key={i} className="text-sm text-muted">
+                          <span className="font-semibold text-ink">
+                            {scaleEmoji(r.score)} {r.score}/5
+                          </span>{" "}
+                          — {r.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <ResultsClient
+                  sessionId={session.id}
+                  anonymous={anonymous}
+                  discussionEnabled={session.discussion_enabled}
+                  questions={template.questions.filter((q) => q.type !== "rating")}
+                  answers={answers}
+                  initialComments={initialComments}
+                  rosterNames={[]}
+                />
+              </section>
+            )}
+          </div>
+
+          {/* Right — owner controls */}
+          {isOwner && (
+            <OwnerSidebar
+              sessionId={session.id}
+              discussionEnabled={session.discussion_enabled}
+              shareShowRaw={shareShowRaw}
+            />
+          )}
+        </div>
       ) : (
         <p className="text-sm text-muted">{t("res.noTemplate")}</p>
       )}

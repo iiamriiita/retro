@@ -2,14 +2,14 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { getLocale } from "@/lib/i18n/server";
-import { buildContext, geminiSummary } from "@/lib/summary";
+import { buildContext, geminiSummary, type ReportTone } from "@/lib/summary";
 
 export const runtime = "nodejs";
 
 // Owner-only: generate the AI report from all answers and persist it so shared
 // viewers can read it.
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -58,10 +58,14 @@ export async function POST(
     );
   }
 
+  const body = (await req.json().catch(() => ({}))) as { tone?: string };
+  const tone: ReportTone = body.tone === "playful" ? "playful" : "neutral";
+
   try {
     const report = await geminiSummary(
       buildContext(session.template_id, answers, locale),
       locale,
+      tone,
     );
     const { error } = await supabase
       .from("retro_sessions")
