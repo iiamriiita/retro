@@ -345,7 +345,7 @@ export default function TeamInsights({
 
         {/* AI pulse */}
         <div
-          className="card"
+          className="card flex flex-col"
           style={{ background: "var(--accent-weak)" }}
         >
           {insights && (
@@ -363,7 +363,7 @@ export default function TeamInsights({
           )}
 
           {!insights ? (
-            <div className="py-4 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center py-4 text-center">
               <p className="mx-auto max-w-xs text-sm text-muted">
                 {tr("ti.emptyDesc")}
               </p>
