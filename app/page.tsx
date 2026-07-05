@@ -54,11 +54,13 @@ export default async function LandingPage() {
                 label={t("landing.ctaStart")}
                 variant="primary"
                 defaultTab="register"
+                triggerClassName="!h-12 !px-6 !text-base"
               />
               <AuthModal
                 label={t("landing.ctaLogin")}
                 variant="ghost"
                 defaultTab="login"
+                triggerClassName="!h-12 !px-6 !text-base"
               />
             </>
           )}

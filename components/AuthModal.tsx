@@ -13,11 +13,13 @@ export default function AuthModal({
   variant = "primary",
   defaultTab = "login",
   defaultOpen = false,
+  triggerClassName = "",
 }: {
   label: string;
   variant?: "primary" | "nav" | "ghost";
   defaultTab?: "login" | "register";
   defaultOpen?: boolean;
+  triggerClassName?: string;
 }) {
   const { t } = useT();
   const [open, setOpen] = useState(defaultOpen);
@@ -166,7 +168,11 @@ export default function AuthModal({
 
   return (
     <>
-      <button type="button" className={btnClass} onClick={openModal}>
+      <button
+        type="button"
+        className={`${btnClass} ${triggerClassName}`.trim()}
+        onClick={openModal}
+      >
         {label}
       </button>
 
