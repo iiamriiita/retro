@@ -6,23 +6,25 @@ import Icon from "@/components/Icon";
 import FormLinkButton from "@/components/FormLinkButton";
 import { useT } from "@/lib/i18n/client";
 
+type ShareView = "both" | "report" | "raw";
+
 // Owner-only sticky sidebar on the results page: discussion switch on top,
 // shared-view content settings below.
 export default function OwnerSidebar({
   sessionId,
   discussionEnabled,
-  shareShowRaw,
+  shareView,
   hasReport,
 }: {
   sessionId: string;
   discussionEnabled: boolean;
-  shareShowRaw: boolean;
+  shareView: ShareView;
   hasReport: boolean;
 }) {
   const { t } = useT();
   const router = useRouter();
   const [busy, setBusy] = useState<"discussion" | "share" | null>(null);
-  const [showRaw, setShowRaw] = useState(shareShowRaw);
+  const [view, setView] = useState<ShareView>(shareView);
   const [error, setError] = useState<string | null>(null);
   const [stuck, setStuck] = useState(false);
 
@@ -57,19 +59,19 @@ export default function OwnerSidebar({
     }
   }
 
-  async function setShare(next: boolean) {
-    if (next === showRaw || busy) return;
+  async function setShare(next: ShareView) {
+    if (next === view || busy) return;
     setBusy("share");
     setError(null);
     try {
       const res = await fetch(`/api/sessions/${sessionId}/share`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ show_raw: next }),
+        body: JSON.stringify({ view: next }),
       });
       if (!res.ok)
         throw new Error((await res.json())?.error ?? t("oc.updateFail"));
-      setShowRaw(next);
+      setView(next);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("oc.updateFail"));
@@ -77,6 +79,16 @@ export default function OwnerSidebar({
       setBusy(null);
     }
   }
+
+  const shareOptions: { v: ShareView; tt: string; d: string }[] = [
+    { v: "both", tt: t("os.shareBoth"), d: t("os.shareBothDesc") },
+    {
+      v: "report",
+      tt: t("os.shareReportOnly"),
+      d: t("os.shareReportOnlyDesc"),
+    },
+    { v: "raw", tt: t("os.shareRawOnly"), d: t("os.shareRawOnlyDesc") },
+  ];
 
   return (
     <div className="space-y-4 md:sticky md:top-[76px] md:self-start">
@@ -93,22 +105,33 @@ export default function OwnerSidebar({
         />
       </div>
 
-      {/* Discussion */}
+      {/* Discussion — toggle switch */}
       <div className="card">
-        <p className="eyebrow">{t("os.discussionTitle")}</p>
-        <p className="mt-2 text-xs text-muted">{t("oc.hint")}</p>
-        <button
-          className={`mt-3 w-full ${discussionEnabled ? "btn-ghost" : "btn-primary"}`}
-          onClick={toggleDiscussion}
-          disabled={busy !== null}
-        >
-          <Icon name={discussionEnabled ? "lock" : "unlock"} size={15} />
-          {busy === "discussion"
-            ? t("oc.processing")
-            : discussionEnabled
-              ? t("oc.closeDiscussion")
-              : t("oc.openDiscussion")}
-        </button>
+        <div className="flex items-center justify-between">
+          <p className="eyebrow">{t("os.discussionTitle")}</p>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={discussionEnabled}
+            onClick={toggleDiscussion}
+            disabled={busy !== null}
+            className="relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-60"
+            style={{
+              background: discussionEnabled
+                ? "var(--accent)"
+                : "var(--surface-3)",
+            }}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                discussionEnabled ? "left-[22px]" : "left-0.5"
+              }`}
+            />
+          </button>
+        </div>
+        {discussionEnabled && (
+          <p className="mt-2 text-xs text-muted">{t("os.discussionOnHint")}</p>
+        )}
       </div>
 
       {/* Shared-view content */}
@@ -116,15 +139,10 @@ export default function OwnerSidebar({
         <p className="eyebrow">{t("os.shareTitle")}</p>
         <p className="mt-2 text-xs text-muted">{t("os.shareHint")}</p>
         <div className="mt-3 space-y-2">
-          {(
-            [
-              { v: true, tt: t("os.shareBoth"), d: t("os.shareBothDesc") },
-              { v: false, tt: t("os.shareReportOnly"), d: t("os.shareReportOnlyDesc") },
-            ] as const
-          ).map((o) => {
-            const needsReport = o.v === false && !hasReport;
+          {shareOptions.map((o) => {
+            const needsReport = o.v === "report" && !hasReport;
             return (
-              <div key={String(o.v)} className="group relative">
+              <div key={o.v} className="group relative">
                 <button
                   type="button"
                   onClick={() => setShare(o.v)}
@@ -132,16 +150,16 @@ export default function OwnerSidebar({
                   className="relative w-full rounded-lg p-3 text-left transition-colors disabled:cursor-not-allowed"
                   style={{
                     background:
-                      showRaw === o.v ? "var(--accent-weak)" : "var(--surface-2)",
+                      view === o.v ? "var(--accent-weak)" : "var(--surface-2)",
                     opacity: needsReport ? 0.5 : undefined,
                   }}
                 >
-                  {showRaw === o.v && (
+                  {view === o.v && (
                     <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
                       <Icon name="check" size={12} />
                     </span>
                   )}
-                  <span className="block text-sm font-medium">{o.tt}</span>
+                  <span className="block pr-6 text-sm font-medium">{o.tt}</span>
                   <span className="block text-xs text-muted">{o.d}</span>
                 </button>
                 {needsReport && (

@@ -25,15 +25,13 @@ export async function POST(
   if (session.owner_id !== user.id)
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
 
-  const body = (await req.json().catch(() => ({}))) as {
-    show_raw?: boolean;
-  };
-  if (typeof body.show_raw !== "boolean")
+  const body = (await req.json().catch(() => ({}))) as { view?: string };
+  if (!["both", "report", "raw"].includes(body.view ?? ""))
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
 
   const { error } = await supabase
     .from("retro_sessions")
-    .update({ share_show_raw: body.show_raw })
+    .update({ share_view: body.view })
     .eq("id", session.id);
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });

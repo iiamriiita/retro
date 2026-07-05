@@ -169,8 +169,11 @@ export default async function ResultsPage({
     created_at: c.created_at,
   }));
 
-  const shareShowRaw: boolean = session.share_show_raw ?? true;
-  const showRaw = isOwner || shareShowRaw;
+  const shareView: "both" | "report" | "raw" =
+    session.share_view ??
+    (session.share_show_raw === false ? "report" : "both");
+  const showRaw = isOwner || shareView !== "report";
+  const showReport = isOwner || shareView !== "raw";
 
   return (
     <>
@@ -215,11 +218,11 @@ export default async function ResultsPage({
         )}
         </div>
         {isOwner && (
-          <div id="share-top-anchor" className="hidden w-[300px] shrink-0 md:block">
+          <div id="share-top-anchor" className="hidden shrink-0 md:block">
             <FormLinkButton
               sessionId={session.id}
               ended
-              triggerClassName="btn-primary w-full"
+              triggerClassName="btn-primary"
             />
           </div>
         )}
@@ -235,12 +238,14 @@ export default async function ResultsPage({
         >
           {/* Left — AI report on top, raw responses below */}
           <div className="min-w-0 space-y-10">
-            <ReportPanel
-              sessionId={session.id}
-              report={session.ai_report}
-              generatedAt={session.ai_report_at}
-              isOwner={isOwner}
-            />
+            {showReport && (
+              <ReportPanel
+                sessionId={session.id}
+                report={session.ai_report}
+                generatedAt={session.ai_report_at}
+                isOwner={isOwner}
+              />
+            )}
 
             {showRaw && (
               <section className="card">
@@ -266,7 +271,7 @@ export default async function ResultsPage({
             <OwnerSidebar
               sessionId={session.id}
               discussionEnabled={session.discussion_enabled}
-              shareShowRaw={shareShowRaw}
+              shareView={shareView}
               hasReport={!!session.ai_report}
             />
           )}
