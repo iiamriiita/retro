@@ -195,8 +195,9 @@ input[type="checkbox"] {
 
 /* Small card/section label — body font, sentence case. */
 .eyebrow {
+  font-family: var(--font-body);
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-muted);
 }
 
