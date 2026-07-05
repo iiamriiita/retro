@@ -60,17 +60,19 @@ export type StructuredReport = {
 
 const FIELD_ZH: Record<ReportSection, string> = {
   themes: "summary：用「一句話」總結這場 retro 的整體重點。",
-  well: "well：2–4 條短句，團隊做得好、值得延續的地方。",
-  improve: "improve：2–4 條短句，需要調整的問題（對事不對人）。",
-  actions: "actions：2–3 條短句，具體、可行動的調整方向。",
+  well: "well：列出大家提到「真正做得好、值得延續」的事（稱讚、亮點、順利的部分）。只有真正正向的內容才放這裡。",
+  improve:
+    "improve：列出所有被提到的問題、痛點、卡點、風險或抱怨——不管它原本出現在哪一題底下，都歸到這裡。",
+  actions:
+    "actions：列出具體、可執行的調整方向或下一步（就算沒人明講，也可以從問題合理推導出可行的行動）。",
 };
 const FIELD_EN: Record<ReportSection, string> = {
   themes: "summary: ONE sentence capturing the overall takeaway of this retro.",
-  well: "well: 2–4 short bullet strings — what's going well, worth keeping.",
+  well: "well: bullet strings for things people said are GENUINELY GOOD and worth keeping (praise, wins, what's working). Only truly positive statements go here.",
   improve:
-    "improve: 2–4 short bullet strings — what to improve (about the work, not people).",
+    "improve: bullet strings for every PROBLEM, pain point, frustration, blocker, risk, or complaint raised — regardless of which question it appeared under.",
   actions:
-    "actions: 2–3 short bullet strings — concrete, specific next steps.",
+    "actions: bullet strings for concrete, specific next steps or changes to try (derive sensible ones from the problems even if no one spelled them out).",
 };
 
 export function summarySystem(
@@ -85,7 +87,7 @@ export function summarySystem(
 
 ${fields}
 
-Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said. Keep each bullet to one short sentence. If a field genuinely has nothing to report, return an empty array — do NOT write apologies, disclaimers, or meta-commentary. Write all text in English.
+Classify by MEANING, not by which question an answer was under: this retro uses a themed template whose questions are metaphors, so a negative answer to a 'what went well' question is an IMPROVE point, not a WELL point. Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent facts. Keep each bullet to one short sentence. If a field genuinely has nothing, return an empty array — NEVER write sentences like 'nothing was identified' or apologies; just leave it empty. Write all text in English.
 
 ${TONE_EN[tone]}`;
   }
@@ -94,7 +96,7 @@ ${TONE_EN[tone]}`;
 
 ${fields}
 
-原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。每一條保持一句短句。若某欄位確實沒有內容，回傳空陣列即可，不要寫道歉、免責或說明性的句子。所有文字用繁體中文。
+請依「內容含意」分類，而不是依它出現在哪一題：這個 retro 用了主題式模板，題目是比喻，所以一個對「哪裡順利」問題的負面回答，應該歸到 improve（待改善），不是 well（亮點）。原則：對事不對人、具體、可行動、忠實反映，不杜撰。每條一句短句。若某欄位確實沒內容，就回傳空陣列，絕對不要寫「沒有發現…」這類句子或道歉，直接留空。所有文字用繁體中文。
 
 ${TONE_ZH[tone]}`;
 }
