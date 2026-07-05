@@ -249,15 +249,22 @@ export default async function ResultsPage({
           <div className="min-w-0 space-y-6">
             {avgMood != null && (
               <section className="card">
-                <p className="text-[15px] font-medium">{t("res.moodTitle")}</p>
-                <div className="mt-2 flex items-baseline gap-1.5">
-                  <span
-                    className="text-3xl font-extrabold tracking-tight"
-                    style={{ color: moodColor }}
-                  >
-                    {avgMood}
-                  </span>
-                  <span className="text-sm text-subtle">/ 5</span>
+                <div className="flex items-start justify-between gap-4">
+                  <h2 className="flex items-center gap-2 text-lg font-bold">
+                    <span style={{ color: "var(--accent)" }}>
+                      <Icon name="smile" size={19} />
+                    </span>
+                    {t("res.moodTitle")}
+                  </h2>
+                  <div className="flex items-baseline gap-1">
+                    <span
+                      className="text-3xl font-extrabold leading-none tracking-tight"
+                      style={{ color: moodColor }}
+                    >
+                      {avgMood}
+                    </span>
+                    <span className="text-sm text-subtle">/ 5</span>
+                  </div>
                 </div>
                 {moodLevel && (
                   <p className="mt-2 text-sm text-muted">
