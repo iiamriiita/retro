@@ -200,7 +200,6 @@ export default async function DashboardPage() {
                   <FormLinkButton
                     sessionId={s.id}
                     ended={state.primary.tone === "closed"}
-                    discussionEnabled={s.discussion_enabled}
                   />
                   <Link
                     className="btn-primary !py-1.5 text-xs"
