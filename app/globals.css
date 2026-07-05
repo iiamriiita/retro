@@ -193,14 +193,11 @@ input[type="checkbox"] {
   box-shadow: inset 0 -2px 0 var(--gold-400);
 }
 
-/* Uppercase mono eyebrow motif from the design system. */
+/* Small card/section label — body font, sentence case. */
 .eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-subtle);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
 /* ---------------- Landing hero scene ---------------- */

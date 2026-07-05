@@ -26,14 +26,12 @@ export default function FormLinkButton({
   const tx = ended
     ? {
         trigger: t("flb.shareResult"),
-        eyebrow: t("flb.shareResultEyebrow"),
         title: t("flb.shareResultTitle"),
         desc: t("flb.shareResultDesc"),
         openNewTab: t("flb.openResultNewTab"),
       }
     : {
         trigger: t("flb.shareForm"),
-        eyebrow: t("flb.inviteEyebrow"),
         title: t("flb.shareTitle"),
         desc: t("flb.shareDesc"),
         openNewTab: t("flb.openNewTab"),
