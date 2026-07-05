@@ -12,31 +12,6 @@ export const ALL_SECTIONS: ReportSection[] = [
   "actions",
 ];
 
-const SECTIONS_ZH: Record<ReportSection, { h: string; d: string }> = {
-  themes: { h: "主題歸納", d: "歸納大家共同提到的 2–4 個主題。" },
-  well: { h: "正向亮點", d: "團隊做得好、值得延續的地方。" },
-  improve: { h: "待改善點", d: "需要調整的問題，對事不對人。" },
-  actions: {
-    h: "具體調整方向建議",
-    d: "可行動的 next steps，越具體越好（例如「站會限制在 15 分鐘、超時的議題移到會後」）。",
-  },
-};
-const SECTIONS_EN: Record<ReportSection, { h: string; d: string }> = {
-  themes: { h: "Themes", d: "Group the 2–4 themes people commonly raised." },
-  well: {
-    h: "What's going well",
-    d: "What the team does well and should keep doing.",
-  },
-  improve: {
-    h: "What to improve",
-    d: "Issues to adjust — about the work, not the people.",
-  },
-  actions: {
-    h: "Concrete next steps",
-    d: 'Actionable next steps, as specific as possible (e.g. "cap stand-ups at 15 minutes and move overflow topics to after the meeting").',
-  },
-};
-
 const TONE_ZH: Record<ReportTone, string> = {
   neutral: "語氣：中性、專業、精簡。",
   balanced: "語氣：清楚專業，帶一點溫度與鼓勵，但不油腔滑調。",
@@ -58,59 +33,58 @@ export type StructuredReport = {
   actions?: string[];
 };
 
-const FIELD_ZH: Record<ReportSection, string> = {
-  themes: "summary：用「一句話」總結這場 retro 的整體重點。",
-  well: "well：所有「正向、做得好、順利」的內容——不管它寫在哪一題底下，只要意思是好的就收進來。每條一句短句。若真的沒有正向內容，回傳空陣列 []。",
-  improve:
-    "improve：所有「問題、困擾、不順、做不好」的內容——不管它寫在哪一題底下，只要意思是壞的就收進來。每條一句短句。若真的沒有負向內容，回傳空陣列 []。",
-  actions:
-    "actions：由你針對上面那些問題（以及大家提到的方向）提出的具體調整建議——就算沒人明講，也請主動給出可行、具體的下一步。",
-};
-const FIELD_EN: Record<ReportSection, string> = {
-  themes: "summary: ONE sentence capturing the overall takeaway of this retro.",
-  well: "well: every genuinely POSITIVE / working-well point — no matter which question it was written under. One short sentence each. If there is nothing genuinely positive, return an empty array [].",
-  improve:
-    "improve: every PROBLEM / frustration / thing that went badly — no matter which question it was written under. One short sentence each. If there is nothing negative, return an empty array [].",
-  actions:
-    "actions: YOUR own concrete, specific suggested adjustments that address the problems above (and any direction people mentioned) — propose them yourself even if no one spelled them out.",
-};
-
 export function summarySystem(
   locale: Locale,
   tone: ReportTone = "neutral",
   sections: ReportSection[] = ALL_SECTIONS,
 ): string {
   const chosen = sections.length > 0 ? sections : ALL_SECTIONS;
+  const wantSummary = chosen.includes("themes");
+  const wantPoints = chosen.includes("well") || chosen.includes("improve");
+  const wantActions = chosen.includes("actions");
+
   if (locale === "en") {
-    const fields = chosen.map((k) => `- ${FIELD_EN[k]}`).join("\n");
-    return `You are an AI assistant for a team retrospective. You'll receive all the answers from one retro (de-identified, text only). Analyse them and return a JSON object with ONLY these fields:
+    const fields: string[] = [];
+    if (wantSummary)
+      fields.push(
+        "- summary: ONE sentence capturing the overall takeaway of this retro.",
+      );
+    if (wantPoints)
+      fields.push(
+        '- points: an array that classifies EVERY answer, one by one. For each answer output an object { "text": a one-short-sentence version of what they said, "kind": "well" if it is positive / went well, or "improve" if it is a problem, frustration, or went badly }. Judge each answer on its OWN meaning, not on which question it sits under — a problem is "improve" even if written under a positive prompt, and a positive is "well" even under a problems prompt. If an answer only names a topic with no clear good/bad, use the bracketed leaning of its question. Skip answers that just say "none" / "n/a" / "nothing".',
+      );
+    if (wantActions)
+      fields.push(
+        '- actions: YOUR own concrete, specific suggested adjustments that address the "improve" problems (and any direction people mentioned) — propose them yourself even if no one spelled them out.',
+      );
+    return `You are an AI assistant for a team retrospective. You'll receive all the answers from one retro (de-identified, text only). Return a JSON object with ONLY these fields:
 
-${fields}
+${fields.join("\n")}
 
-SORT EVERY ANSWER BY WHAT IT ACTUALLY SAYS — never by which question it sits under:
-- Describes something good, working, or that someone liked → \`well\` (even if written under a "problems" prompt).
-- Describes something bad, slow, broken, frustrating, or that someone disliked → \`improve\` (even if written under a "what went well" prompt).
-- Only names a topic with no clear good/bad → use the bracketed leaning next to its question.
-Worked example — answers "efficiency is poor", "team communication is bad", "people joke around too much" are ALL problems and MUST go in \`improve\`; "user testing went great", "we shipped fast" are positives and go in \`well\`.
-Make TWO passes over the answers: one collecting every positive into \`well\`, one collecting every problem into \`improve\`. Almost every retro has problems — only return an empty \`improve\` array if there is genuinely nothing negative anywhere. If your one-sentence summary mentions any challenge, that challenge MUST also appear as an \`improve\` bullet.
+Go through the answers ONE BY ONE — do not skip any. Worked example: "efficiency is poor" → { "text": "Efficiency is poor", "kind": "improve" }; "too much joking around" → kind "improve"; "user testing went great" → kind "well". Keep the wording faithful to the answer (do not flip a negative into a positive).
 
-Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent things that weren't said. Keep each bullet to one short sentence. If a field genuinely has nothing to report, return an empty array — do NOT write apologies, disclaimers, or meta-commentary. Write all text in English.
+Principles: about the work not the person, specific, actionable. Reflect the answers faithfully; don't invent points nobody mentioned. Keep each text to one short sentence. Write all text in English.
 
 ${TONE_EN[tone]}`;
   }
-  const fields = chosen.map((k) => `- ${FIELD_ZH[k]}`).join("\n");
-  return `你是一個團隊 retro（回顧會議）的 AI 助理。你會收到一場 retro 的所有回答（已去識別化，只有文字）。請分析後回傳一個 JSON 物件，只包含這些欄位：
 
-${fields}
+  const fields: string[] = [];
+  if (wantSummary) fields.push("- summary：用「一句話」總結這場 retro 的整體重點。");
+  if (wantPoints)
+    fields.push(
+      '- points：一個陣列，把「每一條」回答逐條分類。每條回答輸出一個物件 { "text": 用一句短句重述這條回答的內容, "kind": 若是正向、順利就填 "well"，若是問題、困擾、不順就填 "improve" }。請依「這條回答本身的意思」判斷，而不是依它寫在哪一題——問題就算寫在正向題也算 "improve"，正向就算寫在問題題也算 "well"。若某條只點出主題、沒說好壞，就依該題括號標示的傾向判斷。像「沒有」「無」「n/a」這種就跳過不收。',
+    );
+  if (wantActions)
+    fields.push(
+      '- actions：由你針對上面那些 "improve" 問題（以及大家提到的方向）提出的具體調整建議——就算沒人明講，也請主動給出可行、具體的下一步。',
+    );
+  return `你是一個團隊 retro（回顧會議）的 AI 助理。你會收到一場 retro 的所有回答（已去識別化，只有文字）。請回傳一個 JSON 物件，只包含這些欄位：
 
-每一條回答都要依「內容本身的好壞」分類，絕不是依它寫在哪一題：
-- 講到好的、順利的、有人喜歡的 → 放進 well（就算寫在「問題」那題）。
-- 講到壞的、慢的、卡住的、令人困擾的、有人不滿的 → 放進 improve（就算寫在「順利」那題）。
-- 只點出主題、沒說好壞 → 依該題旁邊括號標示的傾向判斷。
-範例——「效率差」「團隊溝通不良」「大家太愛開玩笑」全都是問題，一定要放進 improve；「用戶測試很好」「交付很快」是正向，放進 well。
-請把所有回答掃過兩遍：一遍把所有正向的收進 well，一遍把所有問題收進 improve。幾乎每場 retro 都有可以改善的地方——除非真的完全沒有任何負向內容，否則 improve 不可以是空陣列。只要你的一句話總結有提到任何挑戰，那個挑戰就一定要出現在 improve 的其中一條。
+${fields.join("\n")}
 
-原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒有出現的事。每一條保持一句短句。若某欄位確實沒有內容，回傳空陣列即可，不要寫道歉、免責或說明性的句子。所有文字用繁體中文。
+請逐條把回答看過，不可跳過任何一條。範例：「效率差」→ { "text": "效率差", "kind": "improve" }；「大家太愛開玩笑」→ kind "improve"；「用戶測試很好」→ kind "well"。重述時要忠於原意（不可以把負向講成正向）。
+
+原則：對事不對人、具體、可行動。忠實反映回答內容，不要杜撰沒人提到的點。每一條保持一句短句。所有文字用繁體中文。
 
 ${TONE_ZH[tone]}`;
 }
@@ -207,13 +181,24 @@ export async function geminiSummary(
       ? "Produce the JSON report from the answers above."
       : "請根據以上回答產生 JSON 報告。") + noteLine;
 
-  // Build a response schema with only the requested fields.
+  // Build a response schema with only the requested fields. well/improve are
+  // NOT asked for directly (the model tends to leave one empty) — instead we ask
+  // it to label every answer and we split them into the two boxes ourselves.
+  const wantPoints = chosen.includes("well") || chosen.includes("improve");
   const props: Record<string, unknown> = {};
   if (chosen.includes("themes")) props.summary = { type: "STRING" };
-  if (chosen.includes("well"))
-    props.well = { type: "ARRAY", items: { type: "STRING" } };
-  if (chosen.includes("improve"))
-    props.improve = { type: "ARRAY", items: { type: "STRING" } };
+  if (wantPoints)
+    props.points = {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          text: { type: "STRING" },
+          kind: { type: "STRING", enum: ["well", "improve"] },
+        },
+        required: ["text", "kind"],
+      },
+    };
   if (chosen.includes("actions"))
     props.actions = { type: "ARRAY", items: { type: "STRING" } };
   const responseSchema = { type: "OBJECT", properties: props };
@@ -291,8 +276,7 @@ export async function geminiSummary(
 
   let parsed: {
     summary?: unknown;
-    well?: unknown;
-    improve?: unknown;
+    points?: unknown;
     actions?: unknown;
   };
   try {
@@ -309,12 +293,28 @@ export async function geminiSummary(
   const out: StructuredReport = {};
   if (chosen.includes("themes"))
     out.summary = typeof parsed.summary === "string" ? parsed.summary : "";
-  if (chosen.includes("well"))
-    out.well = Array.isArray(parsed.well) ? (parsed.well as string[]) : [];
-  if (chosen.includes("improve"))
-    out.improve = Array.isArray(parsed.improve)
-      ? (parsed.improve as string[])
-      : [];
+  if (wantPoints) {
+    // Split the labelled answers into the green (well) and red (improve) boxes.
+    const points = Array.isArray(parsed.points) ? parsed.points : [];
+    const well: string[] = [];
+    const improve: string[] = [];
+    for (const p of points) {
+      if (!p || typeof p !== "object") continue;
+      const text =
+        typeof (p as { text?: unknown }).text === "string"
+          ? (p as { text: string }).text.trim()
+          : "";
+      if (!text) continue;
+      const kind = String((p as { kind?: unknown }).kind ?? "").toLowerCase();
+      const isImprove =
+        kind.includes("improve") ||
+        kind.includes("bad") ||
+        kind.includes("problem");
+      (isImprove ? improve : well).push(text);
+    }
+    if (chosen.includes("well")) out.well = well;
+    if (chosen.includes("improve")) out.improve = improve;
+  }
   if (chosen.includes("actions"))
     out.actions = Array.isArray(parsed.actions)
       ? (parsed.actions as string[])
