@@ -266,7 +266,7 @@ export default async function ResultsPage({
             )}
 
             {showRaw && (
-              <section className="card">
+              <section>
                 <ResultsClient
                   sessionId={session.id}
                   anonymous={anonymous}

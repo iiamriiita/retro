@@ -389,10 +389,10 @@ export default function ResultsClient({
 
   return (
     <div className="w-full">
-      {/* Identity line */}
+      {/* Identity strip — its own layer peeking out above the card */}
       {discussionEnabled && (
         <div
-          className="-mx-[1.375rem] -mt-[1.25rem] mb-5 flex items-center gap-2 rounded-t-[9px] px-[1.375rem] py-3 text-xs text-muted"
+          className="-mb-6 flex items-center gap-2 rounded-t-xl px-[1.375rem] pb-9 pt-3 text-xs text-muted"
           style={{ background: "var(--accent-weak)" }}
         >
           <Icon name="message" size={13} />
@@ -408,6 +408,7 @@ export default function ResultsClient({
         </div>
       )}
 
+      <div className="card relative">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-lg font-bold">
           <span style={{ color: "var(--accent)" }}>
@@ -568,6 +569,7 @@ export default function ResultsClient({
                   </section>
                 );
               })}
+      </div>
       </div>
 
       {/* Floating "comment" button on selection */}
