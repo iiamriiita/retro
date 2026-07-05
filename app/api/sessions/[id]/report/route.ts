@@ -83,9 +83,21 @@ export async function POST(
       tone,
       sections.length > 0 ? sections : ALL_SECTIONS,
     );
+    // Persist the report, and make sure the shared view now includes it —
+    // a freshly generated report should light up automatically.
+    const { data: cur } = await supabase
+      .from("retro_sessions")
+      .select("share_view")
+      .eq("id", session.id)
+      .single();
+    const nextView = cur?.share_view === "raw" ? "both" : cur?.share_view;
     const { error } = await supabase
       .from("retro_sessions")
-      .update({ ai_report: report, ai_report_at: new Date().toISOString() })
+      .update({
+        ai_report: report,
+        ai_report_at: new Date().toISOString(),
+        ...(nextView ? { share_view: nextView } : {}),
+      })
       .eq("id", session.id);
     if (error) throw new Error(en ? "Failed to save report" : "儲存報告失敗");
     return NextResponse.json({ ok: true, report });
