@@ -37,7 +37,7 @@ const en: Dict = {
   "landing.headlineAccent": "awkward",
   "landing.headlineTail": ".",
   "landing.subtitle":
-    "Launch a retro, share a link, and let everyone weigh in. Then discuss and let AI surface what matters.",
+    "Start the conversation with a link. Let AI help your team get better, retro after retro.",
   "landing.ctaDashboard": "Go to my dashboard",
   "landing.ctaNew": "New retro",
   "landing.ctaStart": "Get started free",
@@ -357,7 +357,7 @@ const zh: Dict = {
   "landing.headlineAccent": "尷尬",
   "landing.headlineTail": "。",
   "landing.subtitle":
-    "發起一場 retro、分享連結，讓大家一起說真話。結束後一起討論，再讓 AI 幫你看見重點。",
+    "一條連結，開啟討論。AI 陪你的團隊一次比一次更好。",
   "landing.ctaDashboard": "前往我的 Dashboard",
   "landing.ctaNew": "發起新 retro",
   "landing.ctaStart": "免費開始使用",
