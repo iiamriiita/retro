@@ -326,23 +326,24 @@ export default function TeamInsights({
                   >
                     <div className="flex w-full flex-1 items-end">
                       <div
-                        className="w-full rounded-md transition-all"
+                        className="relative w-full rounded-md transition-all"
                         style={{
                           height: `${Math.max(6, barPct(t))}%`,
                           background: barColor(t),
                         }}
-                      />
+                      >
+                        <span
+                          className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-max max-w-[240px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
+                          style={{ background: "#452C1C" }}
+                        >
+                          {barTip(t)}
+                        </span>
+                      </div>
                     </div>
                     <span
                       className={`text-[11px] ${last ? "font-semibold text-ink" : "text-subtle"}`}
                     >
                       {t.dateLabel}
-                    </span>
-                    <span
-                      className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[240px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
-                      style={{ background: "#452C1C" }}
-                    >
-                      {barTip(t)}
                     </span>
                   </div>
                 );
