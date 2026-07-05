@@ -349,7 +349,7 @@ export default function TeamInsights({
         {/* AI pulse */}
         <div
           className="card flex flex-col"
-          style={{ background: "var(--accent-weak)" }}
+          style={{ background: "#FDF6E3" }}
         >
           {(insights || busy) && (
             <div className="mb-3 flex items-center justify-between">
