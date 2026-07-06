@@ -56,10 +56,10 @@ export default function CloseSessionButton({
           aria-modal="true"
         >
           <div
-            className="absolute inset-0 bg-black/40"
+            className="overlay-in absolute inset-0 bg-black/40"
             onClick={() => !busy && setOpen(false)}
           />
-          <div className="card relative z-10 w-full max-w-sm">
+          <div className="modal-pop card relative z-10 w-full max-w-sm">
             <h2 className="text-base font-bold">{t("csb.title")}</h2>
             <p className="mt-2 text-sm text-muted">{t("csb.confirm")}</p>
             {error && (

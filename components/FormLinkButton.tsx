@@ -65,11 +65,11 @@ export default function FormLinkButton({
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="overlay-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl"
+            className="modal-pop w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Full-bleed hero illustration */}
