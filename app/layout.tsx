@@ -8,6 +8,7 @@ import { LocaleProvider } from "@/lib/i18n/client";
 import AuthModal from "@/components/AuthModal";
 import LangSwitcher from "@/components/LangSwitcher";
 import UserMenu from "@/components/UserMenu";
+import TopProgress from "@/components/TopProgress";
 import Image from "next/image";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -38,6 +39,7 @@ export default async function RootLayout({
     <html lang={locale === "zh" ? "zh-Hant" : "en"}>
       <body>
         <LocaleProvider locale={locale}>
+          <TopProgress />
           <header
             className="sticky top-0 z-10 border-b border-line"
             style={{ background: "var(--surface)" }}
