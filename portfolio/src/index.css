@@ -1,0 +1,34 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: #1e1e2e;
+  /* Avoid horizontal scroll on mobile */
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Nicer, thinner scrollbars to match the editor look */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #313244;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #45475a;
+}
