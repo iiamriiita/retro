@@ -5,6 +5,37 @@ import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
 import type { AiInsights, TeamStats } from "@/lib/insights";
 
+// Counts up from 0 to the target once on mount (respects reduced-motion).
+function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setN(to);
+      return;
+    }
+    let raf = 0;
+    let start: number | null = null;
+    const dur = 700;
+    const step = (ts: number) => {
+      if (start === null) start = ts;
+      const p = Math.min(1, (ts - start) / dur);
+      setN(Math.round((1 - Math.pow(1 - p, 3)) * to));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [to]);
+  return (
+    <>
+      {n}
+      {suffix}
+    </>
+  );
+}
+
 function Delta({ value, unit }: { value: number | null; unit: string }) {
   if (value == null) return null;
   const up = value > 0;
@@ -57,7 +88,7 @@ function StatCard({
   children,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   tip?: string;
   children?: React.ReactNode;
 }) {
@@ -273,7 +304,13 @@ export default function TeamInsights({
         {/* Submission (form) rate */}
         <StatCard
           label={tr("ti.cardSubmission")}
-          value={stats.participationAvg != null ? `${stats.participationAvg}%` : "—"}
+          value={
+            stats.participationAvg != null ? (
+              <CountUp to={stats.participationAvg} suffix="%" />
+            ) : (
+              "—"
+            )
+          }
           tip={
             stats.teamSize
               ? tr("ti.participationHint", { size: stats.teamSize })
@@ -286,7 +323,13 @@ export default function TeamInsights({
         {/* Discussion activity rate */}
         <StatCard
           label={tr("ti.cardActivity")}
-          value={stats.discussionRate != null ? `${stats.discussionRate}%` : "—"}
+          value={
+            stats.discussionRate != null ? (
+              <CountUp to={stats.discussionRate} suffix="%" />
+            ) : (
+              "—"
+            )
+          }
           tip={tr("ti.activityHint")}
         />
       </div>
@@ -324,10 +367,11 @@ export default function TeamInsights({
                   >
                     <div className="flex w-full flex-1 items-end">
                       <div
-                        className="relative w-full rounded-md transition-all"
+                        className="ti-bar relative w-full rounded-md transition-all"
                         style={{
                           height: `${Math.max(6, barPct(t))}%`,
                           background: barColor(t),
+                          animationDelay: `${i * 60}ms`,
                         }}
                       >
                         <span

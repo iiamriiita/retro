@@ -329,3 +329,67 @@ input[type="checkbox"] {
 @media (prefers-reduced-motion: reduce) {
   .rp-flash { animation: none; }
 }
+
+/* ============================================================
+   Micro-interactions
+   ============================================================ */
+/* Tactile button press — every .btn dips slightly when clicked. */
+.btn {
+  transition-property: color, background-color, border-color, transform, filter;
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Modal / dialog entrance. */
+@keyframes modal-pop {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.modal-pop {
+  animation: modal-pop 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.overlay-in {
+  animation: overlay-in 0.16s ease;
+}
+
+/* Dashboard chart bars grow up from the baseline on mount. */
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+.ti-bar {
+  transform-origin: bottom;
+  animation: bar-grow 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* A small pop for an icon appearing (e.g. the Copied check). */
+@keyframes pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.pop {
+  animation: pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Empty-state sailboat gently bobs. */
+@keyframes es-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.es-boat {
+  animation: es-bob 4.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active:not(:disabled) { transform: none; }
+  .modal-pop,
+  .overlay-in,
+  .pop,
+  .es-boat { animation: none; }
+  .ti-bar { animation: none; transform: none; }
+}

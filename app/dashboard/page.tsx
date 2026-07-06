@@ -134,25 +134,27 @@ export default async function DashboardPage() {
           >
             <circle cx="88" cy="60" r="50" fill="var(--accent-weak)" />
             <circle cx="134" cy="30" r="11" fill="var(--gold-400)" />
-            {/* mast */}
-            <line
-              x1="88"
-              y1="26"
-              x2="88"
-              y2="86"
-              stroke="var(--text-muted)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-            {/* main sail */}
-            <path d="M84 30 L84 84 L52 84 Z" fill="var(--accent)" />
-            {/* jib sail */}
-            <path d="M92 38 L92 84 L120 84 Z" fill="var(--gold-400)" />
-            {/* hull */}
-            <path
-              d="M54 86 L122 86 L110 102 L66 102 Z"
-              fill="var(--text-muted)"
-            />
+            <g className="es-boat">
+              {/* mast */}
+              <line
+                x1="88"
+                y1="26"
+                x2="88"
+                y2="86"
+                stroke="var(--text-muted)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+              {/* main sail */}
+              <path d="M84 30 L84 84 L52 84 Z" fill="var(--accent)" />
+              {/* jib sail */}
+              <path d="M92 38 L92 84 L120 84 Z" fill="var(--gold-400)" />
+              {/* hull */}
+              <path
+                d="M54 86 L122 86 L110 102 L66 102 Z"
+                fill="var(--text-muted)"
+              />
+            </g>
             {/* waves */}
             <path
               d="M28 112 q11 -8 22 0 t22 0 t22 0 t22 0 t22 0"

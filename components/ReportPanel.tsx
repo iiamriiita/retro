@@ -390,10 +390,10 @@ export default function ReportPanel({
           aria-modal="true"
         >
           <div
-            className="absolute inset-0 bg-black/40"
+            className="overlay-in absolute inset-0 bg-black/40"
             onClick={() => !busy && setAskTone(false)}
           />
-          <div className="card relative z-10 w-full max-w-lg">
+          <div className="modal-pop card relative z-10 w-full max-w-lg">
             <h2 className="text-base font-bold">{t("rp.settingsTitle")}</h2>
 
             {/* Tone — drag slider */}

@@ -114,7 +114,16 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
               setTimeout(() => setCopied(false), 1500);
             }}
           >
-            {copied ? tr("cw.copied") : tr("cw.copy")}
+            {copied ? (
+              <>
+                <span className="pop inline-flex">
+                  <Icon name="check" size={15} strokeWidth={3} />
+                </span>
+                {tr("cw.copied")}
+              </>
+            ) : (
+              tr("cw.copy")
+            )}
           </button>
         </div>
         <div className="mt-5 flex flex-wrap gap-3">

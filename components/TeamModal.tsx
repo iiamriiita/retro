@@ -57,11 +57,11 @@ export default function TeamModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
+      className="overlay-in fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
       onClick={() => !onboarding && onClose()}
     >
       <div
-        className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+        className="modal-pop w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-1 flex items-center justify-between">
