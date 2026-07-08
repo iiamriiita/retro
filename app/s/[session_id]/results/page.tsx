@@ -223,7 +223,7 @@ export default async function ResultsPage({
       >
         <TemplateBanner id={session.template_id} />
       </div>
-      <div className="container-wide !max-w-6xl">
+      <div className="container-wide">
       <BackButton fallback="/" />
       <div className="mb-6 flex items-start justify-between gap-6">
         <div className="min-w-0">
