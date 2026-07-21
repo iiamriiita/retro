@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import "./globals.css";
+import "../globals.css";
 import { getCurrentUser } from "@/lib/supabase/auth-server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n/server";

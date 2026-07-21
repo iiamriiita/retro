@@ -112,3 +112,51 @@ lib/
 components/                    form + results UI
 supabase/migrations/0001_init.sql
 ```
+
+---
+
+## 媽媽的行事曆(`/calendar`)
+
+同一個專案裡的獨立小 PWA:**用一句中文(說的或打的)就能新增行事曆事件**,
+不接 Google/Apple 日曆、不用 AI —— 日期時間靠 `lib/calendar/parse.ts` 的
+純規則解析(「下週三下午三點帶妹妹回診」→ 日期 + 時間 + 標題),資料存
+Supabase,提醒用 Web Push 推播。
+
+### 功能
+
+- ➕ 新增:語音(瀏覽器 SpeechRecognition,沒有就退回 iOS 鍵盤麥克風)或
+  打字 → 即時解析 → 確認卡(日期/時間/事情皆可手動修)→ 選提醒時間 → 儲存。
+- 📅 月曆檢視:點日期看當天安排。
+- 📋 清單檢視:依日期分組逐條列出,可展開過去的安排。
+- 🔔 提醒:`/api/calendar/cron` 被排程打到時,把到期提醒推播給所有訂閱過的
+  手機(iPhone 需 iOS 16.4+ 且**先加入主畫面**,app 內建引導)。
+- 🔒 選填 `CALENDAR_PIN`:設定後要輸入通行碼才能使用(擋路人)。
+
+### 設定步驟
+
+1. 跑 migration `supabase/migrations/0010_calendar.sql`(`supabase db push`
+   或貼進 SQL editor)。
+2. 產生 VAPID 金鑰:`npx web-push generate-vapid-keys`,填進
+   `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT`,
+   並自訂一組 `CRON_SECRET`。
+3. 部署後設定排程,每 5 分鐘打一次(Vercel Hobby 的 cron 一天只能一次,
+   建議用免費的 [cron-job.org](https://cron-job.org)):
+
+   ```
+   GET https://你的網域/api/calendar/cron?key=<CRON_SECRET>
+   ```
+
+4. 手機用 Safari 開 `https://你的網域/calendar` → 分享 → 加入主畫面 →
+   從主畫面開啟 → 按「🔔 開啟提醒」。
+
+### 相關檔案
+
+```
+app/(calendar)/                calendar 專區獨立 root layout + 頁面
+app/api/calendar/              events CRUD / push 訂閱 / cron 發送
+components/calendar/           CalendarApp / AddEvent / MonthView / ListView
+lib/calendar/parse.ts          中文口語日期時間解析器(純規則)
+public/sw.js                   service worker(收推播、點通知開 app)
+public/calendar.webmanifest    PWA manifest
+supabase/migrations/0010_calendar.sql
+```
