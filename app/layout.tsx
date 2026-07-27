@@ -10,6 +10,7 @@ import LangSwitcher from "@/components/LangSwitcher";
 import UserMenu from "@/components/UserMenu";
 import TopProgress from "@/components/TopProgress";
 import Image from "next/image";
+import { Analytics } from "@vercel/analytics/next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -83,6 +84,7 @@ export default async function RootLayout({
           </header>
           <main className="overflow-x-clip py-10">{children}</main>
         </LocaleProvider>
+        <Analytics />
       </body>
     </html>
   );
