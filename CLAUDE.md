@@ -1,0 +1,18 @@
+# Team Retro — agent guide
+
+Next.js 15 (App Router) + TypeScript + Tailwind + Supabase (Postgres/RLS/Auth) + Google Gemini. Deployed on Vercel.
+
+## Design system — read before any UI work
+
+The full design system lives in **`docs/design-system.md`**. It is the contract for all UI work in this repo. The hard rules:
+
+- All colors, radii, fonts and shadows MUST come from the tokens in `app/globals.css` `:root`. Never hardcode a hex value — propose a new token first.
+- Gold (`--accent`) is the only interactive color. **One primary button per page.** Hover brightens (`--accent-hover`), never darkens. There are no outlined buttons — secondary actions use the ghost style.
+- Green/red are semantic only: green always means *going well*, red always means *needs improvement*.
+- Cards are flat: no borders, no shadows, never nested. Elevation (shadow) is reserved for menus and modals.
+- Alpha tints (`--accent-weak` etc.) are for small areas only; large fills use solid colors.
+- Illustrations and icons are inline SVG colored with tokens only. No PNG art assets (the wordmark is the single exception).
+- Motion: animate transform/opacity only, follow the duration scale in `docs/design-system.md`, and keep everything behind `prefers-reduced-motion`.
+- Every user-facing string ships in English and Traditional Chinese (zh-TW) together — see `lib/i18n`.
+
+Reuse before creating: import from `components/*`, style with the classes in `app/globals.css` (`.card`, `.btn-primary`, `.btn-ghost`, `.btn-danger`, `.badge`, `.textarea`…). Carve a new component only when nothing existing fits — and when you do, it joins the library and `docs/design-system.md` should be updated to match.
