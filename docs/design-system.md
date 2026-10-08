@@ -114,38 +114,154 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
     "source": "github",
     "repo": "iiamriiita/retro",
     "paths": {
-      "tokens": ["app/globals.css", "tailwind.config.ts"],
-      "assets": ["public/logo.png"],
-      "docs": ["app/globals.css comments", "component sources"]
+      "tokens": [
+        "app/globals.css",
+        "tailwind.config.ts"
+      ],
+      "assets": [
+        "public/logo.png"
+      ],
+      "docs": [
+        "app/globals.css comments",
+        "component sources"
+      ]
     },
-    "synced": "2026-09-23"
+    "synced": "2026-10-08",
+    "omitted": [
+      {
+        "section": "motion",
+        "reason": "The token format has no motion family — motion rules live in motion.md"
+      }
+    ]
   },
   "color": {
-    "themes": [{ "id": "light", "name": "Light" }],
+    "themes": [
+      {
+        "id": "light",
+        "name": "Light"
+      }
+    ],
     "tokens": [
-      { "name": "bg", "value": "#f7f7f6", "usage": "Page ground. A warm off-white — never pure grey — so white cards read as objects on it." },
-      { "name": "surface", "value": "#ffffff", "usage": "Cards and panels. Flat: no border, no shadow; the step up from bg is the whole separation." },
-      { "name": "surface-2", "value": "#f3f2f0", "usage": "Recessed fills inside a card: inputs, answer tiles, ghost buttons, chart tooltips' ground." },
-      { "name": "surface-3", "value": "#eae8e4", "usage": "Hover state of surface-2 fills, neutral badges, source-tag chips. States move one surface step, they never add borders." },
-      { "name": "overlay", "value": "rgba(30, 24, 18, 0.3)", "usage": "Dim layer behind modals — warm-tinted, not pure black." },
-      { "name": "border", "value": "#e6e3de", "usage": "Hairline dividers only (report summary underline, header rule). Cards never use it." },
-      { "name": "border-strong", "value": "#d6d2cb", "usage": "Rare stronger rule when a hairline vanishes on surface-2." },
-      { "name": "text", "value": "#2c1c12", "usage": "Primary ink — a deep coffee brown, not black. Headings, body, button labels on gold." },
-      { "name": "text-muted", "value": "#7e5232", "usage": "Secondary ink: descriptions, hints, section labels. Also the hull/mast brown in illustrations." },
-      { "name": "text-subtle", "value": "#9c948a", "usage": "Tertiary ink: timestamps, empty states, placeholder text." },
-      { "name": "text-inverse", "value": "{text}", "usage": "Label ink on accent fills. Gold is light, so the 'inverse' is the same dark brown — by design." },
-      { "name": "accent", "value": "#f0b90b", "usage": "THE action color. Primary buttons, active toggles, progress bar, focus. One accent does all interactive work." },
-      { "name": "accent-hover", "value": "#fcd535", "usage": "Accent hover — lighter, not darker: the button brightens under the cursor." },
-      { "name": "accent-press", "value": "#d9a400", "usage": "Accent pressed state, paired with a scale(0.97) dip." },
-      { "name": "accent-weak", "value": "rgba(240, 185, 11, 0.16)", "usage": "Small-area gold tints: selected chips, quote highlights, flash-on-scroll. Large areas use a solid — alpha over grey goes muddy." },
-      { "name": "gold-400", "value": "#fcd535", "usage": "Bright gold for illustration highlights (jib sail, sun) and small marks." },
-      { "name": "gold-700", "value": "#a67c00", "usage": "Readable gold: links and gold text on light grounds, where accent itself fails contrast." },
-      { "name": "green-500", "value": "#47854f", "usage": "Semantic positive: 'What's going well' bullets, success badges, high mood scores." },
-      { "name": "green-weak", "value": "rgba(71, 133, 79, 0.14)", "usage": "Positive tint fill — the green report box, success badge ground." },
-      { "name": "red-500", "value": "#d5544a", "usage": "Semantic negative: 'What to improve' markers, low mood, destructive buttons." },
-      { "name": "danger-weak", "value": "rgba(213, 84, 74, 0.1)", "usage": "Negative tint fill — the red report box." },
-      { "name": "tooltip-ink", "value": "#452c1c", "usage": "Tooltip ground: deep warm brown with white text, the one dark surface in the UI." },
-      { "name": "focus-ring", "value": "rgba(240, 185, 11, 0.5)", "usage": "Focus ring, drawn as a 2px box-shadow on inputs." }
+      {
+        "name": "bg",
+        "value": "#f7f7f6",
+        "usage": "Page ground. A warm off-white — never pure grey — so white cards read as objects on it."
+      },
+      {
+        "name": "surface",
+        "value": "#ffffff",
+        "usage": "Cards and panels. Flat: no border, no shadow; the step up from bg is the whole separation."
+      },
+      {
+        "name": "surface-2",
+        "value": "#f3f2f0",
+        "usage": "Recessed fills inside a card: inputs, answer tiles, ghost buttons, chart tooltips' ground."
+      },
+      {
+        "name": "surface-3",
+        "value": "#eae8e4",
+        "usage": "Hover state of surface-2 fills, neutral badges, source-tag chips. States move one surface step, they never add borders."
+      },
+      {
+        "name": "overlay",
+        "value": "rgba(30, 24, 18, 0.3)",
+        "usage": "Dim layer behind modals — warm-tinted, not pure black."
+      },
+      {
+        "name": "border",
+        "value": "#e6e3de",
+        "usage": "Hairline dividers only (report summary underline, header rule). Cards never use it."
+      },
+      {
+        "name": "border-strong",
+        "value": "#d6d2cb",
+        "usage": "Rare stronger rule when a hairline vanishes on surface-2."
+      },
+      {
+        "name": "text",
+        "value": "#2c1c12",
+        "usage": "Primary ink — a deep coffee brown, not black. Headings, body, button labels on gold."
+      },
+      {
+        "name": "text-muted",
+        "value": "#7e5232",
+        "usage": "Secondary ink: descriptions, hints, section labels. Also the hull/mast brown in illustrations."
+      },
+      {
+        "name": "text-subtle",
+        "value": "#9c948a",
+        "usage": "Tertiary ink: timestamps, empty states, placeholder text."
+      },
+      {
+        "name": "text-inverse",
+        "value": "{text}",
+        "usage": "Label ink on accent fills. Gold is light, so the 'inverse' is the same dark brown — by design."
+      },
+      {
+        "name": "accent-ink",
+        "value": "{text}",
+        "usage": "Ink on gold elements. Aliases text — follows any ink change (same role as text-inverse; declared in :root)."
+      },
+      {
+        "name": "accent",
+        "value": "#f0b90b",
+        "usage": "THE action color. Primary buttons, active toggles, progress bar, focus. One accent does all interactive work."
+      },
+      {
+        "name": "accent-hover",
+        "value": "#fcd535",
+        "usage": "Accent hover — lighter, not darker: the button brightens under the cursor."
+      },
+      {
+        "name": "accent-press",
+        "value": "#d9a400",
+        "usage": "Accent pressed state, paired with a scale(0.97) dip."
+      },
+      {
+        "name": "accent-weak",
+        "value": "rgba(240, 185, 11, 0.16)",
+        "usage": "Small-area gold tints: selected chips, quote highlights, flash-on-scroll. Large areas use a solid — alpha over grey goes muddy. (= accent at 16% alpha.)"
+      },
+      {
+        "name": "gold-400",
+        "value": "{accent-hover}",
+        "usage": "Bright gold for illustration highlights (jib sail, sun) and small marks. Aliases accent-hover — there is only one bright gold."
+      },
+      {
+        "name": "gold-700",
+        "value": "#a67c00",
+        "usage": "Readable gold: links and gold text on light grounds, where accent itself fails contrast."
+      },
+      {
+        "name": "green-500",
+        "value": "#47854f",
+        "usage": "Semantic positive: 'What's going well' bullets, success badges, high mood scores."
+      },
+      {
+        "name": "green-weak",
+        "value": "rgba(71, 133, 79, 0.14)",
+        "usage": "Positive tint fill — the green report box, success badge ground."
+      },
+      {
+        "name": "red-500",
+        "value": "#d5544a",
+        "usage": "Semantic negative: 'What to improve' markers, low mood, destructive buttons."
+      },
+      {
+        "name": "danger-weak",
+        "value": "rgba(213, 84, 74, 0.1)",
+        "usage": "Negative tint fill — the red report box. (Used via a fallback expression in the product.)"
+      },
+      {
+        "name": "tooltip-ink",
+        "value": "#452c1c",
+        "usage": "Tooltip ground: deep warm brown with white text, the one dark surface in the UI. (Currently hardcoded in the product.)"
+      },
+      {
+        "name": "focus-ring",
+        "value": "rgba(240, 185, 11, 0.5)",
+        "usage": "Focus ring, drawn as a 2px box-shadow on inputs. The value is accent at 50% alpha; alpha cannot be expressed by reference, so the literal stays."
+      }
     ]
   },
   "type": {
@@ -160,27 +276,111 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
         "name": "Display",
         "family": "display",
         "styles": [
-          { "name": "hero", "fontSize": "56px", "lineHeight": 1.02, "fontWeight": 800, "letterSpacing": "-0.03em", "sample": "Honest team feedback, minus the awkward.", "usage": "Landing headline only." },
-          { "name": "page-title", "fontSize": "24px", "lineHeight": 1.2, "fontWeight": 800, "letterSpacing": "-0.02em", "sample": "My retros", "usage": "One per page." },
-          { "name": "section-title", "fontSize": "18px", "lineHeight": 1.2, "fontWeight": 700, "letterSpacing": "-0.02em", "sample": "AI report", "usage": "Card and section headings (h2–h4 map here automatically)." }
+          {
+            "name": "hero",
+            "fontSize": "56px",
+            "lineHeight": 1.02,
+            "fontWeight": 800,
+            "letterSpacing": "-0.03em",
+            "sample": "Honest team feedback, minus the awkward.",
+            "usage": "Landing headline only."
+          },
+          {
+            "name": "page-title",
+            "fontSize": "24px",
+            "lineHeight": 1.2,
+            "fontWeight": 800,
+            "letterSpacing": "-0.02em",
+            "sample": "My retros",
+            "usage": "One per page."
+          },
+          {
+            "name": "section-title",
+            "fontSize": "18px",
+            "lineHeight": 1.2,
+            "fontWeight": 700,
+            "letterSpacing": "-0.02em",
+            "sample": "AI report",
+            "usage": "Card and section headings (h2–h4 map here automatically)."
+          }
         ]
       },
       {
         "name": "Text",
         "family": "body",
         "styles": [
-          { "name": "card-title", "fontSize": "15px", "lineHeight": 1.4, "fontWeight": 500, "sample": "What's going well", "usage": "Sub-headings inside cards: report boxes, sidebar cards, stat labels." },
-          { "name": "body", "fontSize": "15px", "lineHeight": 1.55, "fontWeight": 400, "sample": "Pairing on the auth refactor sped up work and caught edge cases.", "usage": "Answers, report bullets, reading text." },
-          { "name": "body-sm", "fontSize": "14px", "lineHeight": 1.5, "fontWeight": 400, "sample": "What people opening the shared link can see.", "usage": "Descriptions, hints, button labels (at weight 600)." },
-          { "name": "caption", "fontSize": "12px", "lineHeight": 1.4, "fontWeight": 500, "sample": "AI generated · for reference", "usage": "Timestamps, badges, footnotes." },
-          { "name": "field-label", "fontSize": "12px", "lineHeight": 1.3, "fontWeight": 600, "sample": "Email", "usage": "Form labels, in text-muted." }
+          {
+            "name": "card-title",
+            "fontSize": "15px",
+            "lineHeight": 1.4,
+            "fontWeight": 500,
+            "sample": "What's going well",
+            "usage": "Sub-headings inside cards: report boxes, sidebar cards, stat labels."
+          },
+          {
+            "name": "body",
+            "fontSize": "15px",
+            "lineHeight": 1.55,
+            "fontWeight": 400,
+            "sample": "Pairing on the auth refactor sped up work and caught edge cases.",
+            "usage": "Answers, report bullets, reading text."
+          },
+          {
+            "name": "quote",
+            "fontSize": "17px",
+            "lineHeight": 1.5,
+            "fontWeight": 500,
+            "sample": "Pairing clearly paid off this sprint; requirement sync is still the friction.",
+            "usage": "Reserved for the AI report's summary quote."
+          },
+          {
+            "name": "body-sm",
+            "fontSize": "14px",
+            "lineHeight": 1.5,
+            "fontWeight": 400,
+            "sample": "What people opening the shared link can see.",
+            "usage": "Descriptions and hints. Button labels use the button style."
+          },
+          {
+            "name": "button",
+            "fontSize": "14px",
+            "lineHeight": 1,
+            "fontWeight": 600,
+            "letterSpacing": "-0.01em",
+            "sample": "Generate AI report",
+            "usage": "Button labels — body family. Geometry lives on the Button component."
+          },
+          {
+            "name": "caption",
+            "fontSize": "12px",
+            "lineHeight": 1.4,
+            "fontWeight": 500,
+            "sample": "AI generated · for reference",
+            "usage": "Timestamps, badges, footnotes."
+          },
+          {
+            "name": "field-label",
+            "fontSize": "12px",
+            "lineHeight": 1.3,
+            "fontWeight": 600,
+            "sample": "Email",
+            "usage": "Form labels, in text-muted."
+          }
         ]
       },
       {
         "name": "Mono",
         "family": "mono",
         "styles": [
-          { "name": "eyebrow", "fontSize": "14px", "lineHeight": 1.4, "fontWeight": 500, "letterSpacing": "0.12em", "sample": "TEAM RETRO", "usage": "Uppercase kickers and speech-bubble speaker labels on the landing scene." }
+          {
+            "name": "eyebrow",
+            "fontSize": "14px",
+            "lineHeight": 1.4,
+            "fontWeight": 500,
+            "letterSpacing": "0.12em",
+            "sample": "TEAM RETRO",
+            "usage": "Uppercase kickers and speech-bubble speaker labels on the landing scene."
+          }
         ]
       }
     ]
@@ -188,31 +388,96 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
   "spacing": {
     "note": "Built on the Tailwind 4px grid; these are the steps the product actually uses.",
     "tokens": [
-      { "name": "space-1", "value": "4px", "usage": "Icon-to-label gaps, chip padding." },
-      { "name": "space-2", "value": "8px", "usage": "Tight sibling gaps: tag rows, dot bullets." },
-      { "name": "space-3", "value": "12px", "usage": "List item gaps (answer cards, report bullets)." },
-      { "name": "space-4", "value": "16px", "usage": "Padding inside tint boxes; grid gaps between cards. Also the minimum page side gutter." },
-      { "name": "space-5", "value": "20px", "usage": "Card padding block (22px inline pairs with it)." },
-      { "name": "space-6", "value": "24px", "usage": "Between stacked sections in a column." },
-      { "name": "space-10", "value": "40px", "usage": "Page-level breathing room around heroes and empty states." }
+      {
+        "name": "space-1",
+        "value": "4px",
+        "usage": "Icon-to-label gaps, chip padding."
+      },
+      {
+        "name": "space-2",
+        "value": "8px",
+        "usage": "Tight sibling gaps: tag rows, dot bullets."
+      },
+      {
+        "name": "space-3",
+        "value": "12px",
+        "usage": "List item gaps (answer cards, report bullets)."
+      },
+      {
+        "name": "space-4",
+        "value": "16px",
+        "usage": "Padding inside tint boxes; grid gaps between cards. Also the minimum page side gutter."
+      },
+      {
+        "name": "space-5",
+        "value": "20px",
+        "usage": "Card block padding (inline is space-5x, 22px)."
+      },
+      {
+        "name": "space-5x",
+        "value": "22px",
+        "usage": "Card inline padding — pairs with space-5 (20px block)."
+      },
+      {
+        "name": "space-6",
+        "value": "24px",
+        "usage": "Between stacked sections in a column."
+      },
+      {
+        "name": "space-10",
+        "value": "40px",
+        "usage": "Page-level breathing room around heroes and empty states."
+      }
     ]
   },
   "radius": {
     "note": "Restrained, Supabase-like corners. Small enough to feel technical, round enough to feel warm.",
     "tokens": [
-      { "name": "radius-sm", "value": "5px", "usage": "Badges, tiny marks." },
-      { "name": "radius-md", "value": "7px", "usage": "Buttons, inputs, textareas." },
-      { "name": "radius-lg", "value": "9px", "usage": "Cards." },
-      { "name": "radius-xl", "value": "12px", "usage": "Report tint boxes, modal panels." },
-      { "name": "radius-pill", "value": "999px", "usage": "Toggle track and knob, source-tag chips, chart bars' caps." }
+      {
+        "name": "radius-sm",
+        "value": "5px",
+        "usage": "Badges, tiny marks."
+      },
+      {
+        "name": "radius-md",
+        "value": "7px",
+        "usage": "Buttons, inputs, textareas."
+      },
+      {
+        "name": "radius-lg",
+        "value": "9px",
+        "usage": "Cards."
+      },
+      {
+        "name": "radius-xl",
+        "value": "12px",
+        "usage": "Report tint boxes, modal panels."
+      },
+      {
+        "name": "radius-pill",
+        "value": "999px",
+        "usage": "Toggle track and knob, source-tag chips, chart bars' caps."
+      }
     ]
   },
   "shadow": {
     "note": "Surfaces stay flat — a card never casts a shadow. Only layers that float above the page (menus, modals) lift, and the shadow is warm-toned.",
     "tokens": [
-      { "name": "shadow-md", "value": "0 4px 12px rgba(24, 15, 9, 0.14)", "usage": "Dropdown menus, popovers, landing speech bubbles." },
-      { "name": "shadow-lg", "value": "0 10px 28px rgba(24, 15, 9, 0.2)", "usage": "Modals and dialogs." },
-      { "name": "shadow-xl", "value": "0 18px 44px rgba(24, 15, 9, 0.26)", "usage": "The largest overlays; rarely used." }
+      {
+        "name": "shadow-md",
+        "value": "0 4px 12px rgba(24, 15, 9, 0.14)",
+        "usage": "Dropdown menus, popovers, landing speech bubbles."
+      },
+      {
+        "name": "shadow-lg",
+        "value": "0 10px 28px rgba(24, 15, 9, 0.2)",
+        "usage": "Modals and dialogs."
+      },
+      {
+        "name": "shadow-xl",
+        "value": "0 18px 44px rgba(24, 15, 9, 0.26)",
+        "usage": "The largest overlays; rarely used."
+      }
     ]
   }
 }
@@ -234,14 +499,14 @@ Buttons are borderless filled rectangles: gold for the one primary action, a neu
 
 ## Specs
 
-Height 36px (48px for landing CTAs), padding-inline 16px, `radius-md`, label in body-sm at weight 600 with −0.01em tracking, icon 14–15px with a 8px gap. Disabled: 45% opacity, no color shift. The consumer provides the label and click handler; loading states swap the label, they never spin inside the button.
+Height 36px (48px for landing CTAs), padding-inline `space-4`, `radius-md`, label in the `button` style (600, −0.01em), icon 14–15px with a `space-2` gap. Disabled: 45% opacity, no color shift. The consumer provides the label and click handler; loading states swap the label, they never spin inside the button.
 
 
 ## Card
 
 The card is the system's only container: a flat white rectangle on the warm ground. Hand-written from `app/globals.css` (`.card`).
 
-`surface` fill, `radius-lg`, padding 20px block / 22px inline — **no border, no shadow**. Separation from the page comes entirely from the `bg` → `surface` step, which is why the ground must never be pure white. Inside a card, recessed things (inputs, answer tiles) use `surface-2`; tinted meaning (report boxes) uses `green-weak`/`danger-weak` at `radius-xl`. Cards never nest cards.
+`surface` fill, `radius-lg`, padding `space-5` block / `space-5x` inline — **no border, no shadow**. Separation from the page comes entirely from the `bg` → `surface` step, which is why the ground must never be pure white. Inside a card, recessed things (inputs, answer tiles) use `surface-2`; tinted meaning (report boxes) uses `green-weak`/`danger-weak` at `radius-xl`. Cards never nest cards.
 
 
 ## Badge
@@ -261,7 +526,7 @@ An 18px `radius-pill` chip on `surface-3` showing a respondent's number (anonymo
 
 Text inputs are recessed fills with no border; state lives in the background and the focus ring. Hand-written from `app/globals.css` (`.textarea`, `.field-label`).
 
-Ground `surface-2`, `radius-md`, 12px inline padding, body-sm type; placeholder in `text-subtle`. Hover deepens to `surface-3`; focus returns to `surface-2` and draws the `focus-ring` as a 2px box-shadow — the ring is the accent color at half alpha, so "where am I typing" and "what can I click" share one hue. Labels sit above in field-label style, `text-muted`. Checkboxes and radios take `accent` via `accent-color`.
+Ground `surface-2`, `radius-md`, `space-3` inline padding, body-sm type; placeholder in `text-subtle`. Hover deepens to `surface-3`; focus returns to `surface-2` and draws the `focus-ring` as a 2px box-shadow — the ring is the accent color at half alpha, so "where am I typing" and "what can I click" share one hue. Labels sit above in field-label style, `text-muted`. Checkboxes and radios take `accent` via `accent-color`.
 
 
 ## Toggle
@@ -277,7 +542,7 @@ The AI report layout is the product's signature pattern: a quoted one-line summa
 
 ## Anatomy
 
-- **Summary quote** in body type at 17px/medium, wrapped in oversized `accent`-colored quotation marks set in the display face; a `border` hairline closes the section.
+- **Summary quote** in the `quote` style (17px/500), wrapped in oversized `accent`-colored quotation marks set in the display face; a `border` hairline closes the section.
 - **The pair**: two `radius-xl` boxes on `green-weak` and `danger-weak` — the palette's semantic tokens carrying the data's meaning directly. Green bullets are 8px `green-500` dots; red bullets are `red-500` warning triangles. Titles in card-title style.
 - **Bullets** end with round source tags (see Badge) linking each claim to its origin answer.
 - **Collapse**: lists longer than four items fold behind a centered "Show N more" text button in `text-muted` with a chevron that flips when open — a long red column must not dominate the layout.
