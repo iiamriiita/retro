@@ -16,3 +16,12 @@ The full design system lives in **`docs/design-system.md`**. It is the contract 
 - Every user-facing string ships in English and Traditional Chinese (zh-TW) together — see `lib/i18n`.
 
 Reuse before creating: import from `components/*`, style with the classes in `app/globals.css` (`.card`, `.btn-primary`, `.btn-ghost`, `.btn-danger`, `.badge`, `.textarea`…). Carve a new component only when nothing existing fits — and when you do, it joins the library and `docs/design-system.md` should be updated to match.
+
+## Changing the design system itself
+
+Any change to tokens, principles, motion rules or component specs follows
+**`docs/design-system-workflow.md`**: a structured change ticket, two owner
+confirmations (the ticket, then the impact list) before any file is touched,
+then strictly sources → product → projections. If existing components or rules
+don't fit the task at hand, propose a change through that workflow — never
+work around the system silently.
