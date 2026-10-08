@@ -1,0 +1,21 @@
+<!-- @dsCard group="Indicators" height=160 subtitle="Status badges, and the clickable source tags from the AI report" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..600&display=swap">
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface); font-family: var(--font-body); color: var(--text); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 18px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; }
+  .neutral { background: var(--surface-3); color: var(--text-muted); }
+  .accent { background: var(--accent-weak); color: var(--gold-700); }
+  .success { background: var(--green-weak); color: var(--green-500); }
+  .bullet { font-size: 15px; line-height: 1.55; max-width: 420px; }
+  .tag { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; margin-left: 6px; border: 0; cursor: pointer; border-radius: var(--radius-pill); background: var(--surface-3); color: var(--text-muted); font: 600 11px/1 var(--font-body); vertical-align: middle; }
+  .tag:hover { background: var(--accent-weak); color: var(--gold-700); }
+</style>
+<div class="row">
+  <span class="badge neutral">Draft</span>
+  <span class="badge accent">Discussing</span>
+  <span class="badge success">Closed · 5 responded</span>
+</div>
+<p class="bullet">The staging environment is frequently down, causing lost momentum.
+  <button class="tag" title="Respondent 1 — jump to source">1</button><button class="tag" title="Amy — jump to source">A</button>
+</p>

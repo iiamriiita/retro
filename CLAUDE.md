@@ -4,7 +4,12 @@ Next.js 15 (App Router) + TypeScript + Tailwind + Supabase (Postgres/RLS/Auth) +
 
 ## Design system — read before any UI work
 
-The full design system lives in **`docs/design-system.md`**. It is the contract for all UI work in this repo. The hard rules:
+The design system is the contract for all UI work in this repo. It lives in
+two synchronized forms: **`docs/design-system/`** (the canonical file-per-file
+sources — tokens.json, README.md, motion.md, components/*/README.md) and
+**`docs/design-system.md`** (the same content packed into one file for quick
+reading). Read either; edit through the workflow below, never just one copy.
+The hard rules:
 
 - All colors, radii, fonts and shadows MUST come from the tokens in `app/globals.css` `:root`. Never hardcode a hex value — propose a new token first.
 - Gold (`--accent`) is the only interactive color. **One primary button per page.** Hover brightens (`--accent-hover`), never darkens. There are no outlined buttons — secondary actions use the ghost style.

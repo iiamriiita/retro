@@ -1,3 +1,8 @@
+> **Packed view.** This file bundles the sources in `docs/design-system/`
+> (tokens.json · README.md · motion.md · components/*/README.md) into one
+> path for quick reading. The folder is the canonical, file-per-file form;
+> both are kept in sync by the update workflow.
+
 # Team Retro
 
 **Honest team feedback, minus the awkward.** Team Retro is a retrospective tool for 2–5-person teams: one link collects anonymous answers, and AI sorts them into highlights, improvements and next steps. The design system exists to make a potentially tense ritual feel **warm, calm and safe** — and, because the product was built in an AI pair-programming loop, to act as the **guardrail that kept dozens of AI-built iterations visually coherent**.

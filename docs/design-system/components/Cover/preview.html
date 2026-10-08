@@ -1,0 +1,36 @@
+<!-- @dsCard height=288 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Hanken+Grotesk:wght@400..600&display=swap">
+<style>
+  body { margin: 0; background: var(--bg); }
+  .cover { position: relative; width: 960px; height: 288px; }
+  .cover svg { position: absolute; inset: 0; }
+  .accentB { fill: var(--accent); rx: var(--radius-xl); }
+  .inkB { fill: var(--text); rx: var(--radius-xl); }
+  .tintB { fill: var(--surface-3); rx: var(--radius-xl); }
+  .greenB { fill: var(--green-500); rx: var(--radius-lg); }
+  .redB { fill: var(--red-500); rx: var(--radius-lg); }
+  .sun { fill: var(--gold-400); }
+  .wave1 { stroke: var(--accent); }
+  .wave2 { stroke: var(--text-muted); }
+  .name { position: absolute; left: 32px; bottom: 56px; width: 440px; font: 800 88px/0.95 var(--font-display); letter-spacing: -0.03em; color: var(--text); }
+  .tag { position: absolute; left: 32px; bottom: 28px; width: 440px; font: 400 14px/1.4 var(--font-body); color: var(--text-muted); }
+</style>
+<div class="cover">
+  <!-- Derivation:
+       blocks: accent 240x184 (slab, radius-xl), text 104x152 bleeding the right edge (radius-xl), surface-3 88x224 relief (radius-xl), green-500 112x48 + red-500 48x48 small signal blocks (radius-lg) — signals stay small, gold takes the big block
+       arrangement: staggered stack bleeding off the top and right, gutters space-4 (16px)
+       pattern: the wave motif — README: the sailing metaphor makes hard feedback sayable; two wave strokes from the empty-state illustration in accent and text-muted, plus one gold-400 sun disc (radius-pill)
+       scales: gutters 16 = space-4, corners radius-xl 12 / radius-lg 9, disc = radius-pill -->
+  <svg viewBox="0 0 960 288" width="960" height="288" aria-hidden="true">
+    <rect class="tintB" x="496" y="48" width="88" height="224" />
+    <rect class="accentB" x="600" y="-16" width="240" height="184" />
+    <rect class="inkB" x="856" y="32" width="120" height="152" />
+    <circle class="sun" cx="820" cy="36" r="22" />
+    <rect class="greenB" x="600" y="184" width="112" height="48" />
+    <rect class="redB" x="728" y="184" width="48" height="48" />
+    <path class="wave1" d="M496 254 q 29 -18 58 0 t 58 0 t 58 0 t 58 0 t 58 0 t 58 0 t 58 0 t 58 0" fill="none" stroke-width="4" stroke-linecap="round" />
+    <path class="wave2" d="M524 272 q 29 -18 58 0 t 58 0 t 58 0 t 58 0 t 58 0 t 58 0 t 58 0" fill="none" stroke-width="3" stroke-linecap="round" />
+  </svg>
+  <div class="name">Team Retro</div>
+  <div class="tag">Honest team feedback, minus the awkward.</div>
+</div>

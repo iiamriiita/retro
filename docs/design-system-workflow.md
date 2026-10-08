@@ -61,8 +61,9 @@ where drift is born.
 3. **Step 4 · Sync every projection.** The two published Design System
    artifacts (content files first, the `design-system.json` index with a fresh
    `lastChange` **last**), the overview artifact (raw sources + rendered panes
-   + editor baselines), and `docs/design-system.md` in this repo. Commit and
-   push.
+   + editor baselines), and in this repo both `docs/design-system/` (the
+   file-per-file mirror) and `docs/design-system.md` (the packed view). Commit
+   and push.
 4. **Step 5 · Close out.** Report a change summary (items · files touched ·
    commit hash · artifact versions), then **delete the merged db drafts** on
    the overview artifact so the new originals become the editing baseline —

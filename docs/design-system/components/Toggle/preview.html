@@ -1,0 +1,23 @@
+<!-- @dsCard group="Forms" height=140 subtitle="Click to toggle — gold means on" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..600&display=swap">
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface); font-family: var(--font-body); color: var(--text); }
+  .rowset { max-width: 380px; }
+  .row { display: flex; align-items: center; justify-content: space-between; }
+  .row p { margin: 0; font-size: 15px; font-weight: 500; }
+  .hint { margin: 8px 0 0; font-size: 12px; color: var(--text-muted); }
+  .switch { position: relative; width: 44px; height: 24px; border: 0; cursor: pointer; border-radius: var(--radius-pill); background: var(--surface-3); transition: background .2s; }
+  .switch .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: var(--radius-pill); background: #ffffff; box-shadow: 0 1px 3px rgba(24,15,9,.25); transition: left .2s; }
+  .switch[aria-checked="true"] { background: var(--accent); }
+  .switch[aria-checked="true"] .knob { left: 22px; }
+</style>
+<div class="rowset">
+  <div class="row">
+    <p>Discussion</p>
+    <button class="switch" role="switch" aria-checked="true" aria-label="Discussion"
+      onclick="this.setAttribute('aria-checked', this.getAttribute('aria-checked')==='true' ? 'false' : 'true')">
+      <span class="knob"></span>
+    </button>
+  </div>
+  <p class="hint">Participants can comment on each other's answers.</p>
+</div>
