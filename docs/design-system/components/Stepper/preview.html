@@ -1,14 +1,12 @@
-<!-- @dsCard group="Navigation" height=190 subtitle="雙型態——步驟點（展示）＋進度條（表單）" -->
+<!-- @dsCard group="Navigation" height=190 subtitle="Segmented progress — one segment per step; reached = accent, upcoming = surface-3" -->
 <style>
   body { margin: 0; padding: 24px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
-  .dots { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .dot { width: 8px; height: 8px; border-radius: var(--radius-pill); background: var(--surface-3); }
-  .dot.on { background: var(--accent); }
-  .cap { font: 500 12px/1.4 var(--font-body); color: var(--text-subtle); margin-bottom: 20px; }
-  .track { max-width: 320px; height: 6px; border-radius: var(--radius-pill); background: var(--surface-3); overflow: hidden; margin-bottom: 6px; }
-  .fill { width: 60%; height: 100%; background: var(--accent); border-radius: var(--radius-pill); }
+  .seg { display: flex; align-items: center; gap: 4px; max-width: 420px; }
+  .seg div { height: 6px; flex: 1; border-radius: var(--radius-pill); background: var(--surface-3); transition: background-color .2s; }
+  .seg .on { background: var(--accent); }
+  .cap { font: 500 12px/1.4 var(--font-body); color: var(--text-subtle); margin: 6px 0 20px; }
 </style>
-<div class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
-<div class="cap">Display mode: step 2 of 4 (solid accent / surface-3 upcoming)</div>
-<div class="track"><div class="fill"></div></div>
-<div class="cap">Progress mode: 60%% — surface-3 track, accent fill</div>
+<div class="seg"><div class="on"></div><div></div></div>
+<div class="cap">CreateWizard: 2 segments, step 1</div>
+<div class="seg"><div class="on"></div><div class="on"></div><div class="on"></div><div></div><div></div></div>
+<div class="cap">FillWizard: 5 segments, step 3</div>

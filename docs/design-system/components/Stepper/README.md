@@ -1,9 +1,12 @@
-Step indication has **two modes** sharing one vocabulary. Hand-written from `CreateWizard` (step dots) and `FillWizard` (fill progress); writing this spec also fixed CreateWizard's `bg-gray-200` violation (inactive steps now use `surface-3`).
+Step indication is a **segmented progress bar**: one segment per step, each `flex-1` to fill the row, reached segments (current included) in `accent`, upcoming ones in `surface-3`. Hand-written from `CreateWizard` and `FillWizard` — both wizards use the **same pattern**; only the segment count differs.
 
-## Display mode (wizard dots)
+## Specs
 
-8px dots at `space-2` gaps: reached = solid `accent`, not yet = `surface-3`. The current step may carry a label-sm caption below. Use dots for 2–4 steps; beyond that, switch to the progress mode.
+Segments are 6px tall, `radius-pill` capped, with `space-1` (4px) gaps. Advancing tints the next segment gold over 200ms (the "fast" duration step). Works for 2–N steps; this system has **no dot-style** stepper.
 
-## Progress mode (continuous bar)
+## Family and boundary
 
-`surface-3` track, `accent` fill, 6px tall, `radius-pill` — same family as the top route-progress bar. A "step n of N" label in label-sm, `text-subtle`. Progress moves over 200ms (the "fast" duration step).
+Same family: the top route-progress bar (the continuous `accent` strip) — one "gold = in progress" vocabulary.
+Out of scope: node-style flow steppers (like the ERP test's ApprovalStepper) are a separate proposal when needed.
+
+(Writing this spec also fixed CreateWizard's `bg-gray-200` violation — upcoming segments now use `surface-3`.)
