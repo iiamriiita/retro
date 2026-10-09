@@ -22,6 +22,16 @@ The hard rules:
 
 Reuse before creating: import from `components/*`, style with the classes in `app/globals.css` (`.card`, `.btn-primary`, `.btn-ghost`, `.btn-danger`, `.badge`, `.textarea`…). Carve a new component only when nothing existing fits — and when you do, it joins the library and `docs/design-system.md` should be updated to match.
 
+## Executing UI work
+
+Every UI task — a page, a component, a visual change, a micro-interaction —
+follows **`docs/agent-design-flow.md`**: a written design plan with a
+mandatory state inventory (incl. empty/loading/error) → owner confirms →
+reuse ladder (import → class → compose from tokens → bridge to the update
+workflow when vocabulary is missing) → build under the six constraints →
+machine-checkable self-audit → owner reviews the key screens → a three-line
+delivery summary.
+
 ## Changing the design system itself
 
 Any change to tokens, principles, motion rules or component specs follows
