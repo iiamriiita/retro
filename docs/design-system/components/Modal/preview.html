@@ -1,36 +1,56 @@
-<!-- @dsCard group="Overlays" height=360 subtitle="Two sanctioned variants — Panel (shadow-lg) + Card confirm (deliberately flat)" -->
+<!-- @dsCard group="Overlays" height=430 subtitle="All three looks — form panel (title-row X) + hero panel (on-band X) + card confirm (no X)" -->
 <style>
   body { margin: 0; padding: 20px; background: var(--bg); font-family: var(--font-body); }
-  .dim { background: var(--overlay); border-radius: var(--radius-lg); padding: 24px 16px; display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; align-items: flex-start; }
-  .panel { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 300px; max-width: 100%; padding: 20px 22px; }
-  .confirm { background: var(--surface); border-radius: var(--radius-lg); width: 250px; max-width: 100%; padding: 20px 22px; }
-  h3 { font: 700 18px/1.2 var(--font-display); letter-spacing: -0.02em; margin: 0 0 8px; color: var(--text); }
-  h4 { font: 500 15px/1.4 var(--font-body); margin: 0 0 6px; color: var(--text); }
-  p { font: 400 14px/1.5 var(--font-body); color: var(--text-muted); margin: 0 0 14px; }
-  .row { display: flex; gap: 10px; }
-  .btn { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border: 0; cursor: pointer; border-radius: var(--radius-md); font: 600 14px/1 var(--font-body); transition: background-color .15s, transform .08s ease, filter .15s; }
-  .btn:active { transform: scale(0.97); }
-  .primary { background: var(--accent); color: var(--text-inverse); }
-  .primary:hover { background: var(--accent-hover); }
-  .ghost { background: var(--surface-2); color: var(--text); margin-left: auto; }
-  .ghost:hover { background: var(--surface-3); }
-  .danger { background: var(--red-500); color: var(--surface); }
-  .danger:hover { filter: brightness(0.93); }
+  .dim { background: var(--overlay); border-radius: var(--radius-lg); padding: 22px 16px; display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; align-items: flex-start; }
   .tag { font: 500 10.5px/1.4 var(--font-mono); color: var(--surface); opacity: .75; display: block; margin-bottom: 6px; }
+  .panel { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 260px; max-width: 100%; padding: 18px 20px; }
+  .hero { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 260px; max-width: 100%; overflow: hidden; }
+  .band { position: relative; height: 72px; background: linear-gradient(180deg, var(--accent-hover), var(--accent)); display: flex; align-items: center; justify-content: center; }
+  .bx { position: absolute; right: 10px; top: 10px; width: 30px; height: 30px; border: 0; border-radius: var(--radius-lg); background: rgba(255,255,255,.55); color: var(--text-inverse); cursor: pointer; font: 600 14px/1 var(--font-body); }
+  .confirm { background: var(--surface); border-radius: var(--radius-lg); width: 230px; max-width: 100%; padding: 18px 20px; }
+  .trow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  h3 { font: 800 17px/1.2 var(--font-display); letter-spacing: -0.02em; margin: 0; color: var(--text); }
+  h4 { font: 500 15px/1.4 var(--font-body); margin: 0 0 6px; color: var(--text); }
+  .px { background: none; border: 0; color: var(--text-subtle); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px; }
+  .px:hover { color: var(--text); }
+  label { display: block; font: 600 11px/1.3 var(--font-body); color: var(--text-muted); margin: 10px 0 5px; }
+  .field { background: var(--surface-2); border-radius: var(--radius-md); padding: 8px 10px; font: 400 13px/1.4 var(--font-body); color: var(--text); }
+  p { font: 400 13px/1.5 var(--font-body); color: var(--text-muted); margin: 0 0 12px; }
+  .row { display: flex; gap: 8px; margin-top: 14px; }
+  .btn { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border: 0; cursor: pointer; border-radius: var(--radius-md); font: 600 13px/1 var(--font-body); transition: background-color .15s, transform .08s ease, filter .15s; }
+  .btn:active { transform: scale(0.97); }
+  .primary { background: var(--accent); color: var(--text-inverse); margin-left: auto; }
+  .primary:hover { background: var(--accent-hover); }
+  .ghost { background: var(--surface-2); color: var(--text); }
+  .ghost:hover { background: var(--surface-3); }
+  .danger { background: var(--red-500); color: var(--surface); margin-left: auto; }
+  .danger:hover { filter: brightness(0.93); }
+  .art { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,.4); display: flex; align-items: center; justify-content: center; font-size: 22px; }
 </style>
 <div class="dim">
-  <div><span class="tag">Panel</span>
+  <div><span class="tag">Panel · form</span>
     <div class="panel">
-      <h3>Share results</h3>
-      <p>Anyone with the link can view this report.</p>
-      <div class="row"><button class="btn primary">Copy link</button><button class="btn ghost">Close</button></div>
+      <div class="trow"><h3>Team settings</h3><button class="px" aria-label="close">×</button></div>
+      <label>Team name</label><div class="field">Product ONE</div>
+      <label>Expected size</label><div class="field">4</div>
+      <div class="row"><button class="btn primary">Save</button></div>
+    </div>
+  </div>
+  <div><span class="tag">Panel · hero</span>
+    <div class="hero">
+      <div class="band"><div class="art">✦</div><button class="bx" aria-label="close">×</button></div>
+      <div style="padding:16px 20px 18px">
+        <h4 style="font-weight:800; font-family:var(--font-display)">Share results</h4>
+        <p>Anyone with the link can view the results.</p>
+        <div class="row" style="margin-top:10px"><button class="btn ghost">Open in new tab</button><button class="btn primary">Copy</button></div>
+      </div>
     </div>
   </div>
   <div><span class="tag">Card confirm</span>
     <div class="confirm">
       <h4>Delete this retro?</h4>
-      <p>All answers and the report will be deleted. This cannot be undone.</p>
-      <div class="row"><button class="btn ghost" style="margin-left:0">Cancel</button><button class="btn danger" style="margin-left:auto">Delete</button></div>
+      <p>All answers and the report will be deleted.</p>
+      <div class="row"><button class="btn ghost">Cancel</button><button class="btn danger">Delete</button></div>
     </div>
   </div>
 </div>

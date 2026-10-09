@@ -12,9 +12,10 @@ A content-rich panel may open with a **full-bleed hero band** (today's only case
 
 Built directly from `.card`: `radius-lg`, **deliberately shadowless** — the constitutional exception to "overlays lift" (see README principle 1) — at max-w-sm (384px). Anatomy: label-lg title + body-sm line + action row (ghost cancel + danger or gold confirm). It holds one sentence and two buttons; anything more upgrades to Panel.
 
-## Behavior
+## Behavior & the close convention
 
-Backdrop click and Esc close it (Esc is not yet implemented — see debts); closing must never lose user input (confirm when the form is dirty). Flows longer than two steps get a page, not a modal.
+**Every Panel carries a top-right X**: the form type as a plain icon button (18px, `text-subtle`, hover to `text`, in the title row); the hero type as the 55%-white rounded button on the band. Forced flows (e.g. first-run setup) may hide it temporarily. **Card confirm has no X** — Cancel is the close; a two-button box gets no third exit.
+Backdrop click and Esc close it (Esc unimplemented — see debts); closing must never lose user input. Flows longer than two steps get a page, not a modal.
 
 ## Debts (reality vs law, recorded honestly)
 
@@ -23,3 +24,4 @@ Backdrop click and Esc close it (Esc is not yet implemented — see debts); clos
 3. The share dialog's `rounded-2xl` (16px, not a token radius) should be `radius-xl`; its `!h-11` buttons override the 36px standard.
 4. Esc-to-close is unimplemented app-wide.
 5. The hero X button’s `rgba(255,255,255,.55)` ground is a literal, not yet a token.
+6. AuthModal lacks the top-right X (backdrop-only close) — inconsistent with TeamModal.
