@@ -4,6 +4,7 @@ Buttons are borderless filled rectangles: gold for the one primary action, a neu
 
 - **Primary** — `accent` fill, `text-inverse` (dark brown) label. One per view. Hover *brightens* to `accent-hover`; active goes `accent-press` and the whole button dips to scale(0.97).
 - **Ghost** — `surface-2` fill, `text` label; hover deepens to `surface-3`. The default for secondary actions; there is no outlined button in this system.
+- **Text** — no fill, a `gold-700` readable-gold label; hover tints `accent-weak` (small-area legal). The secondary call when the view's gold is taken — **the designated style for AI-generate actions** (sparkles icon + label).
 - **Danger** — `red-500` fill, for delete/close-session confirmations only.
 
 ## Specs

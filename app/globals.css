@@ -134,6 +134,14 @@ a {
 .btn-danger:hover:not(:disabled) {
   filter: brightness(0.93);
 }
+.btn-text {
+  @apply btn;
+  background: transparent;
+  color: var(--gold-700);
+}
+.btn-text:hover:not(:disabled) {
+  background: var(--accent-weak);
+}
 
 /* ---------------- Badge ---------------- */
 .badge {

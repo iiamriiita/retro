@@ -369,7 +369,7 @@ export default function ReportPanel({
           {isOwner && (
             <button
               type="button"
-              className="btn-primary mt-5"
+              className="btn-text mt-5"
               onClick={() => setAskTone(true)}
             >
               <Icon name="sparkles" size={15} />

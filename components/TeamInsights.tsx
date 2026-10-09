@@ -437,7 +437,7 @@ export default function TeamInsights({
               <p className="mx-auto max-w-xs text-sm text-muted">
                 {tr("ti.emptyDesc")}
               </p>
-              <button onClick={generate} className="btn-primary mx-auto mt-4">
+              <button onClick={generate} className="btn-text mx-auto mt-4">
                 <Icon name="sparkles" size={15} />
                 {tr("ti.generate")}
               </button>
