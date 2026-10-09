@@ -11,7 +11,7 @@ The visual identity in one line: *warm paper, one gold, flat surfaces, brown ink
 
 ## Principles
 
-1. **Flat first.** Cards have no border and no shadow; hierarchy comes from surface steps (`bg` → `surface` → `surface-2` → `surface-3`). Elevation is reserved for things that truly float — menus and modals get `shadow-md`/`shadow-lg`, nothing else does. If a design needs a card to "pop", the answer is a surface step or spacing, never a new shadow.
+1. **Flat first.** Cards have no border and no shadow; hierarchy comes from surface steps (`bg` → `surface` → `surface-2` → `surface-3`). Elevation is reserved for things that truly float — menus and modals get `shadow-md`/`shadow-lg`, nothing else does (one sanctioned exception: the card-style confirm dialog stays deliberately flat — see the Modal spec). If a design needs a card to "pop", the answer is a surface step or spacing, never a new shadow.
 2. **One accent, fully specified.** Gold `accent` is the only interactive hue, and it ships with every state it needs: `accent-hover` (lighter — buttons brighten, they don't darken), `accent-press`, `accent-weak` (16% tint), and `gold-700` for text-sized gold on light grounds where raw `accent` would fail contrast. Because interaction owns gold exclusively, "can I click this?" is answered by color alone.
 3. **Semantic color is not decoration.** Green and red are meanings, not moods: `green-500`/`green-weak` always say *going well*, `red-500`/`danger-weak` always say *needs improvement*. The AI report's two boxes are these tokens verbatim — the data model and the palette share one vocabulary.
 4. **Warm everything.** There is no pure black or pure grey anywhere: ink is coffee (`text` #2c1c12), the overlay is warm-tinted, shadows are brown-based, the ground is `bg` #f7f7f6. The warmth is the brand's answer to the product's job — feedback should feel like a conversation, not an audit.
@@ -563,17 +563,26 @@ Empty states say "Nothing specific this time." in `text-subtle` — never an apo
 
 ## Modal
 
-The modal is the one surface that truly floats: the warm `overlay` dim, a `shadow-lg` panel at `radius-xl`, entering with the 160ms pop. Hand-written from `AuthModal`, `TeamModal` and the share dialog.
+The modal has **two sanctioned variants**, chosen by content weight. Both sit on the warm `overlay` dim, enter with the 160ms pop, and close on backdrop click; the gold primary is **one per view**, and destructive confirmations use danger with no gold anywhere in the window. Hand-written from AuthModal, TeamModal, the share dialog, the delete/close confirms and the report settings dialog.
 
-### Anatomy
+### Panel (forms & content)
 
-- **Title** in headline-sm; body-md text below.
-- **Action row** at the bottom: the gold primary — **one per view** (a modal is its own view); secondary actions are ghost; destructive confirmations use danger, and then no gold appears in the modal at all.
-- Max width 460px, max height 90vh with inner scroll; card padding (20/22px).
+`surface` fill, `radius-xl`, 24px padding, `shadow-lg`. Size scale: forms max-w-md (448px); content-rich (e.g. share) max-w-lg (512px) — the content type may carry an X close in the top-right. Title in headline-sm, body in body-md.
 
-### When to use
+### Card confirm (two-button decisions)
 
-Interrupting decisions only: confirm, sign-in, share. Anything longer than two steps gets a page, not a modal. Backdrop click and Esc close it; closing must never lose user input (confirm first when the form is dirty).
+Built directly from `.card`: `radius-lg`, **deliberately shadowless** — the constitutional exception to "overlays lift" (see README principle 1) — at max-w-sm (384px). Anatomy: label-lg title + body-sm line + action row (ghost cancel + danger or gold confirm). It holds one sentence and two buttons; anything more upgrades to Panel.
+
+### Behavior
+
+Backdrop click and Esc close it (Esc is not yet implemented — see debts); closing must never lose user input (confirm when the form is dirty). Flows longer than two steps get a page, not a modal.
+
+### Debts (reality vs law, recorded honestly)
+
+1. Six overlays use `bg-black/40` pure black — should be the `overlay` token (warm brown 30%).
+2. Three panels and UserMenu use `shadow-xl` — should be `shadow-lg` for modals, `shadow-md` for menus.
+3. The share dialog's `rounded-2xl` (16px, not a token radius) should be `radius-xl`; its `!h-11` buttons override the 36px standard.
+4. Esc-to-close is unimplemented app-wide.
 
 ## SearchBar
 
