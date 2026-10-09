@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
+import useEscClose from "@/lib/useEscClose";
 
 export default function DeleteRetroButton({ sessionId }: { sessionId: string }) {
   const { t } = useT();
@@ -11,6 +12,7 @@ export default function DeleteRetroButton({ sessionId }: { sessionId: string }) 
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  useEscClose(open && !busy, () => setOpen(false));
 
   async function confirmDelete() {
     setBusy(true);
@@ -49,11 +51,11 @@ export default function DeleteRetroButton({ sessionId }: { sessionId: string }) 
           aria-modal="true"
         >
           <div
-            className="overlay-in absolute inset-0 bg-black/40"
+            className="overlay-in absolute inset-0 bg-[var(--overlay)]"
             onClick={() => !busy && setOpen(false)}
           />
           <div className="modal-pop card relative z-10 w-full max-w-sm">
-            <h2 className="text-base font-bold">{t("dash.deleteTitle")}</h2>
+            <h2 className="text-lg font-bold">{t("dash.deleteTitle")}</h2>
             <p className="mt-2 text-sm text-muted">{t("dash.deleteConfirm")}</p>
             {failed && (
               <p className="mt-2 text-sm text-red-600" role="alert">

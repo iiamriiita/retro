@@ -155,7 +155,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
       {/* Step 1: pick a template */}
       {step === 0 && (
         <div className="card space-y-4">
-          <h2 className="text-base font-bold">{tr("cw.headingTemplate")}</h2>
+          <h2 className="text-lg font-bold">{tr("cw.headingTemplate")}</h2>
           <div className="space-y-2">
           {templates.map((t) => {
             const isSel = templateId === t.id;
@@ -194,7 +194,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                       {open ? tr("cw.previewHide") : tr("cw.previewShow")}
                     </button>
                     {open && (
-                      <ul className="mt-2 space-y-2 rounded-lg bg-white p-3">
+                      <ul className="mt-2 space-y-2 rounded-lg bg-surface p-3">
                         {t.questions.map((q) => (
                           <li key={q.key} className="text-xs">
                             <span className="flex items-center gap-1.5 font-medium">
@@ -222,7 +222,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
       {/* Step 2: name + anonymity + deadline */}
       {step === 1 && (
         <div className="card space-y-5">
-          <h2 className="text-base font-bold">{tr("cw.headingSetup")}</h2>
+          <h2 className="text-lg font-bold">{tr("cw.headingSetup")}</h2>
           <div>
             <label className="field-label">{tr("cw.retroName")}</label>
             <input

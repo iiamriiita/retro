@@ -70,8 +70,8 @@ function CardEyebrow({ label, tip }: { label: string; tip?: string }) {
             <Icon name="info" size={13} />
           </span>
           <span
-            className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[220px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
-            style={{ background: "#452C1C" }}
+            className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[220px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-[color:var(--tooltip-text)] group-hover:block"
+            style={{ background: "var(--tooltip-ink)" }}
           >
             {tip}
           </span>
@@ -346,8 +346,8 @@ export default function TeamInsights({
                   <Icon name="info" size={13} />
                 </span>
                 <span
-                  className="pointer-events-none absolute bottom-full left-0 z-20 mb-1.5 hidden w-max max-w-[240px] rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
-                  style={{ background: "#452C1C" }}
+                  className="pointer-events-none absolute bottom-full left-0 z-20 mb-1.5 hidden w-max max-w-[240px] rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-[color:var(--tooltip-text)] group-hover:block"
+                  style={{ background: "var(--tooltip-ink)" }}
                 >
                   {tr("ti.chartTip")}
                 </span>
@@ -375,8 +375,8 @@ export default function TeamInsights({
                         }}
                       >
                         <span
-                          className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-max max-w-[240px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-white group-hover:block"
-                          style={{ background: "#452C1C" }}
+                          className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-max max-w-[240px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium normal-case tracking-normal text-[color:var(--tooltip-text)] group-hover:block"
+                          style={{ background: "var(--tooltip-ink)" }}
                         >
                           {barTip(t)}
                         </span>

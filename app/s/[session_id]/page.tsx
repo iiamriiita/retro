@@ -48,7 +48,7 @@ export default async function FillPage({
   if (locked) {
     return (
       <div className="container-narrow space-y-5">
-        <div className="card bg-gray-50">
+        <div className="card bg-[var(--surface-2)]">
           <h1 className="text-lg font-semibold">{t("fill.endedTitle")}</h1>
           <p className="mt-2 text-sm text-muted">
             {session.status === "closed"
@@ -75,7 +75,7 @@ export default async function FillPage({
                 <textarea
                   rows={3}
                   disabled
-                  className="textarea cursor-not-allowed bg-gray-50"
+                  className="textarea cursor-not-allowed bg-[var(--surface-2)]"
                   placeholder={q.placeholder}
                 />
               </div>

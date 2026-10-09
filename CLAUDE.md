@@ -16,7 +16,7 @@ The hard rules:
 - Green/red are semantic only: green always means *going well*, red always means *needs improvement*.
 - Cards are flat: no borders, no shadows, never nested. Elevation (shadow) is reserved for menus and modals (one exception: the flat card-style confirm dialog — see the Modal spec).
 - Alpha tints (`--accent-weak` etc.) are for small areas only; large fills use solid colors.
-- Illustrations and icons are inline SVG colored with tokens only. No PNG art assets (the wordmark is the single exception).
+- Illustrations and icons are inline SVG colored with tokens only — core tokens plus the `illustration` extension palette in `docs/design-system/tokens.json` (illustration-only; extension colors never enter the UI). No PNG art assets (the wordmark is the single exception).
 - Motion: animate transform/opacity only, follow the duration scale in `docs/design-system.md`, and keep everything behind `prefers-reduced-motion`.
 - Every user-facing string ships in English and Traditional Chinese (zh-TW) together — see `lib/i18n`.
 

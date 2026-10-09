@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
 import TeamModal from "@/components/TeamModal";
 import { useT } from "@/lib/i18n/client";
+import useEscClose from "@/lib/useEscClose";
 
 const SKIP_KEY = "retro_team_setup_skipped";
 
@@ -22,6 +23,7 @@ export default function UserMenu({
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [onboarding, setOnboarding] = useState(false);
+  useEscClose(menuOpen, () => setMenuOpen(false));
   const [teamName, setTeamName] = useState(initialTeamName);
   const [teamSize, setTeamSize] = useState(initialTeamSize);
 
@@ -67,9 +69,7 @@ export default function UserMenu({
         <>
           <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
           <div
-            className="absolute right-0 z-50 mt-2 w-52 rounded-xl bg-white p-1 shadow-xl"
-            style={{ boxShadow: "0 10px 28px rgba(24,15,9,.2)" }}
-          >
+            className="absolute right-0 z-50 mt-2 w-52 rounded-xl bg-surface p-1 shadow-md">
             <div className="px-3 py-2">
               <p className="truncate text-sm font-semibold">{label}</p>
               {teamName && (

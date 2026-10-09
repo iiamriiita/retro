@@ -5,6 +5,7 @@ import { createBrowserSupabase } from "@/lib/supabase/client";
 import Icon from "@/components/Icon";
 import QuestionIcon from "@/components/QuestionIcon";
 import { useT } from "@/lib/i18n/client";
+import useEscClose from "@/lib/useEscClose";
 import type { PublicAnswer, PublicComment, Question } from "@/lib/types";
 
 interface Coords {
@@ -105,6 +106,7 @@ export default function ResultsClient({
 
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [identityOpen, setIdentityOpen] = useState(false);
+  useEscClose(identityOpen, () => setIdentityOpen(false));
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [customName, setCustomName] = useState("");
 
@@ -441,7 +443,7 @@ export default function ResultsClient({
           </button>
           {groupMenuOpen && (
             <div
-              className="absolute right-0 top-full z-30 mt-1 w-max overflow-hidden rounded-lg bg-white p-1"
+              className="absolute right-0 top-full z-30 mt-1 w-max overflow-hidden rounded-lg bg-surface p-1"
               style={{ boxShadow: "var(--shadow-md)" }}
             >
               {(
@@ -627,7 +629,7 @@ export default function ResultsClient({
             background: "var(--accent)",
             color: "var(--text-inverse)",
           }}
-          className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-semibold shadow-lg"
+          className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-semibold shadow-md"
         >
           <Icon name="message" size={13} />
           {t("rc.commentBtn")}
@@ -771,11 +773,11 @@ export default function ResultsClient({
       {/* Identity popup */}
       {identityOpen && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-[var(--overlay)] p-4"
           onClick={() => setIdentityOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl"
+            className="w-full max-w-sm rounded-xl bg-surface p-5 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-sm font-semibold">{t("rc.whoTitle")}</h3>
@@ -833,6 +835,7 @@ function Popover({
   onClose: () => void;
   children: React.ReactNode;
 }) {
+  useEscClose(true, onClose);
   const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
   const W = 320;
@@ -842,7 +845,7 @@ function Popover({
     <>
       <div className="fixed inset-0 z-50" onClick={onClose} />
       <div
-        className="fixed z-[55] rounded-xl bg-white p-4 shadow-xl"
+        className="fixed z-[55] rounded-xl bg-surface p-4 shadow-md"
         style={{ left, top, width: W }}
         onClick={(e) => e.stopPropagation()}
       >

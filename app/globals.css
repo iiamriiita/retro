@@ -14,6 +14,7 @@
   --surface-2: #f3f2f0;
   --surface-3: #eae8e4;
   --overlay: rgba(30, 24, 18, 0.3);
+  --hero-scrim: rgba(255, 255, 255, 0.55); /* chip ground on hero/accent bands */
 
   --border: #e6e3de;
   --border-strong: #d6d2cb;
@@ -34,6 +35,10 @@
   --green-500: #47854f;
   --green-weak: rgba(71, 133, 79, 0.14);
   --red-500: #d5544a;
+  --red-weak: rgba(213, 84, 74, 0.1);
+
+  --tooltip-ink: #452c1c; /* tooltip ground — the one dark surface */
+  --tooltip-text: #ffffff;
 
   /* Corner radii — clean & restrained (Supabase-like) */
   --radius-sm: 5px;
@@ -254,13 +259,13 @@ input[type="checkbox"] {
 .lp-bubble {
   position: absolute;
   max-width: 250px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 15px;
   font-weight: 600;
   line-height: 1.35;
   padding: 12px 15px;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
   animation: lp-bubble-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
@@ -290,7 +295,7 @@ input[type="checkbox"] {
   to { background-position: -200% 0; }
 }
 .rp-skel {
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   background: linear-gradient(
     90deg,
     var(--surface-2) 25%,
@@ -309,7 +314,7 @@ input[type="checkbox"] {
 .rp-dots span {
   width: 4px;
   height: 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--accent);
   animation: rp-bounce 1s ease-in-out infinite;
 }

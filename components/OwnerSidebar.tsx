@@ -140,7 +140,7 @@ export default function OwnerSidebar({
             }}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-surface shadow transition-all ${
                 discOn ? "left-[22px]" : "left-0.5"
               }`}
             />
@@ -195,8 +195,8 @@ export default function OwnerSidebar({
               </button>
               {o.disabled && (
                 <span
-                  className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[220px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-white group-hover:block"
-                  style={{ background: "var(--text)" }}
+                  className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max max-w-[220px] -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-[color:var(--tooltip-text)] group-hover:block"
+                  style={{ background: "var(--tooltip-ink)" }}
                 >
                   {t("os.needReport")}
                 </span>

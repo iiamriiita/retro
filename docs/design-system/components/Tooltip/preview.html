@@ -1,0 +1,14 @@
+<!-- @dsCard group="Overlays" height=200 subtitle="One-line hint on the dark warm ground — tooltip-ink + tooltip-text, no arrow, no shadow" -->
+<style>
+  body { margin: 0; padding: 24px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
+  .row { display: flex; gap: 48px; align-items: flex-end; padding-top: 56px; }
+  .anchor { position: relative; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); }
+  .tip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 6px;
+         background: var(--tooltip-ink); color: var(--tooltip-text); border-radius: var(--radius-md);
+         padding: 6px 10px; font-size: 12px; font-weight: 500; width: max-content; max-width: 220px; pointer-events: none; }
+  svg { width: 13px; height: 13px; stroke: var(--text-subtle); fill: none; stroke-width: 1.5; stroke-linecap: round; }
+</style>
+<div class="row">
+  <span class="anchor"><span class="tip">Share of members who submitted</span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>Participation</span>
+  <span class="anchor"><span class="tip">Generate the AI report to enable discussion</span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>Discussion</span>
+</div>

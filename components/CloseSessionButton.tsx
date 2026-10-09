@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useT } from "@/lib/i18n/client";
+import useEscClose from "@/lib/useEscClose";
 
 export default function CloseSessionButton({
   sessionId,
@@ -13,6 +14,7 @@ export default function CloseSessionButton({
   const { t } = useT();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  useEscClose(open && !busy, () => setOpen(false));
   const [error, setError] = useState<string | null>(null);
 
   async function close() {
@@ -56,11 +58,11 @@ export default function CloseSessionButton({
           aria-modal="true"
         >
           <div
-            className="overlay-in absolute inset-0 bg-black/40"
+            className="overlay-in absolute inset-0 bg-[var(--overlay)]"
             onClick={() => !busy && setOpen(false)}
           />
           <div className="modal-pop card relative z-10 w-full max-w-sm">
-            <h2 className="text-base font-bold">{t("csb.title")}</h2>
+            <h2 className="text-lg font-bold">{t("csb.title")}</h2>
             <p className="mt-2 text-sm text-muted">{t("csb.confirm")}</p>
             {error && (
               <p className="mt-2 text-sm text-red-600" role="alert">

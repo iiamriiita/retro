@@ -9,4 +9,4 @@ Segments are 6px tall, `radius-pill` capped, with `space-1` (4px) gaps. Advancin
 Same family: the top route-progress bar (the continuous `accent` strip) — one "gold = in progress" vocabulary.
 Out of scope: node-style flow steppers (like the ERP test's ApprovalStepper) are a separate proposal when needed.
 
-(Writing this spec also fixed CreateWizard's `bg-gray-200` violation — upcoming segments now use `surface-3`.)
+(Writing this spec fixed CreateWizard's `bg-gray-200` violation; FillWizard's twin was cleared in the 2026-10-09 full remediation — upcoming segments in both wizards now use `surface-3`.)

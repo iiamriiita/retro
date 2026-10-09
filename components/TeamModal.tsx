@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
+import useEscClose from "@/lib/useEscClose";
 
 export default function TeamModal({
   open,
@@ -26,6 +27,7 @@ export default function TeamModal({
   const [size, setSize] = useState(initialSize ? String(initialSize) : "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useEscClose(open && !onboarding && !busy, onClose);
 
   if (!open) return null;
 
@@ -57,11 +59,11 @@ export default function TeamModal({
 
   return (
     <div
-      className="overlay-in fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
+      className="overlay-in fixed inset-0 z-[70] flex items-center justify-center bg-[var(--overlay)] p-4"
       onClick={() => !onboarding && onClose()}
     >
       <div
-        className="modal-pop w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+        className="modal-pop w-full max-w-md rounded-xl bg-surface p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-1 flex items-center justify-between">

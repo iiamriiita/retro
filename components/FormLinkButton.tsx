@@ -4,6 +4,7 @@ import { useState } from "react";
 import Icon from "@/components/Icon";
 import ShareHeroArt from "@/components/ShareHeroArt";
 import { useT } from "@/lib/i18n/client";
+import useEscClose from "@/lib/useEscClose";
 
 export default function FormLinkButton({
   sessionId,
@@ -18,6 +19,7 @@ export default function FormLinkButton({
 }) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
+  useEscClose(open, () => setOpen(false));
   const [copied, setCopied] = useState(false);
 
   // In progress → share the fill form; ended → share the results page.
@@ -65,11 +67,11 @@ export default function FormLinkButton({
 
       {open && (
         <div
-          className="overlay-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="overlay-in fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-4"
           onClick={() => setOpen(false)}
         >
           <div
-            className="modal-pop w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl"
+            className="modal-pop w-full max-w-lg overflow-hidden rounded-2xl bg-surface shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Full-bleed hero illustration */}
@@ -86,7 +88,7 @@ export default function FormLinkButton({
                 onClick={() => setOpen(false)}
                 aria-label={t("am.close")}
                 className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-lg text-[color:var(--text-inverse)] transition-colors"
-                style={{ background: "rgba(255,255,255,0.55)" }}
+                style={{ background: "var(--hero-scrim)" }}
               >
                 <Icon name="x" size={18} />
               </button>
@@ -96,7 +98,7 @@ export default function FormLinkButton({
 
             {/* Body */}
             <div className="p-6">
-              <h3 className="text-xl font-extrabold tracking-tight">
+              <h3 className="text-lg font-bold tracking-tight">
                 {tx.title}
               </h3>
               <p className="mt-1.5 text-sm text-muted">{tx.desc}</p>
@@ -111,7 +113,7 @@ export default function FormLinkButton({
 
               <div className="mt-3 flex gap-2">
                 <a
-                  className="btn-ghost !h-11 flex-1"
+                  className="btn-ghost flex-1"
                   href={path}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -122,7 +124,7 @@ export default function FormLinkButton({
                 </a>
                 <button
                   type="button"
-                  className="btn-primary !h-11 flex-1"
+                  className="btn-primary flex-1"
                   onClick={copy}
                 >
                   <Icon name={copied ? "check" : "link"} size={15} />

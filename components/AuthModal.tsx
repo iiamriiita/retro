@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/client";
+import useEscClose from "@/lib/useEscClose";
+import Icon from "@/components/Icon";
 
 type View = "login" | "otp";
 type OtpMode = "register" | "reset";
@@ -23,6 +25,7 @@ export default function AuthModal({
 }) {
   const { t } = useT();
   const [open, setOpen] = useState(defaultOpen);
+  useEscClose(open, () => setOpen(false));
   const [view, setView] = useState<View>(
     defaultTab === "register" ? "otp" : "login",
   );
@@ -178,11 +181,11 @@ export default function AuthModal({
 
       {open && (
         <div
-          className="overlay-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="overlay-in fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-4"
           onClick={() => setOpen(false)}
         >
           <div
-            className="modal-pop w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+            className="modal-pop w-full max-w-md rounded-xl bg-surface p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div
@@ -218,11 +221,11 @@ export default function AuthModal({
               </div>
               <button
                 type="button"
-                className="pb-2.5 text-muted hover:text-ink"
+                className="pb-2.5 text-subtle hover:text-ink"
                 onClick={() => setOpen(false)}
                 aria-label={t("am.close")}
               >
-                ✕
+                <Icon name="x" size={18} />
               </button>
             </div>
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import Icon from "@/components/Icon";
 import { useT } from "@/lib/i18n/client";
+import useEscClose from "@/lib/useEscClose";
 
 type Tr = (key: string, vars?: Record<string, string | number>) => string;
 type Src = { id: string; r: number; label?: string };
@@ -146,6 +147,7 @@ export default function ReportPanel({
   const [sections, setSections] = useState<string[]>([...SECTIONS]);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  useEscClose(askTone && !busy, () => setAskTone(false));
   const [stepIdx, setStepIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -307,7 +309,7 @@ export default function ReportPanel({
               {structured.improve !== undefined && (
                 <div
                   className="rounded-xl p-4"
-                  style={{ background: "var(--danger-weak, rgba(213,84,74,.10))" }}
+                  style={{ background: "var(--red-weak)" }}
                 >
                   <p className="text-[15px] font-medium">{t("rp.sec_improve")}</p>
                   {structured.improve.length ? (
@@ -349,7 +351,7 @@ export default function ReportPanel({
         </>
       ) : report ? (
         <>
-          <div className="prose-sm max-w-none font-body [&_h2]:mt-4 [&_h2]:font-body [&_h2]:text-base [&_h2]:font-semibold [&_h2]:tracking-normal [&_h3]:font-body [&_h3]:tracking-normal [&_li]:ml-4 [&_li]:list-disc [&_li]:text-sm [&_p]:text-sm [&_strong]:font-normal [&_ul]:my-2">
+          <div className="prose-sm max-w-none font-body [&_h2]:mt-4 [&_h2]:font-body [&_h2]:text-[15px] [&_h2]:font-semibold [&_h2]:tracking-normal [&_h3]:font-body [&_h3]:tracking-normal [&_li]:ml-4 [&_li]:list-disc [&_li]:text-sm [&_p]:text-sm [&_strong]:font-normal [&_ul]:my-2">
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
           {generatedAt && (
@@ -390,11 +392,11 @@ export default function ReportPanel({
           aria-modal="true"
         >
           <div
-            className="overlay-in absolute inset-0 bg-black/40"
+            className="overlay-in absolute inset-0 bg-[var(--overlay)]"
             onClick={() => !busy && setAskTone(false)}
           />
           <div className="modal-pop card relative z-10 w-full max-w-lg">
-            <h2 className="text-base font-bold">{t("rp.settingsTitle")}</h2>
+            <h2 className="text-lg font-bold">{t("rp.settingsTitle")}</h2>
 
             {/* Tone — drag slider */}
             <p className="eyebrow mt-5">{t("rp.toneTitle")}</p>

@@ -237,8 +237,8 @@ export default async function ResultsPage({
                 <Icon name="message" size={13} />
               </span>
               <span
-                className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-white group-hover:block"
-                style={{ background: "var(--text)" }}
+                className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 hidden w-max -translate-x-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-[color:var(--tooltip-text)] group-hover:block"
+                style={{ background: "var(--tooltip-ink)" }}
               >
                 {t("status.discussing")}
               </span>

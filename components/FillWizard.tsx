@@ -290,7 +290,7 @@ export default function FillWizard({
         </div>
       )}
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">{templateName}</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight">{templateName}</h1>
         <p className="mt-1 text-sm text-muted">{templateDescription}</p>
       </div>
 
@@ -299,7 +299,7 @@ export default function FillWizard({
           <div
             key={i}
             className={`h-1.5 flex-1 rounded-full ${
-              i <= step ? "bg-accent" : "bg-gray-200"
+              i <= step ? "bg-accent" : "bg-[var(--surface-3)]"
             }`}
           />
         ))}
@@ -354,7 +354,7 @@ export default function FillWizard({
                             : { background: "var(--surface-2)", color: "var(--text-muted)" }
                         }
                       >
-                        {s.emoji && <span className="text-xl leading-none">{s.emoji}</span>}
+                        {s.emoji && <span className="text-lg leading-none">{s.emoji}</span>}
                         <span className="text-sm font-bold">{s.value}</span>
                       </button>
                     );
