@@ -1,0 +1,20 @@
+<!-- @dsCard group="Overlays" height=300 subtitle="The one floating surface — overlay + shadow-lg + 160ms pop" -->
+<style>
+  body { margin: 0; padding: 20px; background: var(--bg); font-family: var(--font-body); }
+  .dim { background: var(--overlay); border-radius: var(--radius-lg); padding: 28px 20px; display: flex; justify-content: center; }
+  .modal { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 340px; max-width: 100%; padding: 20px 22px; }
+  h3 { font: 700 18px/1.2 var(--font-display); letter-spacing: -0.02em; margin: 0 0 8px; color: var(--text); }
+  p { font: 400 15px/1.55 var(--font-body); color: var(--text-muted); margin: 0 0 16px; }
+  .row { display: flex; gap: 10px; }
+  .btn { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border: 0; cursor: pointer; border-radius: var(--radius-md); font: 600 14px/1 var(--font-body); transition: background-color .15s, transform .08s ease; }
+  .btn:active { transform: scale(0.97); }
+  .primary { background: var(--accent); color: var(--text-inverse); }
+  .primary:hover { background: var(--accent-hover); }
+  .ghost { background: var(--surface-2); color: var(--text); margin-left: auto; }
+  .ghost:hover { background: var(--surface-3); }
+</style>
+<div class="dim"><div class="modal">
+  <h3>Share results</h3>
+  <p>Anyone with the link can view this report.</p>
+  <div class="row"><button class="btn primary">Copy link</button><button class="btn ghost">Close</button></div>
+</div></div>

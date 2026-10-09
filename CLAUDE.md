@@ -12,7 +12,7 @@ reading). Read either; edit through the workflow below, never just one copy.
 The hard rules:
 
 - All colors, radii, fonts and shadows MUST come from the tokens in `app/globals.css` `:root`. Never hardcode a hex value — propose a new token first.
-- Gold (`--accent`) is the only interactive color. **One primary button per page.** Hover brightens (`--accent-hover`), never darkens. There are no outlined buttons — secondary actions use the ghost style.
+- Gold (`--accent`) is the only interactive color. **One primary button per view (a modal counts as its own view).** Hover brightens (`--accent-hover`), never darkens. There are no outlined buttons — secondary actions use the ghost style.
 - Green/red are semantic only: green always means *going well*, red always means *needs improvement*.
 - Cards are flat: no borders, no shadows, never nested. Elevation (shadow) is reserved for menus and modals.
 - Alpha tints (`--accent-weak` etc.) are for small areas only; large fills use solid colors.

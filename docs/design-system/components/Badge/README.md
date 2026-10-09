@@ -2,7 +2,7 @@ Badges are small filled labels for status and counts; source tags are their roun
 
 ## Badge
 
-22px tall, `radius-sm`, caption type at weight 600, no border. Three fills: neutral (`surface-3` + `text-muted`), accent (`accent-weak` + `gold-700` — note the readable gold, never raw `accent` for text), success (`green-weak` + `green-500`).
+22px tall, `radius-sm`, label-sm type at weight 600, no border. Three fills: neutral (`surface-3` + `text-muted`), accent (`accent-weak` + `gold-700` — note the readable gold, never raw `accent` for text), success (`green-weak` + `green-500`).
 
 ## Source tag
 

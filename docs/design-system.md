@@ -131,7 +131,7 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
         "component sources"
       ]
     },
-    "synced": "2026-10-08",
+    "synced": "2026-10-09",
     "omitted": [
       {
         "section": "motion",
@@ -278,11 +278,11 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
     },
     "groups": [
       {
-        "name": "Display",
+        "name": "Headline",
         "family": "display",
         "styles": [
           {
-            "name": "hero",
+            "name": "headline-lg",
             "fontSize": "56px",
             "lineHeight": 1.02,
             "fontWeight": 800,
@@ -291,7 +291,7 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
             "usage": "Landing headline only."
           },
           {
-            "name": "page-title",
+            "name": "headline-md",
             "fontSize": "24px",
             "lineHeight": 1.2,
             "fontWeight": 800,
@@ -300,7 +300,7 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
             "usage": "One per page."
           },
           {
-            "name": "section-title",
+            "name": "headline-sm",
             "fontSize": "18px",
             "lineHeight": 1.2,
             "fontWeight": 700,
@@ -311,32 +311,24 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
         ]
       },
       {
-        "name": "Text",
+        "name": "Body",
         "family": "body",
         "styles": [
           {
-            "name": "card-title",
-            "fontSize": "15px",
-            "lineHeight": 1.4,
-            "fontWeight": 500,
-            "sample": "What's going well",
-            "usage": "Sub-headings inside cards: report boxes, sidebar cards, stat labels."
-          },
-          {
-            "name": "body",
-            "fontSize": "15px",
-            "lineHeight": 1.55,
-            "fontWeight": 400,
-            "sample": "Pairing on the auth refactor sped up work and caught edge cases.",
-            "usage": "Answers, report bullets, reading text."
-          },
-          {
-            "name": "quote",
+            "name": "body-lg",
             "fontSize": "17px",
             "lineHeight": 1.5,
             "fontWeight": 500,
             "sample": "Pairing clearly paid off this sprint; requirement sync is still the friction.",
             "usage": "Reserved for the AI report's summary quote."
+          },
+          {
+            "name": "body-md",
+            "fontSize": "15px",
+            "lineHeight": 1.55,
+            "fontWeight": 400,
+            "sample": "Pairing on the auth refactor sped up work and caught edge cases.",
+            "usage": "Answers, report bullets, reading text."
           },
           {
             "name": "body-sm",
@@ -345,6 +337,36 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
             "fontWeight": 400,
             "sample": "What people opening the shared link can see.",
             "usage": "Descriptions and hints. Button labels use the button style."
+          }
+        ]
+      },
+      {
+        "name": "Label",
+        "family": "body",
+        "styles": [
+          {
+            "name": "label-lg",
+            "fontSize": "15px",
+            "lineHeight": 1.4,
+            "fontWeight": 500,
+            "sample": "What's going well",
+            "usage": "Sub-headings inside cards: report boxes, sidebar cards, stat labels."
+          },
+          {
+            "name": "label-md",
+            "fontSize": "12px",
+            "lineHeight": 1.3,
+            "fontWeight": 600,
+            "sample": "Email",
+            "usage": "Form labels, in text-muted."
+          },
+          {
+            "name": "label-sm",
+            "fontSize": "12px",
+            "lineHeight": 1.4,
+            "fontWeight": 500,
+            "sample": "AI generated · for reference",
+            "usage": "Timestamps, badges, footnotes."
           },
           {
             "name": "button",
@@ -354,22 +376,6 @@ All values below are the source of truth, copied verbatim from `app/globals.css`
             "letterSpacing": "-0.01em",
             "sample": "Generate AI report",
             "usage": "Button labels — body family. Geometry lives on the Button component."
-          },
-          {
-            "name": "caption",
-            "fontSize": "12px",
-            "lineHeight": 1.4,
-            "fontWeight": 500,
-            "sample": "AI generated · for reference",
-            "usage": "Timestamps, badges, footnotes."
-          },
-          {
-            "name": "field-label",
-            "fontSize": "12px",
-            "lineHeight": 1.3,
-            "fontWeight": 600,
-            "sample": "Email",
-            "usage": "Form labels, in text-muted."
           }
         ]
       },
@@ -520,7 +526,7 @@ Badges are small filled labels for status and counts; source tags are their roun
 
 ## Badge
 
-22px tall, `radius-sm`, caption type at weight 600, no border. Three fills: neutral (`surface-3` + `text-muted`), accent (`accent-weak` + `gold-700` — note the readable gold, never raw `accent` for text), success (`green-weak` + `green-500`).
+22px tall, `radius-sm`, label-sm type at weight 600, no border. Three fills: neutral (`surface-3` + `text-muted`), accent (`accent-weak` + `gold-700` — note the readable gold, never raw `accent` for text), success (`green-weak` + `green-500`).
 
 ## Source tag
 
@@ -531,14 +537,14 @@ An 18px `radius-pill` chip on `surface-3` showing a respondent's number (anonymo
 
 Text inputs are recessed fills with no border; state lives in the background and the focus ring. Hand-written from `app/globals.css` (`.textarea`, `.field-label`).
 
-Ground `surface-2`, `radius-md`, `space-3` inline padding, body-sm type; placeholder in `text-subtle`. Hover deepens to `surface-3`; focus returns to `surface-2` and draws the `focus-ring` as a 2px box-shadow — the ring is the accent color at half alpha, so "where am I typing" and "what can I click" share one hue. Labels sit above in field-label style, `text-muted`. Checkboxes and radios take `accent` via `accent-color`.
+Ground `surface-2`, `radius-md`, `space-3` inline padding, body-sm type; placeholder in `text-subtle`. Hover deepens to `surface-3`; focus returns to `surface-2` and draws the `focus-ring` as a 2px box-shadow — the ring is the accent color at half alpha, so "where am I typing" and "what can I click" share one hue. Labels sit above in label-md style, `text-muted`. Checkboxes and radios take `accent` via `accent-color`.
 
 
 ## Toggle
 
 The switch controls session-level modes (discussion on/off) with optimistic state. Hand-written from `components/OwnerSidebar.tsx`.
 
-Track 24×44px at `radius-pill`; knob 20px white with a soft shadow, sliding 0.5→edge. Off: `surface-3` track. On: `accent` track — the only moment the accent fills a control's whole body, which is what makes the state legible at a glance. The label sits left in card-title style; a one-line hint below in `text-muted` explains what "on" means. State changes apply optimistically and roll back on error.
+Track 24×44px at `radius-pill`; knob 20px white with a soft shadow, sliding 0.5→edge. Off: `surface-3` track. On: `accent` track — the only moment the accent fills a control's whole body, which is what makes the state legible at a glance. The label sits left in label-lg style; a one-line hint below in `text-muted` explains what "on" means. State changes apply optimistically and roll back on error.
 
 
 ## ReportSection
@@ -547,12 +553,42 @@ The AI report layout is the product's signature pattern: a quoted one-line summa
 
 ## Anatomy
 
-- **Summary quote** in the `quote` style (17px/500), wrapped in oversized `accent`-colored quotation marks set in the display face; a `border` hairline closes the section.
-- **The pair**: two `radius-xl` boxes on `green-weak` and `danger-weak` — the palette's semantic tokens carrying the data's meaning directly. Green bullets are 8px `green-500` dots; red bullets are `red-500` warning triangles. Titles in card-title style.
+- **Summary quote** in the `body-lg` style (17px/500, reserved for the quote), wrapped in oversized `accent`-colored quotation marks set in the display face; a `border` hairline closes the section.
+- **The pair**: two `radius-xl` boxes on `green-weak` and `danger-weak` — the palette's semantic tokens carrying the data's meaning directly. Green bullets are 8px `green-500` dots; red bullets are `red-500` warning triangles. Titles in label-lg style.
 - **Bullets** end with round source tags (see Badge) linking each claim to its origin answer.
 - **Collapse**: lists longer than four items fold behind a centered "Show N more" text button in `text-muted` with a chevron that flips when open — a long red column must not dominate the layout.
 - **Next steps** run full-width below with `gold-700` arrows.
 
 Empty states say "Nothing specific this time." in `text-subtle` — never an apology, never a hidden section.
 
+## Modal
 
+The modal is the one surface that truly floats: the warm `overlay` dim, a `shadow-lg` panel at `radius-xl`, entering with the 160ms pop. Hand-written from `AuthModal`, `TeamModal` and the share dialog.
+
+### Anatomy
+
+- **Title** in headline-sm; body-md text below.
+- **Action row** at the bottom: the gold primary — **one per view** (a modal is its own view); secondary actions are ghost; destructive confirmations use danger, and then no gold appears in the modal at all.
+- Max width 460px, max height 90vh with inner scroll; card padding (20/22px).
+
+### When to use
+
+Interrupting decisions only: confirm, sign-in, share. Anything longer than two steps gets a page, not a modal. Backdrop click and Esc close it; closing must never lose user input (confirm first when the form is dirty).
+
+## SearchBar
+
+The search bar is a TextField variant: the same recessed, borderless fill plus a magnifier and a clear button. Not yet used in the product — a forward spec for list/table scenes.
+
+`surface-2` ground, `radius-md`, 36px tall, 12px inline padding; a 15px magnifier on the left in `text-subtle`; the clear button appears only when there is a value (an 18px circle on `surface-3`, built like the source tag). Placeholder in `text-subtle`; focus draws the `focus-ring`. Filters live — no separate submit button.
+
+## Stepper
+
+Step indication has **two modes** sharing one vocabulary. Hand-written from `CreateWizard` (step dots) and `FillWizard` (fill progress); writing this spec also fixed CreateWizard's `bg-gray-200` violation (inactive steps now use `surface-3`).
+
+### Display mode (wizard dots)
+
+8px dots at `space-2` gaps: reached = solid `accent`, not yet = `surface-3`. The current step may carry a label-sm caption below. Use dots for 2–4 steps; beyond that, switch to the progress mode.
+
+### Progress mode (continuous bar)
+
+`surface-3` track, `accent` fill, 6px tall, `radius-pill` — same family as the top route-progress bar. A "step n of N" label in label-sm, `text-subtle`. Progress moves over 200ms (the "fast" duration step).

@@ -146,7 +146,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
           <div
             key={i}
             className={`h-1.5 flex-1 rounded-full ${
-              i <= step ? "bg-accent" : "bg-gray-200"
+              i <= step ? "bg-accent" : "bg-[var(--surface-3)]"
             }`}
           />
         ))}

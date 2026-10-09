@@ -1,0 +1,15 @@
+<!-- @dsCard group="Inputs" height=150 subtitle="TextField variant — magnifier + conditional clear" -->
+<style>
+  body { margin: 0; padding: 24px; background: var(--bg); font-family: var(--font-body); }
+  .sb { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border-radius: var(--radius-md); height: 36px; padding: 0 12px; max-width: 320px; }
+  .sb:focus-within { box-shadow: 0 0 0 2px var(--focus-ring); }
+  .sb svg { width: 15px; height: 15px; color: var(--text-subtle); flex: 0 0 auto; }
+  .sb input { border: 0; background: none; outline: none; flex: 1; min-width: 0; font: 400 14px/1.4 var(--font-body); color: var(--text); }
+  .sb input::placeholder { color: var(--text-subtle); }
+  .clear { width: 18px; height: 18px; border-radius: var(--radius-pill); background: var(--surface-3); color: var(--text-muted); border: 0; cursor: pointer; font: 600 11px/1 var(--font-mono); }
+</style>
+<div class="sb">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+  <input value="retro" aria-label="Search">
+  <button class="clear" aria-label="Clear">×</button>
+</div>
