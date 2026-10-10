@@ -1,6 +1,6 @@
 ---
 name: design-task
-description: Run the Team Retro agent design flow for any UI implementation task in this repo — building or changing a page, component, visual style or micro-interaction. Use whenever the owner asks for UI work (「做／加／改 一個頁面、元件、樣式、動效」, "add a button/panel/page", "redesign X", "幫我做設計"), so the task goes through the fixed flow: written design plan with a mandatory state inventory → owner confirms → reuse ladder → build under the six constraints → machine-checkable audit → owner reviews key screens → three-line delivery summary. Not for changing the design system itself — that is the design-system-update skill.
+description: Run the Team Retro agent design flow for any UI implementation task in this repo — building or changing a page, component, visual style or micro-interaction. Use whenever the owner asks for UI work (「做／加／改 一個頁面、元件、樣式、動效」, "add a button/panel/page", "redesign X", "幫我做設計"), so the task goes through the fixed flow: written design plan with a mandatory state inventory → owner confirms → reuse ladder → build under the six constraints → machine-checkable audit → delivery with a three-line summary → owner verifies on the running product → formal revision record. Not for changing the design system itself — that is the design-system-update skill.
 ---
 
 # Design task
@@ -33,7 +33,11 @@ system; changing the system is `design-system-update`.
    invented radius/shadow, one gold button per page, both locales present,
    focus-visible + reduced-motion guards, every Step-2 state accounted for,
    build passes. Fail → fix → re-audit.
-7. **Gate 2** — show the key screens, raise problems met on the way,
-   discuss; changes requested → back to build.
-8. **Deliver** — three lines: reused · carved new (and registration
-   status) · remaining debt.
+7. **Deliver** — run the flow to completion in one pass; close with three
+   lines: reused · carved new (and registration status) · remaining debt,
+   plus where to verify (branch preview / deployed page).
+8. **Gate 2 — owner verifies on the product** — the owner checks the live
+   result (preview or production), never screenshots alone; requested
+   changes → back to build (fix → re-audit → redeliver).
+9. **Close out** — formal revision record: commit hash · files · the three
+   lines; any carved piece's registration and `lastChange` already done.

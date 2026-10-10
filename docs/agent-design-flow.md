@@ -64,15 +64,25 @@ Walk top-down and stop at the first rung that holds:
 
 Any failure → back to Step 4, fix, re-audit.
 
-## Gate 2 — owner reviews the result
-
-Show the key screens, raise any problems or trade-offs met along the way,
-and discuss. Owner approves, or requests changes → back to Step 4.
-
 ## Step 6 · Deliver
 
-A three-line summary: what was **reused** · what was **carved new** (and its
-registration status) · what **debt** remains.
+Run the full flow to completion in one pass, closing with a three-line
+summary: what was **reused** · what was **carved new** (and its registration
+status) · what **debt** remains — and point the owner at where to verify
+(the branch's Vercel preview, or the deployed page).
+
+## Gate 2 — owner verifies on the product
+
+The owner checks the result **on the running product** (preview deployment
+or production), never on screenshots alone. Approval closes the task;
+requested changes go back to Step 4 (fix → re-audit → redeliver).
+
+## Step 7 · Formal revision record (close-out)
+
+After approval, log the revision: commit hash(es) · files touched · the
+three-line summary. If anything was carved or legislated along the way, its
+registration (entry C) and the design system's `lastChange` must already be
+in place — a task is not closed while the library lags behind the product.
 
 ## Relationship to the update workflow
 
