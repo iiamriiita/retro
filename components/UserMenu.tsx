@@ -39,12 +39,6 @@ export default function UserMenu({
     }
   }, [hasTeam]);
 
-  function openEdit() {
-    setOnboarding(false);
-    setModalOpen(true);
-    setMenuOpen(false);
-  }
-
   function closeModal() {
     if (onboarding && typeof window !== "undefined") {
       localStorage.setItem(SKIP_KEY, "1");
@@ -77,13 +71,14 @@ export default function UserMenu({
               )}
             </div>
             <div className="my-1 h-px bg-line" />
-            <button
-              onClick={openEdit}
+            <a
+              href="/team"
+              onClick={() => setMenuOpen(false)}
               className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-[color:var(--surface-2)]"
             >
               <Icon name="settings" size={15} />
               {t("nav.teamSettings")}
-            </button>
+            </a>
             <form action="/auth/signout" method="post">
               <button
                 type="submit"
