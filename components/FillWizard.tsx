@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useT } from "@/lib/i18n/client";
 import RoleIcon from "@/components/RoleIcon";
 import Icon from "@/components/Icon";
+import OptionCard from "@/components/OptionCard";
 import TemplateBanner from "@/components/TemplateBanner";
 import QuestionIcon from "@/components/QuestionIcon";
 import type { Anonymity, ModerateResult, Question } from "@/lib/types";
@@ -343,20 +344,18 @@ export default function FillWizard({
                   {scale.map((s) => {
                     const sel = chosen === String(s.value);
                     return (
-                      <button
+                      <OptionCard
                         key={s.value}
-                        type="button"
-                        onClick={() => setValue(q.key, String(s.value))}
-                        className="flex flex-col items-center gap-1 rounded-lg py-3 transition-colors"
-                        style={
-                          sel
-                            ? { background: "var(--accent)", color: "var(--text-inverse)" }
-                            : { background: "var(--surface-2)", color: "var(--text-muted)" }
-                        }
+                        variant="scale"
+                        selected={sel}
+                        onSelect={() => setValue(q.key, String(s.value))}
+                        className={`flex flex-col items-center gap-1 ${
+                          sel ? "" : "text-muted"
+                        }`}
                       >
                         {s.emoji && <span className="text-lg leading-none">{s.emoji}</span>}
                         <span className="text-sm font-bold">{s.value}</span>
-                      </button>
+                      </OptionCard>
                     );
                   })}
                 </div>
@@ -413,22 +412,12 @@ export default function FillWizard({
               const roleStr = o.label;
               const sel = roleSel[currentQuestion.key] === roleStr;
               return (
-                <button
+                <OptionCard
                   key={o.label}
-                  type="button"
-                  onClick={() => selectRole(currentQuestion.key, roleStr)}
-                  className="relative flex flex-col items-center gap-1.5 rounded-lg p-3 text-center transition-colors"
-                  style={
-                    sel
-                      ? { background: "var(--accent-weak)" }
-                      : { background: "var(--surface-2)" }
-                  }
+                  selected={sel}
+                  onSelect={() => selectRole(currentQuestion.key, roleStr)}
+                  className="flex flex-col items-center gap-1.5 text-center"
                 >
-                  {sel && (
-                    <span className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
-                      <Icon name="check" size={12} />
-                    </span>
-                  )}
                   <RoleIcon emoji={o.emoji} size={40} />
                   <span className="text-sm font-semibold leading-tight">
                     {o.label}
@@ -436,7 +425,7 @@ export default function FillWizard({
                   <span className="text-xs leading-snug text-muted">
                     {o.desc}
                   </span>
-                </button>
+                </OptionCard>
               );
             })}
           </div>

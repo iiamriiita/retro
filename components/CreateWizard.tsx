@@ -5,6 +5,7 @@ import { useT } from "@/lib/i18n/client";
 import TemplateIcon from "@/components/TemplateIcon";
 import QuestionIcon from "@/components/QuestionIcon";
 import Icon from "@/components/Icon";
+import OptionCard from "@/components/OptionCard";
 import type { Anonymity, Template } from "@/lib/types";
 
 function defaultDeadline(): string {
@@ -161,21 +162,13 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
             const isSel = templateId === t.id;
             const open = preview === t.id;
             return (
-              <div
+              <OptionCard
                 key={t.id}
-                onClick={() => setTemplateId(t.id)}
-                className="relative cursor-pointer rounded-xl p-4 transition-colors"
-                style={{
-                  background: isSel
-                    ? "var(--accent-weak)"
-                    : "var(--surface-2)",
-                }}
+                as="div"
+                variant="rich"
+                selected={isSel}
+                onSelect={() => setTemplateId(t.id)}
               >
-                {isSel && (
-                  <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
-                    <Icon name="check" size={12} />
-                  </span>
-                )}
                 <div className="flex items-start gap-3">
                   <TemplateIcon id={t.id} size={44} />
                   <div className="flex-1">
@@ -212,7 +205,7 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                     )}
                   </div>
                 </div>
-              </div>
+              </OptionCard>
             );
           })}
           </div>
@@ -243,24 +236,14 @@ export default function CreateWizard({ templates }: { templates: Template[] }) {
                 { v: "named", t: tr("cw.named"), d: tr("cw.namedDesc") },
                 { v: "anonymous", t: tr("cw.anon"), d: tr("cw.anonDesc") },
               ].map((o) => (
-                <button
+                <OptionCard
                   key={o.v}
-                  type="button"
-                  onClick={() => setAnonymity(o.v as Anonymity)}
-                  className={`relative rounded-lg p-3 text-left transition-colors ${
-                    anonymity === o.v
-                      ? "bg-[color:var(--accent-weak)]"
-                      : "bg-[color:var(--surface-2)] hover:bg-[color:var(--surface-3)]"
-                  }`}
+                  selected={anonymity === o.v}
+                  onSelect={() => setAnonymity(o.v as Anonymity)}
                 >
-                  {anonymity === o.v && (
-                    <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--text-inverse)]">
-                      <Icon name="check" size={12} />
-                    </span>
-                  )}
                   <span className="block text-sm font-medium">{o.t}</span>
                   <span className="block text-xs text-muted">{o.d}</span>
-                </button>
+                </OptionCard>
               ))}
             </div>
           </div>
