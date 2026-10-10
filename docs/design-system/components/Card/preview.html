@@ -1,17 +1,29 @@
-<!-- @dsCard group="Surfaces" height=210 subtitle="Flat card on the warm ground — surface steps, not shadows" -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Hanken+Grotesk:wght@400..600&display=swap">
+<!-- @dsCard group="Surfaces" height=918 subtitle="Figma-grade spec — flat card + recessed fills + spacing anatomy" -->
 <style>
-  body { margin: 0; padding: 24px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
-  .card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px 22px; max-width: 420px; }
-  h2 { margin: 0 0 6px; font: 700 18px/1.2 var(--font-display); letter-spacing: -0.02em; }
-  p { margin: 0 0 12px; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
-  .tile { background: var(--surface-2); border-radius: var(--radius-xl); padding: 14px 16px; font-size: 15px; line-height: 1.55; transition: background .15s; }
-  .tile:hover { background: var(--surface-3); }
-  .cap { margin: 8px 0 0; font-size: 12px; color: var(--text-subtle); }
+  body { margin: 0; padding: 20px 24px 28px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
+  .ss-sec { font: 600 10.5px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle); margin: 26px 0 13px; display: flex; align-items: center; gap: 10px; }
+  .ss-sec:first-child { margin-top: 0; }
+  .ss-sec::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .ss-row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .ss-st { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+  .ss-cap { font: 500 10px/1.5 var(--font-mono); color: var(--text-subtle); max-width: 180px; }
+  .ss-num { font: 600 9.5px/1 var(--font-mono); color: var(--gold-700); }
+  .ss-pad { background: var(--accent-weak); position: relative; }
+  .ss-fill { background: var(--surface-3); border-radius: 3px; }
+  .ss-table { border-collapse: collapse; font-size: 12.5px; width: 100%; max-width: 640px; }
+  .ss-table td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  .ss-table td:first-child { font: 600 11px/1.7 var(--font-mono); color: var(--text-muted); width: 150px; white-space: nowrap; }
+  .ss-tok { display: inline-block; font: 600 10.5px/1 var(--font-mono); background: var(--accent-weak); color: var(--gold-700); padding: 3px 6px; border-radius: 4px; margin: 1px 3px 1px 0; }
+  .ss-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.75; max-width: 640px; }
+  .ss-rules code, .ss-table code { font: 600 11px var(--font-mono); background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
+  .ss-dark .ss-cap { color: var(--surface); opacity: .85; }
 </style>
-<div class="card">
-  <h2>Team mood</h2>
-  <p>Answers sit on a recessed tile — hover it to see the surface step.</p>
-  <div class="tile">The new PR template reduced back-and-forth by providing context.</div>
-  <p class="cap">— Respondent 2</p>
-</div>
+<div class="ss-sec">States</div><div class="ss-row"><div class="ss-st"><div style="width:200px;background:var(--surface);border-radius:var(--radius-lg);padding:14px 16px"><div class="ss-fill" style="width:90px;height:13px;margin-bottom:8px"></div><div class="ss-fill" style="width:160px;height:9px"></div></div><span class="ss-cap">default — flat: no border, no shadow</span></div><div class="ss-st"><div style="width:200px;background:var(--surface);border-radius:var(--radius-lg);padding:14px 16px"><div class="ss-fill" style="width:90px;height:13px;margin-bottom:8px"></div><div style="background:var(--surface-2);border-radius:var(--radius-md);padding:8px 10px;font-size:11px;color:var(--text-subtle)">recessed fill surface-2</div></div><span class="ss-cap">recessed interior — inputs/answers on surface-2</span></div><div class="ss-st"><div style="width:200px;background:var(--surface);border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:center;justify-content:center;min-height:64px;color:var(--text-subtle);font-size:11.5px">(empty-state art + one line)</div><span class="ss-cap">empty — centered art + one text-subtle line</span></div></div><div class="ss-sec">Spacing anatomy</div>
+        <div class="ss-pad" style="width:260px;border-radius:var(--radius-lg);padding:20px 22px">
+          <span style="position:absolute;top:4px;left:50%;transform:translateX(-50%)" class="ss-num">20</span>
+          <span style="position:absolute;left:5px;top:50%;transform:translateY(-50%)" class="ss-num">22</span>
+          <span style="position:absolute;right:5px;top:50%;transform:translateY(-50%)" class="ss-num">22</span>
+          <span style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%)" class="ss-num">20</span>
+          <div style="background:var(--surface);border-radius:4px;height:72px"></div>
+        </div>
+        <div class="ss-cap" style="margin-top:6px">padding 20 (space-5) × 22 (space-5x) · radius-lg 9 · surface on bg</div><div class="ss-sec">Specs</div><table class="ss-table"><tr><td>radius</td><td>9px <span class="ss-tok">radius-lg</span></td></tr><tr><td>padding</td><td>20px × 22px <span class="ss-tok">space-5</span><span class="ss-tok">space-5x</span></td></tr><tr><td>fill</td><td><span class="ss-tok">surface</span>— separation comes entirely from the bg→surface step</td></tr><tr><td>shadow / border</td><td>never (constitutional exception: the card confirm dialog — see Modal)</td></tr><tr><td>recessed fills</td><td><span class="ss-tok">surface-2</span> hover → <span class="ss-tok">surface-3</span></td></tr><tr><td>tinted boxes</td><td><span class="ss-tok">green-weak</span><span class="ss-tok">red-weak</span> · radius-xl 12</td></tr></table><div class="ss-sec">Rules</div><ul class="ss-rules"><li>Cards never nest cards; hierarchy comes from surface steps or spacing.</li><li>If a card must 'pop', the answer is a surface step or spacing — never a new shadow.</li></ul>

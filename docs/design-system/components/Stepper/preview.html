@@ -1,12 +1,23 @@
-<!-- @dsCard group="Navigation" height=190 subtitle="Segmented progress — one segment per step; reached = accent, upcoming = surface-3" -->
+<!-- @dsCard group="Navigation" height=520 subtitle="Figma-grade spec — segmented bar, three states + geometry" -->
 <style>
-  body { margin: 0; padding: 24px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
-  .seg { display: flex; align-items: center; gap: 4px; max-width: 420px; }
-  .seg div { height: 6px; flex: 1; border-radius: var(--radius-pill); background: var(--surface-3); transition: background-color .2s; }
-  .seg .on { background: var(--accent); }
-  .cap { font: 500 12px/1.4 var(--font-body); color: var(--text-subtle); margin: 6px 0 20px; }
+  body { margin: 0; padding: 20px 24px 28px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
+  .ss-sec { font: 600 10.5px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle); margin: 26px 0 13px; display: flex; align-items: center; gap: 10px; }
+  .ss-sec:first-child { margin-top: 0; }
+  .ss-sec::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .ss-row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .ss-st { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+  .ss-cap { font: 500 10px/1.5 var(--font-mono); color: var(--text-subtle); max-width: 180px; }
+  .ss-num { font: 600 9.5px/1 var(--font-mono); color: var(--gold-700); }
+  .ss-pad { background: var(--accent-weak); position: relative; }
+  .ss-fill { background: var(--surface-3); border-radius: 3px; }
+  .ss-table { border-collapse: collapse; font-size: 12.5px; width: 100%; max-width: 640px; }
+  .ss-table td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  .ss-table td:first-child { font: 600 11px/1.7 var(--font-mono); color: var(--text-muted); width: 150px; white-space: nowrap; }
+  .ss-tok { display: inline-block; font: 600 10.5px/1 var(--font-mono); background: var(--accent-weak); color: var(--gold-700); padding: 3px 6px; border-radius: 4px; margin: 1px 3px 1px 0; }
+  .ss-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.75; max-width: 640px; }
+  .ss-rules code, .ss-table code { font: 600 11px var(--font-mono); background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
+  .ss-dark .ss-cap { color: var(--surface); opacity: .85; }
 </style>
-<div class="seg"><div class="on"></div><div></div></div>
-<div class="cap">CreateWizard: 2 segments, step 1</div>
-<div class="seg"><div class="on"></div><div class="on"></div><div class="on"></div><div></div><div></div></div>
-<div class="cap">FillWizard: 5 segments, step 3</div>
+<div class="ss-sec">States</div><div class="ss-row"><div class="ss-st"><div style="display:flex;align-items:center;gap:4px;width:230px"><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--surface-3)"></div></div><span class="ss-cap">CreateWizard — 2 segments, step 1</span></div><div class="ss-st"><div style="display:flex;align-items:center;gap:4px;width:230px"><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--surface-3)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--surface-3)"></div></div><span class="ss-cap">FillWizard — 5 segments, step 3</span></div><div class="ss-st"><div style="display:flex;align-items:center;gap:4px;width:230px"><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div></div><span class="ss-cap">done — all segments accent</span></div></div><div class="ss-sec">Spacing anatomy</div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="display:flex;align-items:center;gap:4px;width:230px"><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--accent)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--surface-3)"></div><div style="height:6px;flex:1;border-radius:var(--radius-pill);background:var(--surface-3)"></div></div>
+          <span class="ss-cap">segment h 6 · gap 4 (space-1) · flex-1 equal · radius-pill caps</span></div><div class="ss-sec">Specs</div><table class="ss-table"><tr><td>segment</td><td>6px tall · flex-1 · <span class="ss-tok">radius-pill</span></td></tr><tr><td>gap</td><td>4px <span class="ss-tok">space-1</span></td></tr><tr><td>fills</td><td>reached (incl. current) <span class="ss-tok">accent</span>; upcoming <span class="ss-tok">surface-3</span></td></tr><tr><td>motion</td><td>advancing tints the next segment gold over 200ms (the 'fast' step)</td></tr><tr><td>boundary</td><td>works for 2–N steps; no dot style; node-flow steppers are a separate proposal</td></tr></table>

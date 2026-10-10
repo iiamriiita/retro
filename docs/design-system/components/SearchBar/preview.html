@@ -1,15 +1,21 @@
-<!-- @dsCard group="Inputs" height=150 subtitle="TextField variant — magnifier + conditional clear" -->
+<!-- @dsCard group="Inputs" height=510 subtitle="Figma-grade spec — TextField variant + conditional clear" -->
 <style>
-  body { margin: 0; padding: 24px; background: var(--bg); font-family: var(--font-body); }
-  .sb { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border-radius: var(--radius-md); height: 36px; padding: 0 12px; max-width: 320px; }
-  .sb:focus-within { box-shadow: 0 0 0 2px var(--focus-ring); }
-  .sb svg { width: 15px; height: 15px; color: var(--text-subtle); flex: 0 0 auto; }
-  .sb input { border: 0; background: none; outline: none; flex: 1; min-width: 0; font: 400 14px/1.4 var(--font-body); color: var(--text); }
-  .sb input::placeholder { color: var(--text-subtle); }
-  .clear { width: 18px; height: 18px; border-radius: var(--radius-pill); background: var(--surface-3); color: var(--text-muted); border: 0; cursor: pointer; font: 600 11px/1 var(--font-mono); }
+  body { margin: 0; padding: 20px 24px 28px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
+  .ss-sec { font: 600 10.5px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle); margin: 26px 0 13px; display: flex; align-items: center; gap: 10px; }
+  .ss-sec:first-child { margin-top: 0; }
+  .ss-sec::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .ss-row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .ss-st { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+  .ss-cap { font: 500 10px/1.5 var(--font-mono); color: var(--text-subtle); max-width: 180px; }
+  .ss-num { font: 600 9.5px/1 var(--font-mono); color: var(--gold-700); }
+  .ss-pad { background: var(--accent-weak); position: relative; }
+  .ss-fill { background: var(--surface-3); border-radius: 3px; }
+  .ss-table { border-collapse: collapse; font-size: 12.5px; width: 100%; max-width: 640px; }
+  .ss-table td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  .ss-table td:first-child { font: 600 11px/1.7 var(--font-mono); color: var(--text-muted); width: 150px; white-space: nowrap; }
+  .ss-tok { display: inline-block; font: 600 10.5px/1 var(--font-mono); background: var(--accent-weak); color: var(--gold-700); padding: 3px 6px; border-radius: 4px; margin: 1px 3px 1px 0; }
+  .ss-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.75; max-width: 640px; }
+  .ss-rules code, .ss-table code { font: 600 11px var(--font-mono); background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
+  .ss-dark .ss-cap { color: var(--surface); opacity: .85; }
 </style>
-<div class="sb">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-  <input value="retro" aria-label="Search">
-  <button class="clear" aria-label="Clear">×</button>
-</div>
+<div class="ss-sec">States</div><div class="ss-row"><div class="ss-st"><div style="display:flex;align-items:center;gap:8px;width:190px;height:36px;background:var(--surface-2);border-radius:var(--radius-md);padding:0 12px;"><span style="color:var(--text-subtle);font-size:13px">⌕</span><span style="flex:1;font:400 14px/1 var(--font-body);color:var(--text-subtle)">Search retros…</span></div><span class="ss-cap">default — 15px magnifier, text-subtle</span></div><div class="ss-st"><div style="display:flex;align-items:center;gap:8px;width:190px;height:36px;background:var(--surface-2);border-radius:var(--radius-md);padding:0 12px;box-shadow:0 0 0 2px var(--focus-ring)"><span style="color:var(--text-subtle);font-size:13px">⌕</span><span style="flex:1;font:400 14px/1 var(--font-body);color:var(--text-subtle)">Search retros…</span></div><span class="ss-cap">focus — focus-ring</span></div><div class="ss-st"><div style="display:flex;align-items:center;gap:8px;width:190px;height:36px;background:var(--surface-2);border-radius:var(--radius-md);padding:0 12px;"><span style="color:var(--text-subtle);font-size:13px">⌕</span><span style="flex:1;font:400 14px/1 var(--font-body)">sprint</span><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:var(--radius-pill);background:var(--surface-3);color:var(--text-muted);font-size:10px">✕</span></div><span class="ss-cap">with value — clear button appears (18px disc)</span></div><div class="ss-st"><div style="display:flex;align-items:center;gap:8px;width:190px;height:36px;background:var(--surface-2);border-radius:var(--radius-md);padding:0 12px;"><span style="color:var(--text-subtle);font-size:13px">⌕</span><span style="flex:1;font:400 14px/1 var(--font-body)">zzz…</span><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:var(--radius-pill);background:var(--surface-3);color:var(--text-muted);font-size:10px">✕</span></div><div style="font:400 12px/1.4 var(--font-body);color:var(--text-subtle);margin-top:5px">No matching results</div><span class="ss-cap">empty results — one text-subtle line</span></div></div><div class="ss-sec">Specs</div><table class="ss-table"><tr><td>geometry</td><td>36px tall · padding 0×12 · <span class="ss-tok">radius-md</span> · <span class="ss-tok">surface-2</span></td></tr><tr><td>magnifier</td><td>15px <span class="ss-tok">text-subtle</span>, left, gap 8</td></tr><tr><td>clear</td><td>only with a value: 18px disc <span class="ss-tok">surface-3</span><span class="ss-tok">radius-pill</span></td></tr><tr><td>behavior</td><td>filters live — no submit button; Esc clears</td></tr><tr><td>status</td><td>forward spec — not yet used in the product (list/table scenes)</td></tr></table>

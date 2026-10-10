@@ -1,56 +1,47 @@
-<!-- @dsCard group="Overlays" height=430 subtitle="All three looks — form panel (title-row X) + hero panel (on-band X) + card confirm (no X)" -->
+<!-- @dsCard group="Overlays" height=1222 subtitle="Figma-grade spec — three visuals + 24px padding anatomy + size steps + close convention" -->
 <style>
-  body { margin: 0; padding: 20px; background: var(--bg); font-family: var(--font-body); }
-  .dim { background: var(--overlay); border-radius: var(--radius-lg); padding: 22px 16px; display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; align-items: flex-start; }
-  .tag { font: 500 10.5px/1.4 var(--font-mono); color: var(--surface); opacity: .75; display: block; margin-bottom: 6px; }
-  .panel { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 260px; max-width: 100%; padding: 18px 20px; }
-  .hero { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 260px; max-width: 100%; overflow: hidden; }
-  .band { position: relative; height: 72px; background: linear-gradient(180deg, var(--accent-hover), var(--accent)); display: flex; align-items: center; justify-content: center; }
-  .bx { position: absolute; right: 10px; top: 10px; width: 30px; height: 30px; border: 0; border-radius: var(--radius-lg); background: rgba(255,255,255,.55); color: var(--text-inverse); cursor: pointer; font: 600 14px/1 var(--font-body); }
-  .confirm { background: var(--surface); border-radius: var(--radius-lg); width: 230px; max-width: 100%; padding: 18px 20px; }
-  .trow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  h3 { font: 800 17px/1.2 var(--font-display); letter-spacing: -0.02em; margin: 0; color: var(--text); }
-  h4 { font: 500 15px/1.4 var(--font-body); margin: 0 0 6px; color: var(--text); }
-  .px { background: none; border: 0; color: var(--text-subtle); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px; }
-  .px:hover { color: var(--text); }
-  label { display: block; font: 600 11px/1.3 var(--font-body); color: var(--text-muted); margin: 10px 0 5px; }
-  .field { background: var(--surface-2); border-radius: var(--radius-md); padding: 8px 10px; font: 400 13px/1.4 var(--font-body); color: var(--text); }
-  p { font: 400 13px/1.5 var(--font-body); color: var(--text-muted); margin: 0 0 12px; }
-  .row { display: flex; gap: 8px; margin-top: 14px; }
-  .btn { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border: 0; cursor: pointer; border-radius: var(--radius-md); font: 600 13px/1 var(--font-body); transition: background-color .15s, transform .08s ease, filter .15s; }
-  .btn:active { transform: scale(0.97); }
-  .primary { background: var(--accent); color: var(--text-inverse); margin-left: auto; }
-  .primary:hover { background: var(--accent-hover); }
-  .ghost { background: var(--surface-2); color: var(--text); }
-  .ghost:hover { background: var(--surface-3); }
-  .danger { background: var(--red-500); color: var(--surface); margin-left: auto; }
-  .danger:hover { filter: brightness(0.93); }
-  .art { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,.4); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  body { margin: 0; padding: 20px 24px 28px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
+  .ss-sec { font: 600 10.5px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle); margin: 26px 0 13px; display: flex; align-items: center; gap: 10px; }
+  .ss-sec:first-child { margin-top: 0; }
+  .ss-sec::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .ss-row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .ss-st { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+  .ss-cap { font: 500 10px/1.5 var(--font-mono); color: var(--text-subtle); max-width: 180px; }
+  .ss-num { font: 600 9.5px/1 var(--font-mono); color: var(--gold-700); }
+  .ss-pad { background: var(--accent-weak); position: relative; }
+  .ss-fill { background: var(--surface-3); border-radius: 3px; }
+  .ss-table { border-collapse: collapse; font-size: 12.5px; width: 100%; max-width: 640px; }
+  .ss-table td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  .ss-table td:first-child { font: 600 11px/1.7 var(--font-mono); color: var(--text-muted); width: 150px; white-space: nowrap; }
+  .ss-tok { display: inline-block; font: 600 10.5px/1 var(--font-mono); background: var(--accent-weak); color: var(--gold-700); padding: 3px 6px; border-radius: 4px; margin: 1px 3px 1px 0; }
+  .ss-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.75; max-width: 640px; }
+  .ss-rules code, .ss-table code { font: 600 11px var(--font-mono); background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
+  .ss-dark .ss-cap { color: var(--surface); opacity: .85; }
 </style>
-<div class="dim">
-  <div><span class="tag">Panel · form</span>
-    <div class="panel">
-      <div class="trow"><h3>Team settings</h3><button class="px" aria-label="close">×</button></div>
-      <label>Team name</label><div class="field">Product ONE</div>
-      <label>Expected size</label><div class="field">4</div>
-      <div class="row"><button class="btn primary">Save</button></div>
-    </div>
-  </div>
-  <div><span class="tag">Panel · hero</span>
-    <div class="hero">
-      <div class="band"><div class="art">✦</div><button class="bx" aria-label="close">×</button></div>
-      <div style="padding:16px 20px 18px">
-        <h4 style="font-weight:800; font-family:var(--font-display)">Share results</h4>
-        <p>Anyone with the link can view the results.</p>
-        <div class="row" style="margin-top:10px"><button class="btn ghost">Open in new tab</button><button class="btn primary">Copy</button></div>
+<div class="ss-sec">Three visuals (on the overlay)</div><div class="ss-dark" style="background:var(--overlay);border-radius:var(--radius-lg);padding:18px 14px;display:flex;flex-wrap:wrap;gap:16px;justify-content:center"><div class="ss-st"><div style="width:230px;background:var(--surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:17px 18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font:700 14px/1.2 var(--font-display);letter-spacing:-0.02em">Team settings</b><span style="color:var(--text-subtle);font:400 15px/1 var(--font-body)">✕</span></div>
+      <div class="ss-fill" style="height:9px;width:150px;margin-bottom:10px"></div>
+      <div style="background:var(--surface-2);border-radius:var(--radius-md);height:26px;margin-bottom:12px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px"><span style="height:26px;padding:0 10px;display:inline-flex;align-items:center;border-radius:var(--radius-md);background:var(--surface-2);font:600 11px/1 var(--font-body)">Cancel</span><span style="height:26px;padding:0 10px;display:inline-flex;align-items:center;border-radius:var(--radius-md);background:var(--accent);font:600 11px/1 var(--font-body)">Save</span></div>
+    </div><span class="ss-cap">Panel · form — max-w-md 448 · plain top-right X</span></div><div class="ss-st"><div style="width:230px;background:var(--surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);overflow:hidden">
+      <div style="position:relative;height:62px;background:linear-gradient(180deg,var(--accent-hover),var(--accent))">
+        <span style="position:absolute;right:8px;top:8px;width:22px;height:22px;border-radius:var(--radius-lg);background:var(--hero-scrim);display:inline-flex;align-items:center;justify-content:center;color:var(--text-inverse);font-size:11px">✕</span>
       </div>
-    </div>
-  </div>
-  <div><span class="tag">Card confirm</span>
-    <div class="confirm">
-      <h4>Delete this retro?</h4>
-      <p>All answers and the report will be deleted.</p>
-      <div class="row"><button class="btn ghost">Cancel</button><button class="btn danger">Delete</button></div>
-    </div>
-  </div>
-</div>
+      <div style="padding:13px 16px"><b style="font:700 13px/1.2 var(--font-display)">Share this retro</b><div class="ss-fill" style="height:8px;width:140px;margin-top:7px"></div></div>
+    </div><span class="ss-cap">Panel · hero — max-w-lg 512 · hero-scrim X 36px</span></div><div class="ss-st"><div style="width:210px;background:var(--surface);border-radius:var(--radius-lg);padding:15px 16px">
+      <b style="font:500 13px/1.4 var(--font-body)">Delete this retro?</b>
+      <div class="ss-fill" style="height:8px;width:150px;margin:7px 0 12px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px"><span style="height:26px;padding:0 10px;display:inline-flex;align-items:center;border-radius:var(--radius-md);background:var(--surface-2);font:600 11px/1 var(--font-body)">Cancel</span><span style="height:26px;padding:0 10px;display:inline-flex;align-items:center;border-radius:var(--radius-md);background:var(--red-500);color:var(--text-inverse);font:600 11px/1 var(--font-body)">Delete</span></div>
+    </div><span class="ss-cap">Card confirm — max-w-sm 384 · deliberately flat · no X</span></div></div><div class="ss-sec">Spacing anatomy (panel)</div>
+        <div class="ss-pad" style="width:280px;border-radius:var(--radius-xl);padding:24px;box-shadow:var(--shadow-lg)">
+          <span style="position:absolute;top:6px;left:50%;transform:translateX(-50%)" class="ss-num">24</span>
+          <span style="position:absolute;left:7px;top:50%;transform:translateY(-50%)" class="ss-num">24</span>
+          <span style="position:absolute;right:7px;top:50%;transform:translateY(-50%)" class="ss-num">24</span>
+          <span style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%)" class="ss-num">24</span>
+          <div style="background:var(--surface);border-radius:4px;padding:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span class="ss-fill" style="width:88px;height:13px"></span><span class="ss-fill" style="width:18px;height:18px;border-radius:50%"></span></div>
+            <div class="ss-cap" style="margin:4px 0 0">title 18 (headline-sm) ↔ X 18px icon</div>
+            <div class="ss-fill" style="height:34px;margin-top:10px"></div>
+            <div class="ss-cap" style="margin:4px 0 0">title → content 20 · between blocks 16–20</div>
+          </div>
+        </div><div class="ss-sec">Specs</div><table class="ss-table"><tr><td>overlay</td><td><span class="ss-tok">overlay</span> rgba(30,24,18,.3) — warm brown, not pure black</td></tr><tr><td>panel</td><td><span class="ss-tok">surface</span> · radius-xl 12 · padding 24 · <span class="ss-tok">shadow-lg</span></td></tr><tr><td>size steps</td><td>form 448 (max-w-md) · content/share 512 (max-w-lg) · confirm 384 (max-w-sm)</td></tr><tr><td>title</td><td>18px / 700 <span class="ss-tok">type.headline-sm</span>; card confirm uses label-lg 15/500</td></tr><tr><td>close X</td><td>form: 18px icon, text-subtle→hover text, in the title row. Hero: 36px chip <span class="ss-tok">hero-scrim</span><span class="ss-tok">radius-lg</span>, right 16 / top 16. Confirm: no X</td></tr><tr><td>hero band</td><td>linear-gradient(180deg, <span class="ss-tok">accent-hover</span><span class="ss-tok">accent</span>) — the system's only sanctioned gradient</td></tr><tr><td>motion</td><td>160ms pop (transform/opacity); instant under reduced-motion</td></tr><tr><td>dismissal</td><td>backdrop + Esc (lib/useEscClose; inert while busy); closing never loses input</td></tr></table><div class="ss-sec">Rules</div><ul class="ss-rules"><li>One gold button per modal; destructive confirms use danger with no gold anywhere in the window.</li><li>Card confirm is deliberately flat — the constitutional exception; one sentence + two buttons max.</li><li>Flows longer than two steps get a page, not a modal. Forced flows may hide the X temporarily.</li></ul>

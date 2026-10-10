@@ -1,42 +1,37 @@
-<!-- @dsCard group="Patterns" height=330 subtitle="The AI report: quote, semantic pair, next steps" -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Hanken+Grotesk:wght@400..600&display=swap">
+<!-- @dsCard group="Patterns" height=739 subtitle="Figma-grade spec — the signature layout, layer by layer" -->
 <style>
-  body { margin: 0; padding: 24px; background: var(--surface); font-family: var(--font-body); color: var(--text); }
-  .quote { max-width: 560px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--border); font-size: 17px; font-weight: 500; line-height: 1.55; }
-  .qm { font-family: var(--font-display); font-size: 24px; line-height: 0; color: var(--accent); vertical-align: -0.28em; }
-  .pair { display: flex; flex-wrap: wrap; gap: 14px; max-width: 560px; }
-  .box { flex: 1 1 230px; border-radius: var(--radius-xl); padding: 14px 16px; }
-  .well { background: var(--green-weak); }
-  .improve { background: var(--red-weak); }
-  .box h3 { margin: 0 0 10px; font: 500 15px/1.4 var(--font-body); }
-  .box ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-  .box li { display: flex; gap: 9px; font-size: 14px; line-height: 1.5; }
-  .dot { flex: 0 0 8px; width: 8px; height: 8px; margin-top: 6px; border-radius: var(--radius-pill); background: var(--green-500); }
-  .tri { flex: 0 0 14px; margin-top: 2px; color: var(--red-500); }
-  .steps { max-width: 560px; margin-top: 16px; }
-  .steps h3 { margin: 0 0 8px; font: 500 15px/1.4 var(--font-body); }
-  .steps p { margin: 0 0 6px; font-size: 14px; line-height: 1.5; }
-  .arrow { color: var(--gold-700); font-weight: 600; margin-right: 6px; }
+  body { margin: 0; padding: 20px 24px 28px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
+  .ss-sec { font: 600 10.5px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle); margin: 26px 0 13px; display: flex; align-items: center; gap: 10px; }
+  .ss-sec:first-child { margin-top: 0; }
+  .ss-sec::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .ss-row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .ss-st { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+  .ss-cap { font: 500 10px/1.5 var(--font-mono); color: var(--text-subtle); max-width: 180px; }
+  .ss-num { font: 600 9.5px/1 var(--font-mono); color: var(--gold-700); }
+  .ss-pad { background: var(--accent-weak); position: relative; }
+  .ss-fill { background: var(--surface-3); border-radius: 3px; }
+  .ss-table { border-collapse: collapse; font-size: 12.5px; width: 100%; max-width: 640px; }
+  .ss-table td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  .ss-table td:first-child { font: 600 11px/1.7 var(--font-mono); color: var(--text-muted); width: 150px; white-space: nowrap; }
+  .ss-tok { display: inline-block; font: 600 10.5px/1 var(--font-mono); background: var(--accent-weak); color: var(--gold-700); padding: 3px 6px; border-radius: 4px; margin: 1px 3px 1px 0; }
+  .ss-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.75; max-width: 640px; }
+  .ss-rules code, .ss-table code { font: 600 11px var(--font-mono); background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
+  .ss-dark .ss-cap { color: var(--surface); opacity: .85; }
 </style>
-<p class="quote"><span class="qm">&ldquo;</span> The team ships fast and tests well, but staging outages and design drift keep stealing momentum. <span class="qm">&rdquo;</span></p>
-<div class="pair">
-  <div class="box well">
-    <h3>What's going well</h3>
-    <ul>
-      <li><span class="dot"></span><span>Pairing on refactors sped up work.</span></li>
-      <li><span class="dot"></span><span>User testing caught real issues early.</span></li>
-    </ul>
-  </div>
-  <div class="box improve">
-    <h3>What to improve</h3>
-    <ul>
-      <li><span class="tri"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4M12 17h.01"/></svg></span><span>Staging is frequently down.</span></li>
-      <li><span class="tri"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4M12 17h.01"/></svg></span><span>Design deviations are caught too late.</span></li>
-    </ul>
-  </div>
-</div>
-<div class="steps">
-  <h3>Concrete next steps</h3>
-  <p><span class="arrow">&rarr;</span>Add a staging health check to the standup.</p>
-  <p><span class="arrow">&rarr;</span>Review implemented UI against Figma weekly.</p>
-</div>
+<div class="ss-sec">Anatomy (with spacing)</div>
+        <div style="max-width:470px">
+          <p style="margin:0;padding-bottom:12px;border-bottom:1px solid var(--border);font:500 14px/1.5 var(--font-body)"><span style="font-family:var(--font-display);color:var(--accent);font-size:19px;vertical-align:-3px">“</span> Pairing pays off; requirement sync is still friction. <span style="font-family:var(--font-display);color:var(--accent);font-size:19px;vertical-align:-3px">”</span></p>
+          <div class="ss-cap" style="margin:3px 0 10px">quote body-lg 17/500 · border underline · ↕ 12+16</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="flex:1 1 180px;background:var(--green-weak);border-radius:var(--radius-xl);padding:14px 16px">
+              <b style="font:500 13px/1.4 var(--font-body)">What’s going well</b>
+              <div style="display:flex;gap:8px;margin-top:8px;font:400 12px/1.5 var(--font-body)"><span style="flex:0 0 8px;width:8px;height:8px;margin-top:5px;border-radius:var(--radius-pill);background:var(--green-500)"></span><span>Pairing sped up refactors.</span></div>
+            </div>
+            <div style="flex:1 1 180px;background:var(--red-weak);border-radius:var(--radius-xl);padding:14px 16px">
+              <b style="font:500 13px/1.4 var(--font-body)">What to improve</b>
+              <div style="display:flex;gap:8px;margin-top:8px;font:400 12px/1.5 var(--font-body)"><span style="color:var(--red-500);font-size:11px;line-height:1.4">▲</span><span>Staging is often down.</span></div>
+            </div>
+          </div>
+          <div class="ss-cap" style="margin:3px 0 10px">boxes green-weak/red-weak · radius-xl 12 · padding 14×16 · gap 12 · dot 8 / triangle 14</div>
+          <p style="margin:0;font:400 13px/1.6 var(--font-body)"><span style="color:var(--gold-700);font-weight:600">→</span> Add a staging health check to standup.</p>
+        </div><div class="ss-sec">Specs</div><table class="ss-table"><tr><td>quote</td><td>17px / 500 <span class="ss-tok">type.body-lg</span> · 24px display accent quote marks · underline <span class="ss-tok">border</span></td></tr><tr><td>boxes</td><td><span class="ss-tok">green-weak</span><span class="ss-tok">red-weak</span> · <span class="ss-tok">radius-xl</span> 12 · padding 14×16 · heading label-lg 15/500</td></tr><tr><td>bullets</td><td>8px green dot <span class="ss-tok">green-500</span>/ 14px warning triangle <span class="ss-tok">red-500</span> · gap 8–9 · <span class="ss-tok">type.body-md</span></td></tr><tr><td>next steps</td><td>gold arrow → <span class="ss-tok">gold-700</span> · gap 6</td></tr><tr><td>source tags</td><td>18px discs after a bullet; click scrolls + flashes accent-weak</td></tr></table><div class="ss-sec">Rules</div><ul class="ss-rules"><li>Green always = going well, red always = needs improvement — data model and palette share one vocabulary.</li><li>Tints are small-area only; further layering inside a box uses surface, never stacked alpha.</li></ul>

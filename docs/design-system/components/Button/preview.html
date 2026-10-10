@@ -1,32 +1,39 @@
-<!-- @dsCard group="Actions" height=150 subtitle="Primary · ghost · danger — press any to feel the dip" -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..800&display=swap">
+<!-- @dsCard group="Actions" height=1101 subtitle="Figma-grade spec — 4 variants × 5 states + spacing anatomy + spec table" -->
 <style>
-  body { margin: 0; padding: 24px; background: var(--bg); font-family: var(--font-body); }
-  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    height: 36px; padding: 0 16px; border: 0; cursor: pointer;
-    border-radius: var(--radius-md);
-    font: 600 14px/1 var(--font-body); letter-spacing: -0.01em;
-    transition: background-color .15s, transform .08s ease;
-  }
-  .btn:active { transform: scale(0.97); }
-  .primary { background: var(--accent); color: var(--text-inverse); }
-  .primary:hover { background: var(--accent-hover); }
-  .primary:active { background: var(--accent-press); }
-  .ghost { background: var(--surface-2); color: var(--text); }
-  .ghost:hover { background: var(--surface-3); }
-  .danger { background: var(--red-500); color: #ffffff; }
-  .danger:hover { filter: brightness(0.93); }
-  .btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
-  svg { width: 15px; height: 15px; }
+  body { margin: 0; padding: 20px 24px 28px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
+  .ss-sec { font: 600 10.5px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle); margin: 26px 0 13px; display: flex; align-items: center; gap: 10px; }
+  .ss-sec:first-child { margin-top: 0; }
+  .ss-sec::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .ss-row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .ss-st { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+  .ss-cap { font: 500 10px/1.5 var(--font-mono); color: var(--text-subtle); max-width: 180px; }
+  .ss-num { font: 600 9.5px/1 var(--font-mono); color: var(--gold-700); }
+  .ss-pad { background: var(--accent-weak); position: relative; }
+  .ss-fill { background: var(--surface-3); border-radius: 3px; }
+  .ss-table { border-collapse: collapse; font-size: 12.5px; width: 100%; max-width: 640px; }
+  .ss-table td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  .ss-table td:first-child { font: 600 11px/1.7 var(--font-mono); color: var(--text-muted); width: 150px; white-space: nowrap; }
+  .ss-tok { display: inline-block; font: 600 10.5px/1 var(--font-mono); background: var(--accent-weak); color: var(--gold-700); padding: 3px 6px; border-radius: 4px; margin: 1px 3px 1px 0; }
+  .ss-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.75; max-width: 640px; }
+  .ss-rules code, .ss-table code { font: 600 11px var(--font-mono); background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
+  .ss-dark .ss-cap { color: var(--surface); opacity: .85; }
 </style>
-<div class="row">
-  <button class="btn primary">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M3 12h2M19 12h2M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>
-    Generate AI report
-  </button>
-  <button class="btn ghost">Regenerate</button>
-  <button class="btn danger">Delete retro</button>
-  <button class="btn primary" disabled>Generating…</button>
-</div>
+<div class="ss-sec">States × variants</div><div class="ss-row"><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--accent);color:var(--accent-ink);">Create retro</span><span class="ss-cap">primary · default</span></div><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--accent-hover);color:var(--accent-ink);">Create retro</span><span class="ss-cap">hover — brightens to accent-hover</span></div><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--accent-press);color:var(--accent-ink);transform:scale(.97)">Create retro</span><span class="ss-cap">pressed — accent-press + scale(.97)</span></div><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--accent);color:var(--accent-ink);box-shadow:0 0 0 2px var(--focus-ring)">Create retro</span><span class="ss-cap">focus — focus-ring 2px</span></div><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--accent);color:var(--accent-ink);opacity:.45">Create retro</span><span class="ss-cap">disabled — 45% opacity, no hue shift</span></div></div><div style="height:14px"></div><div class="ss-row"><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--surface-2);color:var(--text);">Cancel</span><span class="ss-cap">ghost · default</span></div><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--surface-3);color:var(--text);">Cancel</span><span class="ss-cap">hover — deepens to surface-3</span></div><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:transparent;color:var(--gold-700);">✦ Summarize</span><span class="ss-cap">text · default — gold-700</span></div><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--accent-weak);color:var(--gold-700);">✦ Summarize</span><span class="ss-cap">text hover — accent-weak tint</span></div><div class="ss-st"><span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border-radius:var(--radius-md);font:600 14px/1 var(--font-body);letter-spacing:-0.01em;background:var(--red-500);color:var(--text-inverse);">Delete</span><span class="ss-cap">danger · default</span></div></div><div class="ss-sec">Spacing anatomy</div>
+    <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+      <div>
+        <div class="ss-pad" style="display:inline-flex;align-items:center;height:36px;border-radius:var(--radius-md);padding:0 16px">
+          <span style="position:absolute;left:3px;top:50%;transform:translateY(-50%)" class="ss-num">16</span>
+          <span class="ss-fill" style="width:15px;height:15px;border-radius:50%"></span>
+          <span class="ss-num" style="padding:0 3px">8</span>
+          <span class="ss-fill" style="width:92px;height:14px"></span>
+          <span style="position:absolute;right:3px;top:50%;transform:translateY(-50%)" class="ss-num">16</span>
+        </div>
+        <div class="ss-cap" style="margin-top:6px">h 36 · padding 0×16 (space-4) · icon 15 ↔ label gap 8 (space-2) · radius-md 7</div>
+      </div>
+      <div>
+        <div class="ss-pad" style="display:inline-flex;align-items:center;height:48px;border-radius:var(--radius-md);padding:0 24px">
+          <span class="ss-fill" style="width:110px;height:16px"></span>
+        </div>
+        <div class="ss-cap" style="margin-top:6px">Landing hero CTA exception: h 48 · padding 0×24 · 16px label (the only 16px)</div>
+      </div>
+    </div><div class="ss-sec">Specs</div><table class="ss-table"><tr><td>height</td><td>36px — 48px for the landing hero CTA</td></tr><tr><td>padding</td><td>0 × 16px <span class="ss-tok">space-4</span></td></tr><tr><td>radius</td><td>7px <span class="ss-tok">radius-md</span></td></tr><tr><td>label</td><td>14px / 600 / −0.01em <span class="ss-tok">type.button</span> (CTA exception: 16px)</td></tr><tr><td>icon</td><td>14–15px · gap 8px <span class="ss-tok">space-2</span></td></tr><tr><td>fills</td><td><span class="ss-tok">accent</span><span class="ss-tok">surface-2</span><span class="ss-tok">gold-700</span><span class="ss-tok">red-500</span> = primary / ghost / text / danger</td></tr><tr><td>hover</td><td><span class="ss-tok">accent-hover</span><span class="ss-tok">surface-3</span><span class="ss-tok">accent-weak</span> — gold always brightens, never darkens</td></tr><tr><td>pressed</td><td><span class="ss-tok">accent-press</span> + transform: scale(0.97)</td></tr><tr><td>disabled</td><td>45% opacity; hue unchanged</td></tr><tr><td>focus</td><td>2px box-shadow <span class="ss-tok">focus-ring</span></td></tr></table><div class="ss-sec">Rules</div><ul class="ss-rules"><li><strong>One gold button per view</strong> (a modal is its own view).</li><li>No outlined buttons — secondary actions are ghost; AI-generate actions use the text variant (sparkles icon + label).</li><li>Loading swaps the label; never a spinner inside the button.</li></ul>

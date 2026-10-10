@@ -1,23 +1,25 @@
-<!-- @dsCard group="Forms" height=140 subtitle="Click to toggle — gold means on" -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..600&display=swap">
+<!-- @dsCard group="Inputs" height=471 subtitle="Figma-grade spec — on/off/busy + track & knob geometry" -->
 <style>
-  body { margin: 0; padding: 24px; background: var(--surface); font-family: var(--font-body); color: var(--text); }
-  .rowset { max-width: 380px; }
-  .row { display: flex; align-items: center; justify-content: space-between; }
-  .row p { margin: 0; font-size: 15px; font-weight: 500; }
-  .hint { margin: 8px 0 0; font-size: 12px; color: var(--text-muted); }
-  .switch { position: relative; width: 44px; height: 24px; border: 0; cursor: pointer; border-radius: var(--radius-pill); background: var(--surface-3); transition: background .2s; }
-  .switch .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: var(--radius-pill); background: #ffffff; box-shadow: 0 1px 3px rgba(24,15,9,.25); transition: left .2s; }
-  .switch[aria-checked="true"] { background: var(--accent); }
-  .switch[aria-checked="true"] .knob { left: 22px; }
+  body { margin: 0; padding: 20px 24px 28px; background: var(--bg); font-family: var(--font-body); color: var(--text); }
+  .ss-sec { font: 600 10.5px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle); margin: 26px 0 13px; display: flex; align-items: center; gap: 10px; }
+  .ss-sec:first-child { margin-top: 0; }
+  .ss-sec::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .ss-row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .ss-st { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+  .ss-cap { font: 500 10px/1.5 var(--font-mono); color: var(--text-subtle); max-width: 180px; }
+  .ss-num { font: 600 9.5px/1 var(--font-mono); color: var(--gold-700); }
+  .ss-pad { background: var(--accent-weak); position: relative; }
+  .ss-fill { background: var(--surface-3); border-radius: 3px; }
+  .ss-table { border-collapse: collapse; font-size: 12.5px; width: 100%; max-width: 640px; }
+  .ss-table td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  .ss-table td:first-child { font: 600 11px/1.7 var(--font-mono); color: var(--text-muted); width: 150px; white-space: nowrap; }
+  .ss-tok { display: inline-block; font: 600 10.5px/1 var(--font-mono); background: var(--accent-weak); color: var(--gold-700); padding: 3px 6px; border-radius: 4px; margin: 1px 3px 1px 0; }
+  .ss-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.75; max-width: 640px; }
+  .ss-rules code, .ss-table code { font: 600 11px var(--font-mono); background: var(--surface-2); padding: 1px 4px; border-radius: 4px; }
+  .ss-dark .ss-cap { color: var(--surface); opacity: .85; }
 </style>
-<div class="rowset">
-  <div class="row">
-    <p>Discussion</p>
-    <button class="switch" role="switch" aria-checked="true" aria-label="Discussion"
-      onclick="this.setAttribute('aria-checked', this.getAttribute('aria-checked')==='true' ? 'false' : 'true')">
-      <span class="knob"></span>
-    </button>
-  </div>
-  <p class="hint">Participants can comment on each other's answers.</p>
-</div>
+<div class="ss-sec">States</div><div class="ss-row"><div class="ss-st"><span style="position:relative;display:inline-block;width:44px;height:24px;border-radius:var(--radius-pill);background:var(--surface-3);"><span style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:var(--radius-pill);background:var(--surface);box-shadow:0 1px 2px rgba(24,15,9,.18)"></span></span><span class="ss-cap">off — track surface-3</span></div><div class="ss-st"><span style="position:relative;display:inline-block;width:44px;height:24px;border-radius:var(--radius-pill);background:var(--accent);"><span style="position:absolute;top:2px;left:22px;width:20px;height:20px;border-radius:var(--radius-pill);background:var(--surface);box-shadow:0 1px 2px rgba(24,15,9,.18)"></span></span><span class="ss-cap">on — track accent (gold = active)</span></div><div class="ss-st"><span style="position:relative;display:inline-block;width:44px;height:24px;border-radius:var(--radius-pill);background:var(--accent);opacity:.45;"><span style="position:absolute;top:2px;left:22px;width:20px;height:20px;border-radius:var(--radius-pill);background:var(--surface);box-shadow:0 1px 2px rgba(24,15,9,.18)"></span></span><span class="ss-cap">disabled/busy — 45% opacity, locked during optimistic update</span></div></div><div class="ss-sec">Spacing anatomy</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="position:relative;display:inline-block;width:44px;height:24px;border-radius:var(--radius-pill);background:var(--accent);"><span style="position:absolute;top:2px;left:22px;width:20px;height:20px;border-radius:var(--radius-pill);background:var(--surface);box-shadow:0 1px 2px rgba(24,15,9,.18)"></span></span>
+          <span class="ss-cap">track 44×24 (w-11 h-6) · knob 20 (h-5) · inset 2 · travel 2→22 · radius-pill</span>
+        </div><div class="ss-sec">Specs</div><table class="ss-table"><tr><td>track</td><td>44 × 24px · <span class="ss-tok">radius-pill</span> · off <span class="ss-tok">surface-3</span> / on <span class="ss-tok">accent</span></td></tr><tr><td>knob</td><td>20px · <span class="ss-tok">surface</span> · micro shadow (recorded micro-debt: not on the token scale)</td></tr><tr><td>motion</td><td>~200ms transition; travel animates position only</td></tr><tr><td>behavior</td><td>optimistic: flip first, save after; revert + message on failure</td></tr></table>
