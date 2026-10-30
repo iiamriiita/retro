@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n/client";
 import useEscClose from "@/lib/useEscClose";
@@ -41,6 +41,14 @@ export default function AuthModal({
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [existsSwitch, setExistsSwitch] = useState(false);
+  // Supabase rate-limits OTP sends; surface it as a countdown on the button
+  // instead of a raw error. Ticks down once per second until re-enabled.
+  const [cooldown, setCooldown] = useState(0);
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(() => setCooldown((c) => c - 1), 1000);
+    return () => clearInterval(id);
+  }, [cooldown > 0]);
 
   function reset(toRegister = false) {
     setView(toRegister ? "otp" : "login");
@@ -112,13 +120,20 @@ export default function AuthModal({
       setStep("code");
       setInfo(t("am.codeSent"));
     } catch (err) {
-      setError(
-        otpMode === "reset"
-          ? t("am.sendFailReset")
-          : err instanceof Error
-            ? err.message
-            : t("am.sendFail"),
-      );
+      const msg = err instanceof Error ? err.message : "";
+      const limited = /only request this after (\d+) second/.exec(msg);
+      if (limited) {
+        // Rate-limited: no error text, just lock the button and count down.
+        setCooldown(parseInt(limited[1], 10));
+      } else {
+        setError(
+          otpMode === "reset"
+            ? t("am.sendFailReset")
+            : err instanceof Error
+              ? err.message
+              : t("am.sendFail"),
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -314,8 +329,16 @@ export default function AuthModal({
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                <button type="submit" className="btn-primary w-full" disabled={loading}>
-                  {loading ? t("am.sending") : t("am.sendCode")}
+                <button
+                  type="submit"
+                  className="btn-primary w-full"
+                  disabled={loading || cooldown > 0}
+                >
+                  {loading
+                    ? t("am.sending")
+                    : cooldown > 0
+                      ? t("am.resendIn", { s: cooldown })
+                      : t("am.sendCode")}
                 </button>
                 {existsSwitch && (
                   <button
