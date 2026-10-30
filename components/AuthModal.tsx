@@ -402,31 +402,23 @@ export default function AuthModal({
                 >
                   {loading ? t("am.verifying") : t("am.verify")}
                 </button>
-                <button
-                  type="button"
-                  className={`block text-xs ${
-                    cooldown > 0
-                      ? "cursor-not-allowed text-subtle"
-                      : "text-muted hover:text-ink"
-                  }`}
-                  disabled={loading || cooldown > 0}
-                  onClick={resendCode}
-                >
-                  {cooldown > 0
-                    ? t("am.resendIn", { s: cooldown })
-                    : t("am.resend")}
-                </button>
-                <button
-                  type="button"
-                  className="block text-xs text-muted hover:text-ink"
-                  onClick={() => {
-                    setStep("email");
-                    setCode("");
-                    setError(null);
-                  }}
-                >
-                  {t("am.changeEmail")}
-                </button>
+                <p className="text-center text-xs text-subtle">
+                  {t("am.noCode")}{" "}
+                  <button
+                    type="button"
+                    className={
+                      cooldown > 0
+                        ? "cursor-not-allowed text-subtle"
+                        : "font-semibold text-muted hover:text-ink"
+                    }
+                    disabled={loading || cooldown > 0}
+                    onClick={resendCode}
+                  >
+                    {cooldown > 0
+                      ? t("am.resendIn", { s: cooldown })
+                      : t("am.resend")}
+                  </button>
+                </p>
               </form>
             )}
 
