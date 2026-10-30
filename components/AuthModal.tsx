@@ -119,6 +119,7 @@ export default function AuthModal({
       if (error) throw error;
       setStep("code");
       setInfo(t("am.codeSent"));
+      setCooldown(60);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       const limited = /only request this after (\d+) second/.exec(msg);
@@ -134,6 +135,29 @@ export default function AuthModal({
               : t("am.sendFail"),
         );
       }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function resendCode() {
+    setLoading(true);
+    setError(null);
+    setInfo(null);
+    try {
+      const supabase = createBrowserSupabase();
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: { shouldCreateUser: otpMode === "register" },
+      });
+      if (error) throw error;
+      setInfo(t("am.codeSent"));
+      setCooldown(60);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      const limited = /only request this after (\d+) second/.exec(msg);
+      if (limited) setCooldown(parseInt(limited[1], 10));
+      else setError(t("am.sendFail"));
     } finally {
       setLoading(false);
     }
@@ -380,6 +404,20 @@ export default function AuthModal({
                 </button>
                 <button
                   type="button"
+                  className={`block text-xs ${
+                    cooldown > 0
+                      ? "cursor-not-allowed text-subtle"
+                      : "text-muted hover:text-ink"
+                  }`}
+                  disabled={loading || cooldown > 0}
+                  onClick={resendCode}
+                >
+                  {cooldown > 0
+                    ? t("am.resendIn", { s: cooldown })
+                    : t("am.resend")}
+                </button>
+                <button
+                  type="button"
                   className="block text-xs text-muted hover:text-ink"
                   onClick={() => {
                     setStep("email");
@@ -387,7 +425,7 @@ export default function AuthModal({
                     setError(null);
                   }}
                 >
-                  {t("am.resend")}
+                  {t("am.changeEmail")}
                 </button>
               </form>
             )}

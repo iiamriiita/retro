@@ -377,6 +377,7 @@ const en: Dict = {
   "am.verifying": "Verifying…",
   "am.verify": "Verify",
   "am.resend": "Resend",
+  "am.changeEmail": "Use a different email",
   "am.setPassword": "Set a password",
   "am.setPasswordHint":
     "Set a password (at least 6 characters); then log in with email + password.",
@@ -722,6 +723,7 @@ const zh: Dict = {
   "am.verifying": "驗證中…",
   "am.verify": "驗證",
   "am.resend": "重新寄送",
+  "am.changeEmail": "改用其他信箱",
   "am.setPassword": "設定密碼",
   "am.setPasswordHint": "設定一組密碼（至少 6 碼），之後就用 email + 密碼登入。",
   "am.setPasswordFail": "設定密碼失敗，請換一組再試（至少 6 碼）。",
