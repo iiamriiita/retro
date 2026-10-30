@@ -3,8 +3,15 @@ import { createServiceClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-// Returns whether an account already exists for the given email. Used by the
-// sign-up flow so we can tell people to log in instead of registering again.
+// Returns whether a COMPLETED account exists for the given email, so the
+// sign-up flow can tell people to log in instead of registering again.
+// Registration counts as complete only once a password has been set
+// (user_metadata.pw_set, stamped in AuthModal's savePassword step).
+// Half-finished accounts — OTP requested or even verified, but no password —
+// are treated as not registered, so re-running sign-up simply re-sends a
+// code and lets the person finish, instead of dead-ending at a password
+// login they never created. Legacy accounts without the stamp heal the same
+// way: OTP re-proves email ownership, then the password step adds the stamp.
 export async function POST(req: Request) {
   const { email } = (await req.json().catch(() => ({}))) as { email?: string };
   const target = (email ?? "").trim().toLowerCase();
@@ -19,7 +26,13 @@ export async function POST(req: Request) {
     });
     if (error) return NextResponse.json({ exists: false });
     const users = data?.users ?? [];
-    if (users.some((u) => (u.email ?? "").toLowerCase() === target))
+    if (
+      users.some(
+        (u) =>
+          (u.email ?? "").toLowerCase() === target &&
+          u.user_metadata?.pw_set === true,
+      )
+    )
       return NextResponse.json({ exists: true });
     if (users.length < perPage) break;
   }

@@ -151,8 +151,11 @@ export default function AuthModal({
     setError(null);
     try {
       const supabase = createBrowserSupabase();
+      // Setting the password completes registration — stamp the account so
+      // the sign-up exists-check only counts fully registered users.
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
+        data: { pw_set: true },
       });
       if (error) throw error;
       go();
